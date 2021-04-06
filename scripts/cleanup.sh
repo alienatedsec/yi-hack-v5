@@ -1,9 +1,10 @@
 #!/bin/bash
 
 #
-#  This file is part of yi-hack-v5 (https://github.com/TheCrypt0/yi-hack-v5).
+#  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
 #  Copyright (c) 2019 densanki.
 #  Copyright (c) 2019 Davide Maggioni.
+#  Copyright (c) 2021 alienatedsec
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -31,7 +32,7 @@ require_root
 
 echo ""
 echo "------------------------------------------------------------------------"
-echo " YI-HACK-V4 - CLEANUP"
+echo " YI-HACK-V5 - CLEANUP"
 echo "------------------------------------------------------------------------"
 echo ""
 
