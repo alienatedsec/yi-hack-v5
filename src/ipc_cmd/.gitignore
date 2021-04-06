@@ -1,5 +1,5 @@
 # Ignore the install dir
 _install/
-src/ipc_cmd/ipc_cmd/ipc_cmd
-src/ipc_cmd/ipc_cmd/ipc_cmd.o
+ipc_cmd/ipc_cmd
+ipc_cmd/ipc_cmd.o
 
