@@ -1,0 +1,31 @@
+[Unit]
+Description=ONVIF Device(IP camera) Service server
+After=syslog.target
+After=network-online.target
+
+
+
+[Service]
+Type=forking
+WorkingDirectory=/home/xxx/bin
+PIDFile=/tmp/onvif_srvd.pid
+ExecStart=/home/xxx/bin/onvif_srvd \
+	--pid_file /tmp/onvif_srvd.pid \
+	--ifs eth0 \
+	--scope onvif://www.onvif.org/name/TestDev \
+	--scope onvif://www.onvif.org/location/Unknow \
+	--scope onvif://www.onvif.org/Profile/Streaming \
+	--scope onvif://www.onvif.org/Profile/S \
+	--name RTSP --width 1200 --height 720 --url rtsp://%%s:554/unicast --type JPEG
+
+TimeoutSec=4
+
+
+
+Restart=always
+RestartSec=2
+StartLimitBurst=0
+
+
+[Install]
+WantedBy=multi-user.target

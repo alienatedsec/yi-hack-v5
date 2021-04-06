@@ -1,0 +1,72 @@
+# /etc/profile: system-wide .profile file for the Bourne shells
+#
+#
+ulimit -s 1024
+set_path_before()
+{
+	[ -d $1 ] && PATH="$1:$PATH"
+}
+
+PATH="/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin:/home/yi-hack-v5/sbin"
+LD_LIBRARY_PATH="/usr/local/lib:/home/hisiko/hisilib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd:/tmp/sd/yi-hack-v5:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib"
+
+set_path_before /usr/local/sbin
+set_path_before /usr/local/bin
+
+export PATH
+export LD_LIBRARY_PATH
+
+# ANSI COLORS
+CRE="
+[K"
+NORMAL="[0;39m"
+RED="[1;31m"
+GREEN="[1;32m"
+YELLOW="[1;33m"
+BLUE="[1;34m"
+MAGENTA="[1;35m"
+CYAN="[1;36m"
+WHITE="[1;37m"
+
+umask 022
+
+alias crontab="crontab -c /tmp/sd/yi-hack-v5/etc/crontabs"
+
+HACK_VERSION=$(cat /tmp/sd/yi-hack-v5/version)
+NEW_VERSION=$(cat /tmp/.hacknewver 2>/dev/null)
+
+###############################################################################
+
+echo ""
+echo "      _     _           _           ___ "
+echo "  _ _|_|___| |_ ___ ___| |_ ___ _ _| | |"
+echo " | | | |___|   | .'|  _| '_|___| | |_  |"
+echo " |_  |_|   |_|_|__,|___|_,_|    \_/  |_|"
+echo " |___|"
+echo " -----------------------------------------------------"
+echo "  yi-hack-v5 - $HACK_VERSION"
+echo " -----------------------------------------------------"
+
+if [[ -z $NEW_VERSION ]] ; then
+    echo " WARNING: Cannot check for updates from GitHub."
+    echo ""
+    echo " The camera might not be connected to the internet"
+    echo " or, if it has just been turned on, the updater"
+    echo " hasn't contacted the server yet."
+    echo " -----------------------------------------------------"
+else
+    if [[ $NEW_VERSION == "yes" ]] ; then
+        echo " UPDATE: A new version is available."
+        echo ""
+        echo " You can download it from GitHub:"
+        echo " > https://github.com/alienatedsec/yi-hack-v5/releases"
+        echo " -----------------------------------------------------"
+    elif [[ $NEW_VERSION == "no_currentversionisbeta" ]] ; then
+        echo " WARNING: You are using an early-access version."
+        echo " -----------------------------------------------------"
+    fi
+fi
+
+echo ""
+
+#echo "${NORMAL}"

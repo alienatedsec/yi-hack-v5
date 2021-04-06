@@ -1,0 +1,31 @@
+#!/bin/bash
+
+export CROSSPATH=/opt/arm-hisiv300-linux/bin
+export PATH=${PATH}:${CROSSPATH}
+
+export TARGET=arm-hisiv300-linux-uclibcgnueabi
+export CROSS=arm-hisiv300-linux-uclibcgnueabi
+export BUILD=x86_64-pc-linux-gnu
+
+export CROSSPREFIX=${CROSS}-
+
+export STRIP=${CROSSPREFIX}strip
+export CXX=${CROSSPREFIX}g++
+export CC=${CROSSPREFIX}gcc
+export LD=${CROSSPREFIX}ld
+export AS=${CROSSPREFIX}as
+export AR=${CROSSPREFIX}ar
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+cd mqtt-config
+
+make clean
+make
+
+mkdir -p ../_install/bin
+
+cp ./mqtt-config ../_install/bin
+
+${STRIP} ../_install/bin/*

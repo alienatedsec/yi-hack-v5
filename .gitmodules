@@ -1,0 +1,30 @@
+[submodule "src/dropbear/dropbear"]
+	path = src/dropbear/dropbear
+	url = https://github.com/mkj/dropbear.git
+[submodule "src/uClibc/uClibc"]
+	path = src/uClibc/uClibc
+	url = https://github.com/kraj/uClibc.git
+[submodule "src/busybox/busybox"]
+	path = src/busybox/busybox
+	url = https://github.com/mirror/busybox.git
+[submodule "src/proxychains-ng/proxychains-ng"]
+	path = src/proxychains-ng/proxychains-ng
+	url = https://github.com/rofl0r/proxychains-ng.git
+[submodule "src/ftpd/pure-ftpd"]
+	path = src/ftpd/pure-ftpd
+	url = https://github.com/jedisct1/pure-ftpd.git
+[submodule "src/uClibc++/uClibc++"]
+	path = src/uClibc++/uClibc++
+	url = https://git.busybox.net/uClibc++
+[submodule "src/mosquitto/mosquitto"]
+	path = src/mosquitto/mosquitto
+	url = https://github.com/eclipse/mosquitto.git
+[submodule "src/wsdd/wsdd"]
+	path = src/wsdd/wsdd
+	url = https://github.com/KoynovStas/wsdd.git
+[submodule "src/libfuse/libfuse"]
+	path = src/libfuse/libfuse
+	url = https://github.com/libfuse/libfuse.git
+[submodule "src/mqtt/mqttv4"]
+	path = src/mqtt/mqttv4
+	url = https://github.com/roleoroleo/mqttv4.git

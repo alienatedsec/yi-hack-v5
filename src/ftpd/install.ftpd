@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+# Compress the file
+#upx ./_install/sbin/pure-ftpd
+
+mkdir -p ../../build/home/yi-hack-v5/sbin/
+
+rsync -a ./_install/sbin/pure-ftpd ../../build/home/yi-hack-v5/sbin/
+

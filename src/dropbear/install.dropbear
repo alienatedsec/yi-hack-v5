@@ -1,0 +1,23 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+# Compress the file
+# upx ./_install/*
+
+mkdir -p ../../build/home/yi-hack-v5/bin/
+mkdir -p ../../build/home/yi-hack-v5/sbin/
+mkdir -p ../../build/home/yi-hack-v5/usr/bin/
+
+arm-hisiv300-linux-uclibcgnueabi-strip ./_install/dropbearmulti
+rsync -a ./_install/dropbearmulti ../../build/home/yi-hack-v5/bin/
+
+# Copy binary with different names: fat32 doesn't support symbolic links - thanks Roleo
+cp -f ../../build/home/yi-hack-v5/bin/dropbearmulti ../../build/home/yi-hack-v5/bin/dbclient
+cp -f ../../build/home/yi-hack-v5/bin/dropbearmulti ../../build/home/yi-hack-v5/bin/dropbearconvert
+cp -f ../../build/home/yi-hack-v5/bin/dropbearmulti ../../build/home/yi-hack-v5/bin/dropbearkey
+cp -f ../../build/home/yi-hack-v5/bin/dropbearmulti ../../build/home/yi-hack-v5/bin/scp
+cp -f ../../build/home/yi-hack-v5/bin/dbclient ../../build/home/yi-hack-v5/bin/ssh
+
+cp -f ../../build/home/yi-hack-v5/bin/dropbearmulti ../../build/home/yi-hack-v5/sbin/dropbear

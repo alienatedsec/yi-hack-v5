@@ -1,0 +1,50 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+mkdir -p ../../build/home/yi-hack-v5/lib/
+
+
+#rsync -a ./_install/lib/libcrypt* ../../build/home/yi-hack-v5/lib/
+#rsync -a ./_install/lib/libnsl* ../../build/home/yi-hack-v5/lib/
+#rsync -a ./_install/lib/libutil* ../../build/home/yi-hack-v5/lib/
+#rsync -a ./_install/lib/libutil* ../../build/home/yi-hack-v5/lib/
+
+mkdir -p ../../build/rootfs/lib/
+
+# Copying all files 
+rsync -a ./_install/lib/* ../../build/home/yi-hack-v5/lib/
+
+#rsync -a ./_install/lib/libuClibc* ../../build/home/yi-hack-v5/lib/
+#rsync -a ./_install/lib/libc.so.0 ../../build/home/yi-hack-v5/lib/
+#rsync -a ./_install/lib/ld-uClibc* ../../build/home/yi-hack-v5/lib/
+#rsync -a ./_install/lib/libm* ../../build/home/yi-hack-v5/lib/
+
+# Deleting all symlinks from the folder
+find ../../build/home/yi-hack-v5/lib -type l -delete
+
+# Copying files due to symlink issues
+cp -f ../../build/home/yi-hack-v5/lib/ld-uClibc-0.9.33.2.so ../../build/home/yi-hack-v5/lib/ld-uClibc.so.0 
+cp -f ../../build/home/yi-hack-v5/lib/libcrypt-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libcrypt.so.0
+cp -f ../../build/home/yi-hack-v5/lib/libuClibc-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libc.so.0
+cp -f ../../build/home/yi-hack-v5/lib/libdl-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libdl.so.0 
+cp -f ../../build/home/yi-hack-v5/lib/libm-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libm.so.0
+cp -f ../../build/home/yi-hack-v5/lib/libnsl-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libnsl.so.0 
+cp -f ../../build/home/yi-hack-v5/lib/libpthread-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libpthread.so.0
+cp -f ../../build/home/yi-hack-v5/lib/libresolv-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libresolv.so.0
+cp -f ../../build/home/yi-hack-v5/lib/librt-0.9.33.2.so ../../build/home/yi-hack-v5/lib/librt.so.0
+cp -f ../../build/home/yi-hack-v5/lib/libthread_db-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libthread_db.so.1 
+cp -f ../../build/home/yi-hack-v5/lib/libutil-0.9.33.2.so ../../build/home/yi-hack-v5/lib/libutil.so.0
+
+# kept for just in case
+rsync -a ./_install/lib/libuClibc* ../../build/rootfs/lib/
+rsync -a ./_install/lib/libc.so.0 ../../build/rootfs/lib/
+rsync -a ./_install/lib/ld-uClibc* ../../build/rootfs/lib/
+rsync -a ./_install/lib/libm* ../../build/rootfs/lib/
+
+ln -fs /tmp/sd/yi-hack-v5/lib/libutil-0.9.33.2.so ../../build/rootfs/lib/libutil-0.9.33.2.so
+ln -fs libutil-0.9.33.2.so ../../build/rootfs/lib/libutil.so.0
+
+ln -fs /tmp/sd/yi-hack-v5/lib/libcrypt-0.9.33.2.so ../../build/rootfs/lib/libcrypt-0.9.33.2.so
+ln -fs libcrypt-0.9.33.2.so ../../build/rootfs/lib/libcrypt.so.0

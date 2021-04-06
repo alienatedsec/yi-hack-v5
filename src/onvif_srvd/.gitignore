@@ -1,0 +1,18 @@
+# Ignore the install dir
+_install/
+onvif_srvd/.depend
+onvif_srvd/SDK/
+onvif_srvd/generated/
+onvif_srvd/gsoap-2.8/
+onvif_srvd/lib/
+onvif_srvd/onvif_srvd
+onvif_srvd/openssl
+onvif_srvd/openssl-1.0.2u/
+onvif_srvd/src/ServiceContext.o
+onvif_srvd/src/ServiceDevice.o
+onvif_srvd/src/ServiceMedia.o
+onvif_srvd/src/ServicePTZ.o
+onvif_srvd/src/daemon.o
+onvif_srvd/src/eth_dev_param.o
+onvif_srvd/src/onvif_srvd.o
+

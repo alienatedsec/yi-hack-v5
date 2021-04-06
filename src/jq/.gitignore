@@ -1,0 +1,4 @@
+# Ignore the install dir
+_install/
+jq-1.6/
+jq-*.tar.gz

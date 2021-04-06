@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+rm -rf ./_install
+
+cd wsdd || exit 1
+git reset --hard || exit 1
+
+cd ..
+
+patch -p0 < lock_error.patch
+patch -p0 < ip_mreqn.patch
+
+cp Makefile.wsdd wsdd/Makefile

@@ -1,0 +1,7 @@
+# Ignore the install dir
+_install/
+h264grabber/h264grabber
+h264grabber/h264grabber.o
+
+
+

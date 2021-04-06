@@ -1,0 +1,9 @@
+# Ignore the install dir
+_install/
+mqtt-config/config.o
+mqtt-config/lib/
+mqtt-config/mqtt-config
+mqtt-config/mqtt-config.o
+mqtt-config/validate.o
+
+
