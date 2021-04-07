@@ -1,5 +1,5 @@
 #!/bin/sh
-YI_HACK_PREFIX="/home/yi-hack-v5"
+YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 
 sedencode(){
 #  echo -e "$(sed 's/\\/\\\\\\/g;s/\&/\\\&/g;s/\//\\\//g;')"
