@@ -1,25 +1,25 @@
 #!/bin/sh
 
 if [ -f "/tmp/sd/yi-hack-v5.7z" ] || [ -d "/tmp/sd/yi-hack-v5" ]; then
-    YI_HACK_V4_PREFIX="/tmp/sd"
+    YI_HACK_V5_PREFIX="/tmp/sd"
     YI_PREFIX="/home/app"
     UDHCPC_SCRIPT_DEST="/home/app/script/default.script"
 elif [ -d "/usr/yi-hack-v5" ]; then
-    YI_HACK_V4_PREFIX="/usr"
+    YI_HACK_V5_PREFIX="/usr"
     YI_PREFIX="/home"
     UDHCPC_SCRIPT_DEST="/home/default.script"
 elif [ -d "/home/yi-hack-v5" ]; then
-    YI_HACK_V4_PREFIX="/home"
+    YI_HACK_V5_PREFIX="/home"
     YI_PREFIX="/home/app"
     UDHCPC_SCRIPT_DEST="/home/app/script/default.script"
 fi
 
-ARCHIVE_FILE="$YI_HACK_V4_PREFIX/yi-hack-v5.7z"
-DESTDIR="$YI_HACK_V4_PREFIX/yi-hack-v5"
+ARCHIVE_FILE="$YI_HACK_V5_PREFIX/yi-hack-v5.7z"
+DESTDIR="$YI_HACK_V5_PREFIX/yi-hack-v5"
 
 DHCP_SCRIPT_DEST="/home/app/script/wifidhcp.sh"
-UDHCP_SCRIPT="$YI_HACK_V4_PREFIX/yi-hack-v5/script/default.script"
-DHCP_SCRIPT="$YI_HACK_V4_PREFIX/yi-hack-v5/script/wifidhcp.sh"
+UDHCP_SCRIPT="$YI_HACK_V5_PREFIX/yi-hack-v5/script/default.script"
+DHCP_SCRIPT="$YI_HACK_V5_PREFIX/yi-hack-v5/script/wifidhcp.sh"
 
 files=`find $YI_PREFIX -maxdepth 1 -name "*.7z"`
 if [ ${#files[@]} -gt 0 ]; then
@@ -34,7 +34,7 @@ fi
 
 if [ ! -f $YI_PREFIX/cloudAPI_real ]; then
 	mv $YI_PREFIX/cloudAPI $YI_PREFIX/cloudAPI_real
-	cp $YI_HACK_V4_PREFIX/yi-hack-v5/script/cloudAPI $YI_PREFIX/
+	cp $YI_HACK_V5_PREFIX/yi-hack-v5/script/cloudAPI $YI_PREFIX/
         rm $UDHCPC_SCRIPT_DEST
         cp $UDHCP_SCRIPT $UDHCPC_SCRIPT_DEST
 	if [ -f $DHCP_SCRIPT_DEST ]; then
@@ -43,8 +43,8 @@ if [ ! -f $YI_PREFIX/cloudAPI_real ]; then
 	fi
 fi
 
-mkdir -p $YI_HACK_V4_PREFIX/yi-hack-v5/etc/crontabs
-mkdir -p $YI_HACK_V4_PREFIX/yi-hack-v5/etc/dropbear
+mkdir -p $YI_HACK_V5_PREFIX/yi-hack-v5/etc/crontabs
+mkdir -p $YI_HACK_V5_PREFIX/yi-hack-v5/etc/dropbear
 
 # Comment out all the cloud stuff from base/init.sh
 sed -i '/^\.\/watch_process/s/^/#/' /home/app/init.sh
