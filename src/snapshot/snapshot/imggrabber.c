@@ -47,8 +47,8 @@
 
 #define FF_INPUT_BUFFER_PADDING_SIZE 32
 
-#define PATH_RES_HIGH "/home/yi-hack/etc/wm_res/high/wm_540p_"
-#define PATH_RES_LOW  "/home/yi-hack/etc/wm_res/low/wm_540p_"
+#define PATH_RES_HIGH "/tmp/sd/yi-hack-v5/etc/wm_res/high/wm_540p_"
+#define PATH_RES_LOW  "/tmp/sd/yi-hack-v5/etc/wm_res/low/wm_540p_"
 
 // yi_home
 #define TABLE_HIGH_OFFSET_YI_HOME 0x10
