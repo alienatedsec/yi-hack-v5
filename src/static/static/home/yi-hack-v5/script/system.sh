@@ -183,6 +183,14 @@ RRTSP_PWD=$PASSWORD
 # some non-working functions to be added later
 
 if [[ $(get_config RTSP) == "yes" ]] ; then
+
+    if [[ $MODEL_SUFFIX == "yi_dome" ]] || [[ $MODEL_SUFFIX == "yi_home" ]] ; then
+        HIGHWIDTH="1280"
+        HIGHHEIGHT="720"
+    else
+        HIGHWIDTH="1920"
+        HIGHHEIGHT="1080"
+    fi
         rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT &
     if [[ $(get_config RTSP_STREAM) == "low" ]]; then
         h264grabber -r low -m $MODEL_SUFFIX -f &
@@ -190,7 +198,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
     fi
     if [[ $(get_config RTSP_STREAM) == "high" ]]; then
         h264grabber -r high -m $MODEL_SUFFIX -f &
-        ONVIF_PROFILE_0="--name Profile_0 --width 1920 --height 1080 --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
+        ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
     fi
     if [[ $(get_config RTSP_STREAM) == "both" ]]; then
          h264grabber -r low -m $MODEL_SUFFIX -f &
@@ -199,7 +207,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
             ONVIF_PROFILE_1="--name Profile_1 --width 640 --height 360 --url rtsp://%s$D_RTSP_PORT/ch0_1.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=low$WATERMARK --type H264"
         fi
         if [[ $(get_config ONVIF_PROFILE) == "high" ]] || [[ $(get_config ONVIF_PROFILE) == "both" ]] ; then
-            ONVIF_PROFILE_0="--name Profile_0 --width 1920 --height 1080 --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
+            ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
         fi
     fi
 #Seems to be killing the resource
@@ -217,9 +225,9 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
     fi
 
     if [[ $MODEL_SUFFIX == "yi_dome" ]] || [[ $MODEL_SUFFIX == "yi_dome_1080p" ]] ; then
-        onvif_srvd --pid_file /var/run/onvif_srvd.pid --model "Yi Hack" --manufacturer "Yi" --firmware_ver "$YI_HACK_VER" --hardware_id $HW_ID --serial_num $SERIAL_NUMBER --ifs $ONVIF_NETIF --port $ONVIF_PORT --scope onvif://www.onvif.org/Profile/S $ONVIF_PROFILE_0 $ONVIF_PROFILE_1 $ONVIF_USERPWD --ptz --move_left "/tmp/sd/yi-hack-v5/bin/ipc_cmd -M left" --move_right "/tmp/sd/yi-hack-v5/bin/ipc_cmd -M right" --move_up "/tmp/sd/yi-hack-v5/bin/ipc_cmd -M up" --move_down "/tmp/sd/yi-hack-v5/bin/ipc_cmd -M down" --move_stop "/tmp/sd/yi-hack-v5/bin/ipc_cmd -M stop" --move_preset "/tmp/sd/yi-hack-v5/bin/ipc_cmd -p %t"
+        onvif_srvd --pid_file /var/run/onvif_srvd.pid --model "$MODEL_SUFFIX" --manufacturer "Yi" --firmware_ver "$YI_HACK_VER" --hardware_id $HW_ID --serial_num $SERIAL_NUMBER --ifs $ONVIF_NETIF --port $ONVIF_PORT --scope onvif://www.onvif.org/Profile/S $ONVIF_PROFILE_0 $ONVIF_PROFILE_1 $ONVIF_USERPWD --ptz --move_left "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m left" --move_right "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m right" --move_up "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m up" --move_down "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m down" --move_stop "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m stop" --move_preset "/tmp/sd/yi-hack-v5/bin/ipc_cmd -p %t"
     else
-        onvif_srvd --pid_file /var/run/onvif_srvd.pid --model "Yi Hack" --manufacturer "Yi" --firmware_ver "$YI_HACK_VER" --hardware_id $HW_ID --serial_num $SERIAL_NUMBER --ifs $ONVIF_NETIF --port $ONVIF_PORT --scope onvif://www.onvif.org/Profile/S $ONVIF_PROFILE_0 $ONVIF_PROFILE_1 $ONVIF_USERPWD
+        onvif_srvd --pid_file /var/run/onvif_srvd.pid --model "$MODEL_SUFFIX" --manufacturer "Yi" --firmware_ver "$YI_HACK_VER" --hardware_id $HW_ID --serial_num $SERIAL_NUMBER --ifs $ONVIF_NETIF --port $ONVIF_PORT --scope onvif://www.onvif.org/Profile/S $ONVIF_PROFILE_0 $ONVIF_PROFILE_1 $ONVIF_USERPWD
     fi
     if [[ $(get_config ONVIF_WSDD) == "yes" ]] ; then
         wsdd --pid_file /var/run/wsdd.pid --if_name $ONVIF_NETIF --type tdn:NetworkVideoTransmitter --xaddr http://%s$D_ONVIF_PORT --scope "onvif://www.onvif.org/name/Unknown onvif://www.onvif.org/Profile/Streaming"

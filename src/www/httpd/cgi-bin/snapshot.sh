@@ -10,6 +10,7 @@ validateFile()
     esac
 }
 
+MODEL_SUFFIX=$(cat /home/app/.camver)
 BASE64="no"
 RES="-r high"
 WATERMARK="no"
@@ -51,9 +52,9 @@ fi
 
 if [ "$REDIRECT" == "yes" ] ; then
     if [ "$BASE64" == "no" ] ; then
-        imggrabber $RES $WATERMARK > /tmp/sd/record/$OUTPUT_FILE
+        imggrabber -m $MODEL_SUFFIX $RES $WATERMARK > /tmp/sd/record/$OUTPUT_FILE
     elif [ "$BASE64" == "yes" ] ; then
-        imggrabber $RES $WATERMARK | base64 > /tmp/sd/record/$OUTPUT_FILE
+        imggrabber -m $MODEL_SUFFIX $RES $WATERMARK | base64 > /tmp/sd/record/$OUTPUT_FILE
     fi
     printf "Content-type: application/json\r\n\r\n"
     printf "{\n"
@@ -62,9 +63,9 @@ if [ "$REDIRECT" == "yes" ] ; then
 else
     if [ "$BASE64" == "no" ] ; then
         printf "Content-type: image/jpeg\r\n\r\n"
-        imggrabber $RES $WATERMARK
+        imggrabber -m $MODEL_SUFFIX $RES $WATERMARK
     elif [ "$BASE64" == "yes" ] ; then
         printf "Content-type: image/jpeg;base64\r\n\r\n"
-        imggrabber $RES $WATERMARK | base64
+        imggrabber -m $MODEL_SUFFIX $RES $WATERMARK | base64
     fi
 fi
