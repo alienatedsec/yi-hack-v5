@@ -224,7 +224,7 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
         ONVIF_NETIF="eth0"
     fi
 
-    if [[ $MODEL_SUFFIX == "yi_dome" ]] || [[ $MODEL_SUFFIX == "yi_dome_1080p" ]] ; then
+    if [[ $MODEL_SUFFIX == "yi_dome" ]] || [[ $MODEL_SUFFIX == "yi_dome_1080p" ]] || [[ $MODEL_SUFFIX == "yi_cloud_dome_1080p" ]] ; then
         onvif_srvd --pid_file /var/run/onvif_srvd.pid --model "$MODEL_SUFFIX" --manufacturer "Yi" --firmware_ver "$YI_HACK_VER" --hardware_id $HW_ID --serial_num $SERIAL_NUMBER --ifs $ONVIF_NETIF --port $ONVIF_PORT --scope onvif://www.onvif.org/Profile/S $ONVIF_PROFILE_0 $ONVIF_PROFILE_1 $ONVIF_USERPWD --ptz --move_left "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m left" --move_right "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m right" --move_up "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m up" --move_down "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m down" --move_stop "/tmp/sd/yi-hack-v5/bin/ipc_cmd -m stop" --move_preset "/tmp/sd/yi-hack-v5/bin/ipc_cmd -p %t"
     else
         onvif_srvd --pid_file /var/run/onvif_srvd.pid --model "$MODEL_SUFFIX" --manufacturer "Yi" --firmware_ver "$YI_HACK_VER" --hardware_id $HW_ID --serial_num $SERIAL_NUMBER --ifs $ONVIF_NETIF --port $ONVIF_PORT --scope onvif://www.onvif.org/Profile/S $ONVIF_PROFILE_0 $ONVIF_PROFILE_1 $ONVIF_USERPWD

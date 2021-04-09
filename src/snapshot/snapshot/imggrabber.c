@@ -101,22 +101,22 @@
 #define W_HIGH_YI_DOME_1080P 1920
 #define H_HIGH_YI_DOME_1080P 1080
 
-// yi_cloud_1080p
-#define TABLE_HIGH_OFFSET_YI_CLOUD_1080P 0x10
-#define TABLE_LOW_OFFSET_YI_CLOUD_1080P 0x25A0
-#define TABLE_RECORD_SIZE_YI_CLOUD_1080P 32
-#define TABLE_RECORD_NUM_YI_CLOUD_1080P 300
-#define BUF_SIZE_YI_CLOUD_1080P 1586752
-#define STREAM_HIGH_OFFSET_YI_CLOUD_1080P 0x9640
-#define STREAM_LOW_OFFSET_YI_CLOUD_1080P 0x109640
-#define FRAME_COUNTER_OFFSET_YI_CLOUD_1080P 18
-#define FRAME_OFFSET_OFFSET_YI_CLOUD_1080P 4
-#define FRAME_LENGTH_OFFSET_YI_CLOUD_1080P 8
-#define FRAME_TYPE_OFFSET_YI_CLOUD_1080P 16
-#define W_LOW_YI_CLOUD_1080P 640
-#define H_LOW_YI_CLOUD_1080P 360
-#define W_HIGH_YI_CLOUD_1080P 1920
-#define H_HIGH_YI_CLOUD_1080P 1080
+// yi_cloud_dome_1080p
+#define TABLE_HIGH_OFFSET_YI_CLOUD_DOME_1080P 0x10
+#define TABLE_LOW_OFFSET_YI_CLOUD_DOME_1080P 0x25A0
+#define TABLE_RECORD_SIZE_YI_CLOUD_DOME_1080P 32
+#define TABLE_RECORD_NUM_YI_CLOUD_DOME_1080P 300
+#define BUF_SIZE_YI_CLOUD_DOME_1080P 1586752
+#define STREAM_HIGH_OFFSET_YI_CLOUD_DOME_1080P 0x9640
+#define STREAM_LOW_OFFSET_YI_CLOUD_DOME_1080P 0x109640
+#define FRAME_COUNTER_OFFSET_YI_CLOUD_DOME_1080P 18
+#define FRAME_OFFSET_OFFSET_YI_CLOUD_DOME_1080P 4
+#define FRAME_LENGTH_OFFSET_YI_CLOUD_DOME_1080P 8
+#define FRAME_TYPE_OFFSET_YI_CLOUD_DOME_1080P 16
+#define W_LOW_YI_CLOUD_DOME_1080P 640
+#define H_LOW_YI_CLOUD_DOME_1080P 360
+#define W_HIGH_YI_CLOUD_DOME_1080P 1920
+#define H_HIGH_YI_CLOUD_DOME_1080P 1080
 
 // yi_dome
 #define TABLE_HIGH_OFFSET_YI_DOME 0x10
@@ -482,22 +482,22 @@ int main(int argc, char **argv) {
                 h_low = H_LOW_YI_DOME_1080P;
                 w_high = W_HIGH_YI_DOME_1080P;
                 h_high = H_HIGH_YI_DOME_1080P;
-            } else if (strcasecmp("yi_cloud_1080p", optarg) == 0) {
-                table_high_offset = TABLE_HIGH_OFFSET_YI_CLOUD_1080P;
-                table_low_offset = TABLE_LOW_OFFSET_YI_CLOUD_1080P;
-                table_record_size = TABLE_RECORD_SIZE_YI_CLOUD_1080P;
-                table_record_num = TABLE_RECORD_NUM_YI_CLOUD_1080P;
-                buf_size = BUF_SIZE_YI_CLOUD_1080P;
-                stream_high_offset = STREAM_HIGH_OFFSET_YI_CLOUD_1080P;
-                stream_low_offset = STREAM_LOW_OFFSET_YI_CLOUD_1080P;
-                frame_counter_offset = FRAME_COUNTER_OFFSET_YI_CLOUD_1080P;
-                frame_offset_offset = FRAME_OFFSET_OFFSET_YI_CLOUD_1080P;
-                frame_length_offset = FRAME_LENGTH_OFFSET_YI_CLOUD_1080P;
-                frame_type_offset = FRAME_TYPE_OFFSET_YI_CLOUD_1080P;
-                w_low = W_LOW_YI_CLOUD_1080P;
-                h_low = H_LOW_YI_CLOUD_1080P;
-                w_high = W_HIGH_YI_CLOUD_1080P;
-                h_high = H_HIGH_YI_CLOUD_1080P;
+            } else if (strcasecmp("yi_cloud_dome_1080p", optarg) == 0) {
+                table_high_offset = TABLE_HIGH_OFFSET_YI_CLOUD_DOME_1080P;
+                table_low_offset = TABLE_LOW_OFFSET_YI_CLOUD_DOME_1080P;
+                table_record_size = TABLE_RECORD_SIZE_YI_CLOUD_DOME_1080P;
+                table_record_num = TABLE_RECORD_NUM_YI_CLOUD_DOME_1080P;
+                buf_size = BUF_SIZE_YI_CLOUD_DOME_1080P;
+                stream_high_offset = STREAM_HIGH_OFFSET_YI_CLOUD_DOME_1080P;
+                stream_low_offset = STREAM_LOW_OFFSET_YI_CLOUD_DOME_1080P;
+                frame_counter_offset = FRAME_COUNTER_OFFSET_YI_CLOUD_DOME_1080P;
+                frame_offset_offset = FRAME_OFFSET_OFFSET_YI_CLOUD_DOME_1080P;
+                frame_length_offset = FRAME_LENGTH_OFFSET_YI_CLOUD_DOME_1080P;
+                frame_type_offset = FRAME_TYPE_OFFSET_YI_CLOUD_DOME_1080P;
+                w_low = W_LOW_YI_CLOUD_DOME_1080P;
+                h_low = H_LOW_YI_CLOUD_DOME_1080P;
+                w_high = W_HIGH_YI_CLOUD_DOME_1080P;
+                h_high = H_HIGH_YI_CLOUD_DOME_1080P;
             } else if (strcasecmp("yi_dome", optarg) == 0) {
                 table_high_offset = TABLE_HIGH_OFFSET_YI_DOME;
                 table_low_offset = TABLE_LOW_OFFSET_YI_DOME;
