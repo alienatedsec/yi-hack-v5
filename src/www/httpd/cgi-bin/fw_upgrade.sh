@@ -1,6 +1,6 @@
 #!/bin/sh
 
-YI_HACK_PREFIX="/tmp/sd/yi-hack"
+YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/qigan/lib:/home/app/locallib:/tmp/sd:/tmp/sd/gdb:/tmp/sd/yi-hack-v5/lib
@@ -49,7 +49,7 @@ elif [ "$VAL" == "upgrade" ] ; then
     mkdir -p /tmp/sd/.fw_upgrade.conf
     cd /tmp/sd/.fw_upgrade
 
-    MODEL_SUFFIX=`cat $YI_HACK_PREFIX/model_suffix`
+    MODEL_SUFFIX=`cat /home/app/.camver`
     FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
     if [ -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ]; then
         mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/.fw_upgrade/${MODEL_SUFFIX}_x.x.x.tgz
