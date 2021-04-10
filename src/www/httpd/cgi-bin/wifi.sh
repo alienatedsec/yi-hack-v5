@@ -1,6 +1,6 @@
 #!/bin/sh
 
-YI_HACK_PREFIX="/tmp/sd/yi-hack"
+YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 ACTION="none"
 
 removedoublequotes(){
