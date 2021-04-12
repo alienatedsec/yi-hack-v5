@@ -149,8 +149,8 @@
 #define FRAME_TYPE_OFFSET_YI_OUTDOOR 16
 #define W_LOW_YI_OUTDOOR 640
 #define H_LOW_YI_OUTDOOR 360
-#define W_HIGH_YI_OUTDOOR 1280
-#define H_HIGH_YI_OUTDOOR 720
+#define W_HIGH_YI_OUTDOOR 1920
+#define H_HIGH_YI_OUTDOOR 1080
 
 #define MILLIS_10 10000
 
@@ -321,7 +321,7 @@ void print_usage(char *prog_name)
     fprintf(stderr, "\t-r, --res RES                    Set resolution: \"low\" or \"high\" (default \"high\")\n");
     fprintf(stderr, "\t    --width WIDTH                Set width in pixel (alternative to res)\n");
     fprintf(stderr, "\t    --height HIGHT               Set height in pixel (alternative to res)\n");
-    fprintf(stderr, "\t-r, --model MODEL                Select cam model: yi_home, yi_home_1080, yi_dome_1080, yi_cloud_1080, yi_dome or yi_outdoor\n");
+    fprintf(stderr, "\t-r, --model MODEL                Select cam model: yi_home, yi_home_1080, yi_dome_1080, yi_cloud_dome_1080, yi_dome or yi_outdoor\n");
     fprintf(stderr, "\t    --table_offset VAL           Set the offset of the table for the resolution selected\n");
     fprintf(stderr, "\t    --table_record_size VAL      Set the size of the record in the table\n");
     fprintf(stderr, "\t    --table_record_num VAL       Set the number of record in the table\n");
