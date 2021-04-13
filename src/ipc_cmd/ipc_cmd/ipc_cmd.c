@@ -21,6 +21,7 @@
 
 #include "ipc_cmd.h"
 #include "getopt.h"
+#include "signal.h"
 
 mqd_t ipc_mq;
 
@@ -55,7 +56,7 @@ void ipc_stop()
 
 void print_usage(char *progname)
 {
-    fprintf(stderr, "\nUsage: %s [t ON/OFF] [-s SENS] [-l LED] [-v WHEN] [-i IR] [-r ROTATE] [-m MOVE] [-p NUM] [-d]\n\n", progname);
+    fprintf(stderr, "\nUsage: %s [t ON/OFF] [-s SENS] [-l LED] [-v WHEN] [-i IR] [-r ROTATE] [-a AIHUMANDETECTION] [-m MOVE] [-p NUM] [-f FILE] [-S] [-T] [-d]\n\n", progname);
     fprintf(stderr, "\t-t ON/OFF, --switch ON/OFF\n");
     fprintf(stderr, "\t\tswitch ON or OFF the cam\n");
     fprintf(stderr, "\t-s SENS, --sensitivity SENS\n");
@@ -68,17 +69,28 @@ void print_usage(char *progname)
     fprintf(stderr, "\t\tset ir led: ON or OFF\n");
     fprintf(stderr, "\t-r ROTATE, --rotate ROTATE\n");
     fprintf(stderr, "\t\tset rotate: ON or OFF\n");
+    fprintf(stderr, "\t-a AIHUMANDETECTION, --aihumandetection AIHUMANDETECTION\n");
+    fprintf(stderr, "\t\tset AI Human Detection: ON or OFF\n");
+    fprintf(stderr, "\t-b SOUNDDETECTION, --sounddetection SOUNDDETECTION\n");
+    fprintf(stderr, "\t\tset Sound Detection: ON or OFF\n");
+//    fprintf(stderr, "\t-b BABYCRYING, --babycrying BABYCRYING\n");
+//    fprintf(stderr, "\t\tset baby crying detection: ON or OFF\n");
     fprintf(stderr, "\t-m MOVE, --move MOVE\n");
     fprintf(stderr, "\t\tsend PTZ command: RIGHT, LEFT, DOWN, UP or STOP\n");
     fprintf(stderr, "\t-p NUM, --preset NUM\n");
     fprintf(stderr, "\t\tsend PTZ go to preset command: NUM = [0..7]\n");
     fprintf(stderr, "\t-f FILE, --file FILE\n");
     fprintf(stderr, "\t\tread binary command from FILE\n");
-    fprintf(stderr, "\t-x,     --xxx\n");
+    fprintf(stderr, "\t-x, --xxx\n");
     fprintf(stderr, "\t\tsend xxx message\n");
-    fprintf(stderr, "\t-d,     --debug\n");
+    fprintf(stderr, "\t-S TIME, --start_motion TIME\n");
+    fprintf(stderr, "\t\tstart a motion detection event that lasts TIME\n");
+    fprintf(stderr, "\t\t(0<TIME<=300 seconds)\n");
+    fprintf(stderr, "\t-T, --stop_motion\n");
+    fprintf(stderr, "\t\tstop a motion detection event\n");
+    fprintf(stderr, "\t-d, --debug\n");
     fprintf(stderr, "\t\tenable debug\n");
-    fprintf(stderr, "\t-h,     --help\n");
+    fprintf(stderr, "\t-h, --help\n");
     fprintf(stderr, "\t\tprint this help\n");
 }
 
@@ -93,10 +105,17 @@ int main(int argc, char ** argv)
     int save = NONE;
     int ir = NONE;
     int rotate = NONE;
+    int aihumandetection = NONE;
+    int sounddetection = NONE;
+    int soundsensitivity = NONE;
+//    int babycrying = NONE;
     int move = NONE;
     int preset = NONE;
     int debug = 0;
     unsigned char preset_msg[20];
+    int start = 0;
+    int stop = 0;
+    int time_to_stop = 60;
     char file[1024];
     unsigned char msg_file[1024];
     FILE *fIn;
@@ -114,9 +133,15 @@ int main(int argc, char ** argv)
             {"save",  required_argument, 0, 'v'},
             {"ir",  required_argument, 0, 'i'},
             {"rotate",  required_argument, 0, 'r'},
+            {"aihumandetection",  required_argument, 0, 'a'},
+            {"sounddetection",  required_argument, 0, 'b'},
+            {"soundsensitivity",  required_argument, 0, 'n'},
             {"move",  required_argument, 0, 'm'},
+            {"move-reverse",  required_argument, 0, 'M'},
             {"preset",  required_argument, 0, 'p'},
             {"file", required_argument, 0, 'f'},
+            {"start", required_argument, 0, 'S'},
+            {"stop", no_argument, 0, 'T'},
             {"xxx", no_argument, 0, 'x'},
             {"debug",  no_argument, 0, 'd'},
             {"help",  no_argument, 0, 'h'},
@@ -125,7 +150,7 @@ int main(int argc, char ** argv)
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "t:s:l:v:i:r:m:p:f:xdh",
+        c = getopt_long (argc, argv, "t:s:l:v:i:r:a:b:n:m:M:p:f:S:Txdh",
                          long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -183,6 +208,36 @@ int main(int argc, char ** argv)
             }
             break;
 
+        case 'a':
+            if (strcasecmp("off", optarg) == 0) {
+                aihumandetection = AI_HUMAN_DETECTION_OFF;
+            } else if (strcasecmp("on", optarg) == 0) {
+                aihumandetection = AI_HUMAN_DETECTION_ON;
+            }
+            break;
+
+        case 'b':
+            if (strcasecmp("off", optarg) == 0) {
+                sounddetection = SOUND_DETECTION_OFF;
+            } else if (strcasecmp("on", optarg) == 0) {
+                sounddetection = SOUND_DETECTION_ON;
+            }
+            break;
+
+        case 'n':
+            if (strcasecmp("50", optarg) == 0) {
+                soundsensitivity = SOUND_SENS_50;
+            } else if (strcasecmp("60", optarg) == 0) {
+                soundsensitivity = SOUND_SENS_60;
+            } else if (strcasecmp("70", optarg) == 0) {
+                soundsensitivity = SOUND_SENS_70;
+            } else if (strcasecmp("80", optarg) == 0) {
+                soundsensitivity = SOUND_SENS_80;
+            } else if (strcasecmp("90", optarg) == 0) {
+                soundsensitivity = SOUND_SENS_90;
+            }
+            break;
+
         case 'm':
             if (strcasecmp("right", optarg) == 0) {
                 move = MOVE_RIGHT;
@@ -192,6 +247,20 @@ int main(int argc, char ** argv)
                 move = MOVE_DOWN;
             } else if (strcasecmp("up", optarg) == 0) {
                 move = MOVE_UP;
+            } else if (strcasecmp("stop", optarg) == 0) {
+                move = MOVE_STOP;
+            }
+            break;
+
+        case 'M':
+            if (strcasecmp("right", optarg) == 0) {
+                move = MOVE_LEFT;
+            } else if (strcasecmp("left", optarg) == 0) {
+                move = MOVE_RIGHT;
+            } else if (strcasecmp("down", optarg) == 0) {
+                move = MOVE_UP;
+            } else if (strcasecmp("up", optarg) == 0) {
+                move = MOVE_DOWN;
             } else if (strcasecmp("stop", optarg) == 0) {
                 move = MOVE_STOP;
             }
@@ -220,6 +289,30 @@ int main(int argc, char ** argv)
                 print_usage(argv[0]);
                 exit(EXIT_FAILURE);
             }
+            break;
+
+        case 'S':
+            errno = 0;    /* To distinguish success/failure after call */
+            time_to_stop = strtol(optarg, &endptr, 10);
+
+            /* Check for various possible errors */
+            if ((errno == ERANGE && (time_to_stop == LONG_MAX || time_to_stop == LONG_MIN)) || (errno != 0 && time_to_stop == 0)) {
+                print_usage(argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            if ((time_to_stop <= 0) || (time_to_stop > 300)) {
+                print_usage(argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            if (endptr == optarg) {
+                print_usage(argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            start = 1;
+            break;
+
+        case 'T':
+            stop = 1;
             break;
 
         case 'd':
@@ -294,6 +387,30 @@ int main(int argc, char ** argv)
         mq_send(ipc_mq, IPC_ROTATE_ON, sizeof(IPC_ROTATE_ON) - 1, 0);
     }
 
+    if (aihumandetection == AI_HUMAN_DETECTION_OFF) {
+        mq_send(ipc_mq, IPC_AI_HUMAN_DETECTION_OFF, sizeof(IPC_AI_HUMAN_DETECTION_OFF) - 1, 0);
+    } else if (aihumandetection == AI_HUMAN_DETECTION_ON) {
+        mq_send(ipc_mq, IPC_AI_HUMAN_DETECTION_ON, sizeof(IPC_AI_HUMAN_DETECTION_ON) - 1, 0);
+    }
+
+    if (sounddetection == SOUND_DETECTION_OFF) {
+        mq_send(ipc_mq, IPC_SOUND_DETECTION_OFF, sizeof(IPC_SOUND_DETECTION_OFF) - 1, 0);
+    } else if (sounddetection == SOUND_DETECTION_ON) {
+        mq_send(ipc_mq, IPC_SOUND_DETECTION_ON, sizeof(IPC_SOUND_DETECTION_ON) - 1, 0);
+    }
+
+    if (soundsensitivity == SOUND_SENS_50) {
+        mq_send(ipc_mq, IPC_SOUND_SENS_50, sizeof(IPC_SOUND_SENS_50) - 1, 0);
+    } else if (soundsensitivity == SOUND_SENS_60) {
+        mq_send(ipc_mq, IPC_SOUND_SENS_60, sizeof(IPC_SOUND_SENS_60) - 1, 0);
+    } else if (soundsensitivity == SOUND_SENS_70) {
+        mq_send(ipc_mq, IPC_SOUND_SENS_70, sizeof(IPC_SOUND_SENS_70) - 1, 0);
+    } else if (soundsensitivity == SOUND_SENS_80) {
+        mq_send(ipc_mq, IPC_SOUND_SENS_80, sizeof(IPC_SOUND_SENS_80) - 1, 0);
+    } else if (soundsensitivity == SOUND_SENS_90) {
+        mq_send(ipc_mq, IPC_SOUND_SENS_90, sizeof(IPC_SOUND_SENS_90) - 1, 0);
+    }
+
     if (move == MOVE_RIGHT) {
         mq_send(ipc_mq, IPC_MOVE_RIGHT, sizeof(IPC_MOVE_RIGHT) - 1, 0);
     } else if (move == MOVE_LEFT) {
@@ -330,6 +447,52 @@ int main(int argc, char ** argv)
         }
         fclose(fIn);
         mq_send(ipc_mq, msg_file, nread, 0);
+    }
+
+    if (start == 1) {
+        mq_send(ipc_mq, IPC_MOTION_START, sizeof(IPC_MOTION_START) - 1, 0);
+
+        pid_t pid;
+
+        /* Fork off the parent process */
+        pid = fork();
+        /* An error occurred */
+        if (pid < 0)
+            exit(EXIT_FAILURE);
+         /* Success: Let the parent terminate */
+        if (pid > 0)
+            exit(EXIT_SUCCESS);
+        /* On success: The child process becomes session leader */
+        if (setsid() < 0)
+            exit(EXIT_FAILURE);
+        /* Catch, ignore and handle signals */
+        signal(SIGCHLD, SIG_IGN);
+        signal(SIGHUP, SIG_IGN);
+        /* Fork off for the second time*/
+        pid = fork();
+        /* An error occurred */
+        if (pid < 0)
+            exit(EXIT_FAILURE);
+        /* Success: Let the parent terminate */
+        if (pid > 0)
+            exit(EXIT_SUCCESS);
+        /* Set new file permissions */
+        umask(0);
+        /* Change the working directory to the root directory */
+        /* or another appropriated directory */
+        chdir("/");
+        /* Close all open file descriptors */
+//        int x;
+//        for (x = sysconf(_SC_OPEN_MAX); x>=0; x--) {
+//            close (x);
+//        }
+
+        sleep(time_to_stop);
+        mq_send(ipc_mq, IPC_MOTION_STOP, sizeof(IPC_MOTION_STOP) - 1, 0);
+    }
+
+    if (stop == 1) {
+        mq_send(ipc_mq, IPC_MOTION_STOP, sizeof(IPC_MOTION_STOP) - 1, 0);
     }
 
     if (xxx == 1) {
