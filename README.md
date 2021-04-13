@@ -2,7 +2,7 @@
 	<img height="200" src="https://raw.githubusercontent.com/alienatedsec/yi-hack-v5/master/imgs/yi-hack-v5-header.png">
 </p>
 <p align="center">
-	<a target="_blank" href="https://discord.gg/vSSHkfrN">
+	<a target="_blank" href="https://discord.gg/bsKncwvRU7">
         	<img src="https://img.shields.io/discord/825822449449828414?logo=discord" alt="Official Discord Server">
 	</a>
 	<a target="_blank" href="https://github.com/alienatedsec/yi-hack-v5/releases">
