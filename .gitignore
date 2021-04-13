@@ -30,5 +30,10 @@ src/snapshot/snapshot/ffmpeg-4.3.2/
 src/snapshot/snapshot/jpeg-9d/
 scripts/packfiles.sh
 .file.swp
+src/ipc_cmd/ipc_cmd/ipc_multiplexer
+src/ipc_cmd/ipc_cmd/ipc_multiplexer.o
+src/ipc_cmd/ipc_cmd/ipc_read
+src/ipc_cmd/ipc_cmd/ipc_read.o
+
 
 

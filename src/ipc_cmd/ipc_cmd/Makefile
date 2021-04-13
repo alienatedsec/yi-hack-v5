@@ -1,7 +1,7 @@
 OBJECTS_C = ipc_cmd.o
 OBJECTS_R = ipc_read.o
 OBJECTS_M = ipc_multiplexer.o
-#LIBS = -lpthread -lrt
+LIBS = -lpthread -lrt
 
 all: ipc_cmd ipc_read ipc_multiplexer
 
