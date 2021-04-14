@@ -2,7 +2,7 @@
 	<img height="200" src="https://raw.githubusercontent.com/alienatedsec/yi-hack-v5/master/imgs/yi-hack-v5-header.png">
 </p>
 <p align="center">
-	<a target="_blank" href="https://discord.gg/vSSHkfrN">
+	<a target="_blank" href="https://discord.gg/bsKncwvRU7">
         	<img src="https://img.shields.io/discord/825822449449828414?logo=discord" alt="Official Discord Server">
 	</a>
 	<a target="_blank" href="https://github.com/alienatedsec/yi-hack-v5/releases">
@@ -14,6 +14,8 @@
 
 The answer is simple: missing updates, RTSP and not based on the latest stock firmware (which features improvements and new cool stuff).
 Besides, there were no updates to Yi-Hack-V4, and I am really against that RTSP licensing model. I have contributed enough and will continue my work separately.
+
+I am slowly releasing beta versions, and I can see lots of downloads, testing and contributions. A big thank you to the community.
 
 ## Table of Contents
 
@@ -33,7 +35,7 @@ This firmware will add the following features:
   - **MQTT** - detect motion directly from your home server!
   - WebServer - user-friendly stats and configurations.
   - SSH server -  _Enabled by default._
-  - Telnet server -  _Enabled by default._
+  - Telnet server -  _Disabled by default._
   - FTP server -  _Enabled by default._
   - Web server -  _Enabled by default._
   - The possibility to change some camera settings (copied from the official app):
@@ -44,7 +46,7 @@ This firmware will add the following features:
     - ir led
     - rotate
   - PTZ support through a web page.
-  - Snapshot feature (not tested or even intergated in the web configuration)
+  - Snapshot feature
   - Proxychains-ng - _Disabled by default. Useful if the camera is region locked._
   - The possibility to disable all the cloud features while keeping the RTSP stream.
 
@@ -52,12 +54,12 @@ This firmware will add the following features:
 
 Currently this project supports the following cameras:
 
-- Yi 1080p Home 48US - confirmed with minor issues / still testing
+- Yi 1080p Home 48US - confirmed
 - Yi Home 17CN / 27US / 47US - confirmed
-- Yi Dome - confirmed
-- Yi 1080p Dome - not confirmed / I have no device to test
-- Yi 1080p Cloud Dome - not confirmed / I have no device to test
-- Yi 1080p Outdoor - not confirmed / I have no device to test
+- Yi Dome - confirmed, but heavy performance issues with Snapshot and ONVIF is killing the CPU
+- Yi 1080p Dome - confirmed; however, I have no device to test
+- Yi 1080p Cloud Dome - confirmed; however, I have no device to test
+- Yi 1080p Outdoor - confirmed; however, I have no device to test
 
 ## Getting Started
 1. Check that you have a correct Xiaomi Yi camera. (see the section above)
@@ -65,6 +67,7 @@ Currently this project supports the following cameras:
 2. Get an microSD card, preferably of capacity 16gb or less and format it by selecting File System as FAT32.
 
 **_IMPORTANT: The microSD card must be formatted in FAT32. exFAT formatted microSD cards will not work._**
+**I have not formatted any of my 32GB cards in order to load the firmware. Just copy files directly and it should work.**
 
 <details><summary>How to format microSD cards > 32GB as FAT32 in Windows 10</summary><p>
 
@@ -105,7 +108,7 @@ You should now have a FAT32 partition on your microSD card that will allow the c
 | **Yi 1080p Cloud Dome** | rootfs_y19 | home_y19 | Firmware files required for the Yi 1080p Cloud Dome camera. |
 | **Yi Outdoor** | rootfs_h30 | home_h30 | Firmware files required for the Yi Outdoor camera. |
 
-4. Save both files on root path of microSD card.
+4. Save both files and the folder on root path of microSD card.
 
 **_IMPORTANT: Make sure that the filename stored on microSD card are correct and didn't get changed. e.g. The firmware filenames for the Yi 1080p Dome camera must be home_h20 and rootfs_h20._**
 
@@ -134,7 +137,7 @@ _TO DO - (It happened a few times and it's often possible to recover from it)_
 
 ## Acknowledgments
 Special thanks to the following people and projects, without them `yi-hack-v5` wouldn't be possible.
-- @TheCrypt0 - [https://github.com/TheCrypt0/yi-hack-v4](https://github.com/TheCrypt0/yi-hack-v5)
+- @TheCrypt0 - [https://github.com/TheCrypt0/yi-hack-v4](https://github.com/TheCrypt0/yi-hack-v4)
 - @shadow-1 - [https://github.com/shadow-1/yi-hack-v3](https://github.com/shadow-1/yi-hack-v3)
 - @fritz-smh - [https://github.com/fritz-smh/yi-hack](https://github.com/fritz-smh/yi-hack)
 - @niclet  - [https://github.com/niclet/yi-hack-v2](https://github.com/niclet/yi-hack-v2)
@@ -150,3 +153,8 @@ As much as TheCrypt0 has made it possible for the 'yi-hack-v4', the latest featu
 ---
 ### DISCLAIMER
 **I AM NOT RESPONSIBLE FOR ANY USE OR DAMAGE THIS SOFTWARE MAY CAUSE. THIS IS INTENDED FOR EDUCATIONAL PURPOSES ONLY. USE AT YOUR OWN RISK.**
+---
+### DONATIONS
+**I HAVE BEEN ASKED FOR A LINK MULTIPLE TIMES; THEREFORE, PLEASE FOLLOW THE BELOW**
+---
+[![paypal](https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=K3V4PSH2CV9AA)
