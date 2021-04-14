@@ -1,7 +1,7 @@
 #!/bin/sh
 
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
-PATH=$PATH:$YI_HACK_PREFIX/bin:$YI_HACK_PREFIX/usr/bin
+PATH=$PATH:$YI_HACK_PREFIX/bin:$YI_HACK_PREFIX/usr/bin:/bin:/usr/bin
 CONF_MQTT_ADVERTISE_FILE="etc/mqtt_advertise.conf"
 
 get_mqtt_advertise_config() {

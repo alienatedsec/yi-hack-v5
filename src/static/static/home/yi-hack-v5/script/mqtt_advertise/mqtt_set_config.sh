@@ -7,8 +7,8 @@ CONF_FILE="etc/camera.conf"
 CONF_MQTT_ADVERTISE_FILE="etc/mqtt_advertise.conf"
 MQTT_FILE="etc/mqttv4.conf"
 
-PATH=$PATH:$YI_HACK_PREFIX/bin:$YI_HACK_PREFIX/usr/bin
-LD_LIBRARY_PATH=$YI_HACK_PREFIX/lib:$LD_LIBRARY_PATH
+PATH=$PATH:$YI_HACK_PREFIX/bin:$YI_HACK_PREFIX/usr/bin:/bin:/usr/bin
+LD_LIBRARY_PATH=$YI_HACK_PREFIX/lib:/lib:$LD_LIBRARY_PATH
 
 get_config() {
     key=^$1

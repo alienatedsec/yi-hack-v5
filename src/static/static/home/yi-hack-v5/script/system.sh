@@ -2,7 +2,12 @@
 
 CONF_FILE="etc/system.conf"
 
-YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
+if [ -d "/tmp/sd/yi-hack-v5" ]; then
+        YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
+elif [ -d "/home/yi-hack-v5" ]; then
+        YI_HACK_PREFIX="/home/yi-hack-v5"
+fi
+
 YI_HACK_UPGRADE_PATH="/tmp/sd/.fw_upgrade"
 
 YI_HACK_VER=$(cat /tmp/sd/yi-hack-v5/version)
@@ -250,7 +255,8 @@ fi
 if [ "$FREE_SPACE" != "0" ]; then
     echo "0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE" >> /var/spool/cron/crontabs/root
 fi
-$YI_HACK_PREFIX/usr/sbin/crond -c /var/spool/cron/crontabs/
+
+/usr/sbin/crond -c /var/spool/cron/crontabs/
 
 # Add MQTT Advertise
 if [ -f "$YI_HACK_PREFIX/script/mqtt_advertise/startup.sh" ]; then
