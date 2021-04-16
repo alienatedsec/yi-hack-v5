@@ -10,6 +10,18 @@ validateFile()
     esac
 }
 
+YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
+CONF_FILE="$YI_HACK_PREFIX/etc/camera.conf"
+
+if grep -q SWITCH_ON=no "$CONF_FILE"; then
+    printf "Status: 503 Service Unavailable\r\n"
+    printf "Content-type: application/json\r\n\r\n"
+    printf "{\n"
+    printf "\"%s\":\"%s\"\\n" "error" "true"
+    printf "}"
+    exit 0
+fi
+
 MODEL_SUFFIX=$(cat /home/app/.camver)
 BASE64="no"
 RES="-r high"
