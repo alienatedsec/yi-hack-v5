@@ -4,6 +4,22 @@ APP.ptz = (function ($) {
 
     function init() {
         registerEventHandler();
+        snapshotTimer();
+    }
+
+    function snapshotTimer() {
+        interval = 1000;
+        lastUpdate = Date.now();
+        function updateImage() {
+            jQuery.get('cgi-bin/snapshot.sh?res=low&base64=yes', function(data) {
+                image = document.getElementById('imgSnap');
+                image.src = 'data:image/png;base64,' + data;
+                this_interval = Math.max(interval - (Date.now() - lastUpdate), 0);
+                lastUpdate = Date.now();
+                setTimeout(updateImage, this_interval);
+            })
+        }
+        setTimeout(updateImage);
     }
 
     function registerEventHandler() {
