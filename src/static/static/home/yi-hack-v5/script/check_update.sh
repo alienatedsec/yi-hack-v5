@@ -13,7 +13,8 @@ get_config()
 MAX_RETRY=10
 N_RETRY=0
 
-REMOTE_VERSION_URL=https://raw.githubusercontent.com/alienatedsec/yi-hack-v5/master/VERSION
+REMOTE_RELEASE_URL=https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest
+REMOTE_RELEASE_FILE=/tmp/.hackremoterel
 REMOTE_VERSION_FILE=/tmp/.hackremotever
 REMOTE_NEWVERSION_FILE=/tmp/.hacknewver
 
@@ -22,9 +23,9 @@ LOCAL_VERSION_FILE=/tmp/sd/yi-hack-v5/version
 if [[ $(get_config CHECK_UPDATES) == "yes" ]] ; then
     while : ; do
         # Get the latest version number from github
-        wget -T 10 -O $REMOTE_VERSION_FILE $REMOTE_VERSION_URL --no-check-certificate &> /dev/null
+        wget -T 10 -O $REMOTE_RELEASE_FILE $REMOTE_RELEASE_URL --no-check-certificate &> /dev/null
 
-        if [ ! -f $REMOTE_VERSION_FILE ]; then
+        if [ ! -f $REMOTE_RELEASE_FILE ]; then
             # The remote version number hasn't been downloaded yet (timeout)
             # The camera might be connecting to the wifi
             # Keep checking every 5 seconds and increment retry number
@@ -32,10 +33,12 @@ if [[ $(get_config CHECK_UPDATES) == "yes" ]] ; then
             ((N_RETRY++))
         fi
         
-        [ ! -f $REMOTE_VERSION_FILE ] && [ $N_RETRY -le $MAX_RETRY ] || break
+        [ ! -f $REMOTE_RELEASE_FILE ] && [ $N_RETRY -le $MAX_RETRY ] || break
     done
     
-    if [ -f $REMOTE_VERSION_FILE ] ; then
+    if [ -f $REMOTE_RELEASE_FILE ] ; then
+        jq -r .tag_name < $REMOTE_RELEASE_FILE > $REMOTE_VERSION_FILE
+        rm $REMOTE_RELEASE_FILE
         V_LOCAL=$(cat $LOCAL_VERSION_FILE | cut -d'_' -f1)
         V_REMOTE=$(cat $REMOTE_VERSION_FILE | cut -d'_' -f1)
         
