@@ -46,9 +46,10 @@ for ROW in $ROWS; do
             hostname $VALUE
             echo "$VALUE" > $YI_HACK_PREFIX/etc/hostname
         fi
-    elif [ "$KEY" == "TIMEZONE" ] ; then
-        echo $VALUE > $YI_HACK_PREFIX/etc/TZ
     else
+        if [ "$KEY" == "TIMEZONE" ] ; then
+            echo $VALUE > $YI_HACK_PREFIX/etc/TZ
+        fi
         VALUE=$(echo "$VALUE" | sedencode)
         sed -i "s/^\(${KEY}\s*=\s*\).*$/\1${VALUE}/" $CONF_FILE
     fi
