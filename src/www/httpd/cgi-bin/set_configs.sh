@@ -51,7 +51,7 @@ for ROW in $ROWS; do
             echo $VALUE > $YI_HACK_PREFIX/etc/TZ
         fi
         VALUE=$(echo "$VALUE" | sedencode)
-        sed -i "s/^\(${KEY}\s*=\s*\).*$/\1${VALUE}/" $CONF_FILE
+        sed -i "s/^\(${KEY}[[:blank:]]*=[[:blank:]]*\).*$/\1${VALUE}/" $CONF_FILE
     fi
     
 done
