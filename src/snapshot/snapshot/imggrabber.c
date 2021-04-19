@@ -152,6 +152,7 @@
 #define W_HIGH_YI_OUTDOOR 1920
 #define H_HIGH_YI_OUTDOOR 1080
 
+#define TIMEOUT_INTERVAL 5
 #define MILLIS_10 10000
 
 #define RESOLUTION_NONE 0
@@ -372,6 +373,8 @@ int main(int argc, char **argv) {
 
     unsigned char *bufferh264, *bufferyuv;
     int bufferh264_size;
+
+    time_t start_time, current_time;
 
     // Settings default
     table_high_offset = TABLE_HIGH_OFFSET_YI_HOME_1080P;
@@ -678,6 +681,8 @@ int main(int argc, char **argv) {
     }
     if (debug) fprintf(stderr, "%lld - found latest frame: id %d, frame_counter %d\n", current_timestamp(), current_frame, frame_counter);
 
+    start_time = time(NULL);
+
     // Wait for the next record to arrive and read the frame
     for (;;) {
         // Get pointer to the record
@@ -738,25 +743,31 @@ int main(int argc, char **argv) {
             }
         }
 
+        current_time = time(NULL);
+        if (current_time - start_time > TIMEOUT_INTERVAL) {
+            fprintf(stderr, "Error, timeout expired and no frame found\n");
+            return -3;
+        }
+
         // Wait 10 milliseconds
         usleep(MILLIS_10);
     }
 
     if (bufferh264 == NULL) {
         fprintf(stderr, "Error, buffer is empty\n");
-        return -3;
+        return -4;
     }
 
     bufferyuv = (unsigned char *) malloc(width * height * 3 / 2);
     if (bufferyuv == NULL) {
         fprintf(stderr, "Unable to allocate memory\n");
-        return -4;
+        return -5;
     }
 
     if (debug) fprintf(stderr, "Decoding h264 frame\n");
     if(frame_decode(bufferyuv, bufferh264, bufferh264_size) < 0) {
         fprintf(stderr, "Error decoding h264 frame\n");
-        return -5;
+        return -6;
     }
     free(bufferh264);
 
@@ -764,14 +775,14 @@ int main(int argc, char **argv) {
         if (debug) fprintf(stderr, "Adding watermark\n");
         if (add_watermark(bufferyuv, width, height) < 0) {
             fprintf(stderr, "Error adding watermark\n");
-            return -6;
+            return -7;
         }
     }
 
     if (debug) fprintf(stderr, "Encoding jpeg image\n");
     if(YUVtoJPG("stdout", bufferyuv, width, height, width, height) < 0) {
         fprintf(stderr, "Error encoding jpeg file\n");
-        return -7;
+        return -8;
     }
 
     free(bufferyuv);
