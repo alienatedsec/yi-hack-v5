@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DIR="none"
-TIME="0.1"
+TIME="0.3"
 
 for I in 1 2
 do
