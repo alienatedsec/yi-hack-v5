@@ -77,14 +77,15 @@ fi
 
 if [[ x$(get_config SSH_PASSWORD) != "x" ]] ; then
     SSH_PASSWORD=$(get_config SSH_PASSWORD)
-    PASSWORD_MD5="$(echo "${SSH_PASSWORD}" | mkpasswd --method=MD5 --stdin)"
-    cp -f "/etc/passwd" "/tmp/sd/yi-hack-v5/etc/passwd"
-    sed -i 's|^root::|root:'${PASSWORD_MD5}':|g' "/tmp/sd/yi-hack-v5/etc/passwd"
-    sed -i 's|/root|/tmp/sd/yi-hack-v5|g' "/tmp/sd/yi-hack-v5/etc/passwd"
-    mount --bind "/tmp/sd/yi-hack-v5/etc/passwd" "/etc/passwd"
-    cp -f "/etc/shadow" "/tmp/sd/yi-hack-v5/etc/shadow"
-    sed -i 's|^root::|root:'${PASSWORD_MD5}':|g' "/tmp/sd/yi-hack-v5/etc/shadow"
-    mount --bind "/tmp/sd/yi-hack-v5/etc/shadow" "/etc/shadow"
+#    PASSWORD_MD5="$(echo "${SSH_PASSWORD}" | mkpasswd --method=des --stdin)"
+    echo root:$SSH_PASSWORD | chpasswd --md5
+#    cp -f "/etc/passwd" "/tmp/sd/yi-hack-v5/etc/passwd"
+#    sed -i 's|^root::|root:'${PASSWORD_MD5}':|g' "/etc/passwd"
+#    sed -i 's|/root|/tmp/sd/yi-hack-v5|g' "/etc/passwd"
+#    mount --bind "/tmp/sd/yi-hack-v5/etc/passwd" "/etc/passwd"
+#    cp -f "/etc/shadow" "/tmp/sd/yi-hack-v5/etc/shadow"
+#    sed -i 's|^root::|root:'${PASSWORD_MD5}':|g' "/etc/shadow"
+#    mount --bind "/tmp/sd/yi-hack-v5/etc/shadow" "/etc/shadow"
 fi
 
 case $(get_config RTSP_PORT) in
@@ -103,6 +104,7 @@ esac
 if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
     (
         cd /home/app
+        LD_LIBRARY_PATH="/tmp/sd/yi-hack-v5/lib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd" ./rmm &
         sleep 2
         ./mp4record &
         ./cloud &

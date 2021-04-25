@@ -1,7 +1,6 @@
 #!/bin/sh
 
 CONF_FILE="etc/system.conf"
-
 YI_HACK_V5_PREFIX="/tmp/sd/yi-hack-v5"
 
 get_config()
@@ -9,10 +8,16 @@ get_config()
 	key=$1
 	grep $1 $YI_HACK_V5_PREFIX/$CONF_FILE | cut -d "=" -f2
 }
-                
+
+if [ -d "/tmp/sd/yi-hack-v5" ] ; then                
+(
 if [[ $(get_config PROXYCHAINSNG) == "yes" ]] ; then
 	$YI_HACK_V5_PREFIX/bin/proxychains4 ./cloudAPI_real "$@"
 else
 	./cloudAPI_real "$@"
 fi
+)
 
+else
+    ./cloudAPI_real "$@"
+fi

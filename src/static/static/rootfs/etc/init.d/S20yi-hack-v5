@@ -1,8 +1,14 @@
 #!/bin/sh
 if [ -d "/tmp/sd/yi-hack-v5" ]; then
     /tmp/sd/yi-hack-v5/script/system.sh
-elif [ -d "/home/yi-hack-v5" ]; then
-    /home/yi-hack-v5/script/system.sh
 else
-exit
+        cd /home/app
+        sleep 2
+        ./mp4record &
+        ./cloud &
+        ./p2p_tnp &
+        ./oss &
+        ./watch_process &
+        tcpsvd -vE 0.0.0.0 21 ftpd -w &
+        telnetd &
 fi

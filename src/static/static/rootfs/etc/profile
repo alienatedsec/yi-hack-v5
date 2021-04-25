@@ -8,10 +8,10 @@ set_path_before()
 }
 
 PATH="/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin:/home/yi-hack-v5/sbin"
-LD_LIBRARY_PATH="/usr/local/lib:/home/hisiko/hisilib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd:/tmp/sd/yi-hack-v5:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib"
-
 set_path_before /usr/local/sbin
 set_path_before /usr/local/bin
+
+LD_LIBRARY_PATH="/usr/local/lib:/home/hisiko/hisilib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd:/tmp/sd/yi-hack-v5:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib"
 
 export PATH
 export LD_LIBRARY_PATH

@@ -8,6 +8,10 @@ rm -rf ./_install
 cd pure-ftpd || exit 1
 git reset --hard || exit 1
 
+cd ..
+patch -p0 < ftpd.patch
+cd pure-ftpd
+
 ./autogen.sh || exit 1
 
 ./configure CC=arm-hisiv300-linux-uclibcgnueabi-gcc \
