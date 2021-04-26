@@ -27,6 +27,7 @@ src/mqtt/mqttv4
 src/uClibc/uClibc
 src/wsdd/wsdd
 src/snapshot/snapshot/ffmpeg-4.3.2/
+src/snapshot/snapshot/ffmpeg-4.4/
 src/snapshot/snapshot/jpeg-9d/
 scripts/packfiles.sh
 .file.swp

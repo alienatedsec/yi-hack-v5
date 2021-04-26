@@ -54,7 +54,7 @@ hostname -F $YI_HACK_PREFIX/etc/hostname
 
 export TZ=$(get_config TIMEZONE)
 
-if [[ $(get_config SWAP_FILE) == "yes" ]] ; then
+if [[ $(get_config SWAP_FILE) == "yes" ]] || [[ $MODEL_SUFFIX == "yi_dome" ]] || [[ $MODEL_SUFFIX == "yi_home" ]] ; then
     SD_PRESENT=$(mount | grep mmc | grep -c ^)
     if [[ $SD_PRESENT -eq 1 ]]; then
         if [[ -f /tmp/sd/swapfile ]]; then
@@ -106,12 +106,12 @@ if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
         cd /home/app
 #        LD_LIBRARY_PATH="/tmp/sd/yi-hack-v5/lib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd" ./rmm &
         sleep 2
-        ./mp4record &
-        ./cloud &
-        ./p2p_tnp &
-        if [[ $(cat /home/app/.camver) != "yi_dome" ]] ; then
-            ./oss &
-        fi
+#        ./mp4record &
+#        ./cloud &
+#        ./p2p_tnp &
+#        if [[ $(cat /home/app/.camver) != "yi_dome" ]] ; then
+#            ./oss &
+#        fi
         ./watch_process &
     )
 elif [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then

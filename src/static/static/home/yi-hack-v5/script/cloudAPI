@@ -1,5 +1,13 @@
 #!/bin/sh
 
+ulimit -s 1024
+export LD_LIBRARY_PATH=/home/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/tmp/sd/yi-hack-v5/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/app/locallib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/home/hisiko/hisilib:$LD_LIBRARY_PATH
+export PATH=/home/app/localbin:$PATH
+export PATH=/home/base/tools:$PATH
+
 CONF_FILE="etc/system.conf"
 YI_HACK_V5_PREFIX="/tmp/sd/yi-hack-v5"
 
