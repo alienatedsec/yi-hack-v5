@@ -104,7 +104,7 @@ esac
 if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
     (
         cd /home/app
-        LD_LIBRARY_PATH="/tmp/sd/yi-hack-v5/lib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd" ./rmm &
+#        LD_LIBRARY_PATH="/tmp/sd/yi-hack-v5/lib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd" ./rmm &
         sleep 2
         ./mp4record &
         ./cloud &

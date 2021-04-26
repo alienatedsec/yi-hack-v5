@@ -1,5 +1,5 @@
 OBJECTS = imggrabber.o convert2jpg.o add_water.o water_mark.o
-FFMPEG = ffmpeg-4.3.2
+FFMPEG = ffmpeg-4.4
 FFMPEG_DIR = ./$(FFMPEG)
 INC_FF = -I$(FFMPEG_DIR)
 LIB_FF = $(FFMPEG_DIR)/libavcodec/libavcodec.a $(FFMPEG_DIR)/libavutil/libavutil.a -lpthread -lm
