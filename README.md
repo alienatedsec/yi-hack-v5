@@ -25,6 +25,7 @@ I am slowly releasing beta versions, and I can see lots of downloads, testing an
 - [Unbrick your camera](#unbrick-your-camera)
 - [Acknowledgments](#acknowledgments)
 - [Disclaimer](#disclaimer)
+- [Donations](#donations)
 
 ## Features
 This firmware will add the following features:
