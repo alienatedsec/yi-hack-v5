@@ -39,7 +39,7 @@ for ROW in $ROWS; do
             if [ "$MAC" != "" ]; then
                 hostname yi-$MAC
             else
-                hostname yi-hack
+                hostname yi-hack-v5
             fi
             hostname > $YI_HACK_PREFIX/etc/hostname
         else

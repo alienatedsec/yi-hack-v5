@@ -330,7 +330,8 @@ void print_usage(char *prog_name)
     fprintf(stderr, "\t    --stream_offset VAL          Set the offset of the stream for the resolution selected\n");
     fprintf(stderr, "\t    --frame_counter_offset VAL   Set the offset of the frame counter in the record\n");
     fprintf(stderr, "\t    --frame_offset_offset VAL    Set the offset of the frame offset in the record\n");
-    fprintf(stderr, "\t    --frame_length_offset VAL    Set  offset of the frame lenght in the record\n");
+    fprintf(stderr, "\t    --frame_length_offset VAL    Set the offset of the frame lenght in the record\n");
+    fprintf(stderr, "\t    --frame_type_offset VAL      Set the offset of the frame type in the record\n");
     fprintf(stderr, "\t-w, --watermark                  Add watermark to image\n");
     fprintf(stderr, "\t-d, --debug                      Enable debug\n");
     fprintf(stderr, "\t-h, --help                       Show this help\n");

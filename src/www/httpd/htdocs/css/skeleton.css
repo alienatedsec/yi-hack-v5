@@ -23,6 +23,7 @@
 - Utilities
 - Clearing
 - Media Queries
+- Disabled
 */
 
 
@@ -284,7 +285,6 @@ label > .label-body {
   margin-left: .5rem;
   font-weight: normal; }
 
-
 /* Lists
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 ul {
@@ -416,3 +416,13 @@ there.
 
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {}
+
+/* Disabled */
+input[type="text"]:disabled {
+  background: #ccc;
+}
+
+input[type="checkbox"]:disabled {
+  background: #ccc;
+}
+

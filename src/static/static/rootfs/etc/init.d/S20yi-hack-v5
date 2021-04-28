@@ -9,9 +9,17 @@ export PATH=/home/base/tools:$PATH
 if [ -d "/tmp/sd/yi-hack-v5" ]; then
     /tmp/sd/yi-hack-v5/script/system.sh
 else
-    sleep 2
-    cd /home/app
-    ./watch_process &
-    tcpsvd -vE 0.0.0.0 21 ftpd -w &
-    telnetd &
+    (  
+        sleep 2
+        cd /home/app
+        ./mp4record &
+        ./cloud &
+        ./p2p_tnp &
+            if [[ $(cat /home/app/.camver) != "yi_dome" ]] ; then
+                ./oss &
+            fi
+        ./watch_process &
+        tcpsvd -vE 0.0.0.0 21 ftpd -w &
+        telnetd &
+    )
 fi
