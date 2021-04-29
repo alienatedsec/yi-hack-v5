@@ -8,10 +8,10 @@ elif [ -d "/home/yi-hack-v5" ]; then
         YI_HACK_PREFIX="/home/yi-hack-v5"
 fi
 
-YI_HACK_UPGRADE_PATH="/tmp/sd/.fw_upgrade"
-
 YI_HACK_VER=$(cat /tmp/sd/yi-hack-v5/version)
 MODEL_SUFFIX=$(cat /home/app/.camver)
+
+YI_HACK_UPGRADE_PATH="/tmp/sd/$MODEL_SUFFIX"
 
 get_config()
 {
@@ -31,7 +31,7 @@ rm -f $YI_HACK_PREFIX/www/cgi-bin/core
 
 touch /tmp/httpd.conf
 
-if [ -f $YI_HACK_UPGRADE_PATH/yi-hack/fw_upgrade_in_progress ]; then
+if [ -f $YI_HACK_UPGRADE_PATH/yi-hack-v5/fw_upgrade_in_progress ]; then
     echo "#!/bin/sh" > /tmp/fw_upgrade_2p.sh
     echo "# Complete fw upgrade and restore configuration" >> /tmp/fw_upgrade_2p.sh
     echo "sleep 1" >> /tmp/fw_upgrade_2p.sh

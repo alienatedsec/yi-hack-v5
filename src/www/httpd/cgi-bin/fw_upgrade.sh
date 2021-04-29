@@ -1,6 +1,8 @@
 #!/bin/sh
 
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
+MODEL_SUFFIX=`cat /home/app/.camver`
+FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
 
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/qigan/lib:/home/app/locallib:/tmp/sd:/tmp/sd/gdb:/tmp/sd/yi-hack-v5/lib
@@ -40,19 +42,18 @@ elif [ "$VAL" == "upgrade" ] ; then
     fi
 
     # Clean old upgrades
-    rm -rf /tmp/sd/.fw_upgrade
-    rm -rf /tmp/sd/.fw_upgrade.conf
+    rm -rf /tmp/sd/${MODEL_SUFFIX}
+    rm -rf /tmp/sd/${MODEL_SUFFIX}.conf
     rm -rf /tmp/sd/Factory
     rm -rf /tmp/sd/newhome
 
-    mkdir -p /tmp/sd/.fw_upgrade
-    mkdir -p /tmp/sd/.fw_upgrade.conf
-    cd /tmp/sd/.fw_upgrade
+    mkdir -p /tmp/sd/${MODEL_SUFFIX}
+    mkdir -p /tmp/sd/${MODEL_SUFFIX}.conf
+ #   cd /tmp/sd/${MODEL_SUFFIX}
 
-    MODEL_SUFFIX=`cat /home/app/.camver`
-    FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
+    
     if [ -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ]; then
-        mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/.fw_upgrade/${MODEL_SUFFIX}_x.x.x.tgz
+#        mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/${MODEL_SUFFIX}/${MODEL_SUFFIX}_x.x.x.tgz
         LATEST_FW="x.x.x"
     else
         LATEST_FW=`/usr/bin/wget -O -  https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest 2>&1 | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
@@ -62,7 +63,8 @@ elif [ "$VAL" == "upgrade" ] ; then
             exit
         fi
 
-        /usr/bin/wget https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/download/$LATEST_FW/${MODEL_SUFFIX}_${LATEST_FW}.tgz
+        /usr/bin/wget https://github.com/alienatedsec/yi-hack-v5/releases/download/$LATEST_FW/${MODEL_SUFFIX}_${LATEST_FW}.tgz
+        
         if [ ! -f ${MODEL_SUFFIX}_${LATEST_FW}.tgz ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Unable to download firmware file."
@@ -71,14 +73,15 @@ elif [ "$VAL" == "upgrade" ] ; then
     fi
 
     # Backup configuration
-    cp -rf $YI_HACK_PREFIX/etc/* /tmp/sd/.fw_upgrade.conf/
-    rm /tmp/sd/.fw_upgrade.conf/*.tar.gz
+    cp -rf $YI_HACK_PREFIX/etc/* /tmp/sd/${MODEL_SUFFIX}.conf/
+    rm /tmp/sd/${MODEL_SUFFIX}.conf/*.tar.gz
 
     # Prepare new hack
-    tar zxvf ${MODEL_SUFFIX}_${LATEST_FW}.tgz
-    rm ${MODEL_SUFFIX}_${LATEST_FW}.tgz
-    mkdir -p /tmp/sd/.fw_upgrade/yi-hack-v5/etc
-    cp -rf /tmp/sd/.fw_upgrade.conf/* /tmp/sd/.fw_upgrade/yi-hack-v5/etc/
+    gzip -d ${MODEL_SUFFIX}_${LATEST_FW}.tgz
+    tar xvf ${MODEL_SUFFIX}_${LATEST_FW}.tar
+    rm ${MODEL_SUFFIX}_${LATEST_FW}.tar
+    mkdir -p /tmp/sd/${MODEL_SUFFIX}/yi-hack-v5/etc
+    cp -rf /tmp/sd/${MODEL_SUFFIX}.conf/* /tmp/sd/${MODEL_SUFFIX}/yi-hack-v5/etc/
 
     # Report the status to the caller
     printf "Content-type: text/html\r\n\r\n"

@@ -5,8 +5,8 @@ CONF_FILE="etc/system.conf"
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 MODEL_SUFFIX=$(cat /home/app/.camver)
 
-#LOG_FILE="/tmp/sd/wd_rtsp.log"
-LOG_FILE="/dev/null"
+LOG_FILE="/tmp/sd/wd_rtsp.log"
+#LOG_FILE="/dev/null"
 
 COUNTER=0
 COUNTER_LIMIT=10
