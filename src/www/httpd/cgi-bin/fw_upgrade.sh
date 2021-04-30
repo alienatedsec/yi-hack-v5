@@ -50,7 +50,7 @@ elif [ "$VAL" == "upgrade" ] ; then
     mkdir -p /tmp/sd/${MODEL_SUFFIX}
     mkdir -p /tmp/sd/${MODEL_SUFFIX}.conf
  #   cd /tmp/sd/${MODEL_SUFFIX}
-
+    cd /tmp/sd
     
     if [ -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ]; then
 #        mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/${MODEL_SUFFIX}/${MODEL_SUFFIX}_x.x.x.tgz
