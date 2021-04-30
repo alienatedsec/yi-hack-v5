@@ -9,7 +9,8 @@ rm mqttv4.conf
 rm proxychains.conf
 rm system.conf
 
-tar jxvf defaults.tar.bz2 > /dev/null 2>&1
+bzip2 -d defaults.tar.bz2
+tar xvf defaults.tar > /dev/null 2>&1
 
 printf "Content-type: application/json\r\n\r\n"
 printf "{\n"

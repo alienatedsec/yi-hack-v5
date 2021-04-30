@@ -14,10 +14,12 @@ get_config()
 TMPOUT=/tmp/config.tar.bz2.dl
 TMPDIR=/tmp/workdir.tmp
 TMPOUTbz2=$TMPDIR/config.tar.bz2
+TMPOUTtar=$TMPDIR/config.tar
 
 # Cleaning
 rm -f $TMPOUT
 rm -f $TMPOUTbz2
+rm -f $TMPOUTtar
 rm -rf $TMPDIR
 
 mkdir -p $TMPDIR
@@ -61,7 +63,8 @@ fi
 LEN=$((CONTENT_LENGTH-LENSKIPSTART-LENSKIPEND+2))
 dd if=$TMPOUT of=$TMPOUTbz2 bs=1 skip=$LENSKIPSTART count=$LEN >/dev/null 2>&1
 cd $TMPDIR
-tar jxvf $TMPOUTbz2 >/dev/null 2>&1
+bzip2 -d $TMPOUTbz2
+tar xvf $TMPOUTtar >/dev/null 2>&1
 RES=$?
 
 # Verify result of tar.bz2 command and copy files to destination
