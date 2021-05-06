@@ -218,13 +218,8 @@ int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
         return -2;
     }
 
-    inbuf = (uint8_t *) malloc(length + FF_INPUT_BUFFER_PADDING_SIZE);
-    if (inbuf == NULL) {
-        if (debug) fprintf(stderr, "Error allocating memory\n");
-        avcodec_close(c);
-        av_free(c);
-        return -2;
-    }
+    // inbuf is already allocated in the main function
+    inbuf = p;
     memset(inbuf + length, 0, FF_INPUT_BUFFER_PADDING_SIZE);
 
     // Get only 1 frame
@@ -251,7 +246,6 @@ int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
     }
     if(!got_picture) {
         if (debug) fprintf(stderr, "No input frame\n");
-        free(inbuf);
         av_frame_free(&picture);
         avcodec_close(c);
         av_free(c);
@@ -270,7 +264,6 @@ int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
 
     // Clean memory
     if (debug) fprintf(stderr, "Cleaning ffmpeg memory\n");
-    free(inbuf);
     av_frame_free(&picture);
     avcodec_close(c);
     av_free(c);
@@ -758,6 +751,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Error, buffer is empty\n");
         return -4;
     }
+    // Add FF_INPUT_BUFFER_PADDING_SIZE to make the size compatible with ffmpeg conversion
+    bufferh264 = (unsigned char *) realloc(bufferh264, bufferh264_size + FF_INPUT_BUFFER_PADDING_SIZE);
 
     bufferyuv = (unsigned char *) malloc(width * height * 3 / 2);
     if (bufferyuv == NULL) {
