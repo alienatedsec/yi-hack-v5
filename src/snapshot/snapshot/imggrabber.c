@@ -628,7 +628,7 @@ int main(int argc, char **argv) {
     fFid = fopen(BUFFER_FILE, "r") ;
     if ( fFid == NULL ) {
         fprintf(stderr, "Could not open file %s\n", BUFFER_FILE) ;
-        return -1;
+        return -2;
     }
 
     // Map file to memory
@@ -636,7 +636,7 @@ int main(int argc, char **argv) {
     if (addr == MAP_FAILED) {
         fprintf(stderr, "Error mapping file %s\n", BUFFER_FILE);
         fclose(fFid);
-        return -2;
+        return -3;
     }
     if (debug) fprintf(stderr, "%lld - mapping file %s, size %d, to %08x\n", current_timestamp(), BUFFER_FILE, buf_size, (unsigned int) addr);
 
@@ -740,7 +740,7 @@ int main(int argc, char **argv) {
         current_time = time(NULL);
         if (current_time - start_time > TIMEOUT_INTERVAL) {
             fprintf(stderr, "Error, timeout expired and no frame found\n");
-            return -3;
+            return -4;
         }
 
         // Wait 10 milliseconds
@@ -749,7 +749,7 @@ int main(int argc, char **argv) {
 
     if (bufferh264 == NULL) {
         fprintf(stderr, "Error, buffer is empty\n");
-        return -4;
+        return -5;
     }
     // Add FF_INPUT_BUFFER_PADDING_SIZE to make the size compatible with ffmpeg conversion
     bufferh264 = (unsigned char *) realloc(bufferh264, bufferh264_size + FF_INPUT_BUFFER_PADDING_SIZE);
@@ -757,13 +757,13 @@ int main(int argc, char **argv) {
     bufferyuv = (unsigned char *) malloc(width * height * 3 / 2);
     if (bufferyuv == NULL) {
         fprintf(stderr, "Unable to allocate memory\n");
-        return -5;
+        return -6;
     }
 
     if (debug) fprintf(stderr, "Decoding h264 frame\n");
     if(frame_decode(bufferyuv, bufferh264, bufferh264_size) < 0) {
         fprintf(stderr, "Error decoding h264 frame\n");
-        return -6;
+        return -7;
     }
     free(bufferh264);
 
@@ -771,14 +771,14 @@ int main(int argc, char **argv) {
         if (debug) fprintf(stderr, "Adding watermark\n");
         if (add_watermark(bufferyuv, width, height) < 0) {
             fprintf(stderr, "Error adding watermark\n");
-            return -7;
+            return -8;
         }
     }
 
     if (debug) fprintf(stderr, "Encoding jpeg image\n");
     if(YUVtoJPG("stdout", bufferyuv, width, height, width, height) < 0) {
         fprintf(stderr, "Error encoding jpeg file\n");
-        return -8;
+        return -9;
     }
 
     free(bufferyuv);
