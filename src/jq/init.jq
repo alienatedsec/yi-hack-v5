@@ -14,6 +14,7 @@ tar zxvf $ARCHIVE
 
 cd jq-1.6 || exit 1
 
+autoreconf -fi
 ./configure CC=arm-hisiv300-linux-uclibcgnueabi-gcc USER_CFLAGS="-march=armv5te -mcpu=arm926ej-s -I/opt/arm-hisiv300-linux/target/usr/include -L/opt/arm-hisiv300-linux/target/usr/lib" --host=arm --disable-docs AR=arm-hisiv300-linux-uclibcgnueabi-ar RANLIB=arm-hisiv300-linux-uclibcgnueabi-ranlib --prefix=$SCRIPT_DIR/_install --disable-maintainer-mode
 #    USER_CFLAGS="-march=armv5te -mcpu=arm926ej-s -I/opt/arm-hisiv300-linux/target/usr/include -L/opt/arm-hisiv300-linux/target/usr/lib" \
 #    AR=arm-hisiv300-linux-uclibcgnueabi-ar \
