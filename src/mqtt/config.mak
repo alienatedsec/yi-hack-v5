@@ -15,9 +15,9 @@
 #  along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-CC=arm-hisiv300-linux-gcc
+CC=arm-hisiv300-linux-uclibcgnueabi-gcc
 USER_CFLAGS=-march=armv5te -mcpu=arm926ej-s -I/opt/hisi-linux/x86-arm/arm-hisiv300-linux/target/usr/include -L/opt/hisi-linux/x86-arm/arm-hisiv300-linux/target/usr/lib
 USER_LDFLAGS=
-AR=arm-hisiv300-linux-ar
-RANLIB=arm-hisiv300-linux-ranlib
-STRIP=arm-hisiv300-linux-strip
+AR=arm-hisiv300-linux-uclibcgnueabi-ar
+RANLIB=arm-hisiv300-linux-uclibcgnueabi-ranlib
+STRIP=arm-hisiv300-linux-uclibcgnueabi-strip
