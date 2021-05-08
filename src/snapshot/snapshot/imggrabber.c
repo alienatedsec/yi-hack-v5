@@ -362,7 +362,6 @@ int main(int argc, char **argv) {
 
     unsigned char *addr;
     int resolution = RESOLUTION_HIGH;
-    int debug = 0;
     int watermark = 0;
 
     unsigned char *bufferh264, *bufferyuv;
