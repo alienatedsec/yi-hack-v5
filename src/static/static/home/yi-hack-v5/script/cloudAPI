@@ -19,11 +19,23 @@ get_config()
 
 if [ -d "/tmp/sd/yi-hack-v5" ] ; then                
 (
-if [[ $(get_config PROXYCHAINSNG) == "yes" ]] ; then
+  if [[ $get_config DISABLE_CLOUD) == "no" ]] ; then
+	./cloudAPI_fake "$@"
+  else
+  (
+    if [[ $(get_config PROXYCHAINSNG) == "yes" ]] ; then
 	$YI_HACK_V5_PREFIX/bin/proxychains4 ./cloudAPI_real "$@"
-else
+    else
 	./cloudAPI_real "$@"
-fi
+    fi
+  )
+  fi
+
+  if [[ $(get_config PROXYCHAINSNG) == "yes" ]] ; then
+	$YI_HACK_V5_PREFIX/bin/proxychains4 ./cloudAPI_real "$@"
+  else
+	./cloudAPI_real "$@"
+  fi
 )
 
 else
