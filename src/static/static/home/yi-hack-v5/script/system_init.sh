@@ -38,6 +38,7 @@ fi
 if [ ! -f $YI_PREFIX/cloudAPI_real ]; then
 	mv $YI_PREFIX/cloudAPI $YI_PREFIX/cloudAPI_real
 	cp $YI_HACK_V5_PREFIX2/yi-hack-v5/script/cloudAPI $YI_PREFIX/
+	cp $YI_HACK_V5_PREFIX2/yi-hack-v5/script/cloudAPI_fake $YI_PREFIX/
         rm $UDHCPC_SCRIPT_DEST
         cp $UDHCP_SCRIPT $UDHCPC_SCRIPT_DEST
 	if [ -f $DHCP_SCRIPT_DEST ]; then
