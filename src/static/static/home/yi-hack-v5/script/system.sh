@@ -119,6 +119,12 @@ elif [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
         cd /home/app
         sleep 2
         ./mp4record &
+        ./cloud &
+        ./p2p_tnp &
+        if [[ $(cat /home/app/.camver) != "yi_dome" ]] ; then
+            ./oss &
+        fi
+        ./watch_process &
     )
 fi
 
