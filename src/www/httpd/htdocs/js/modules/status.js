@@ -44,7 +44,7 @@ APP.status = (function ($) {
                 $('#wlan_essid').html(data.wlan_essid + "<input class=\"button-primary\" type=\"button\" id=\"button-wifi-edit\" value=\"Edit\" style=\"margin-left:40px;\" onclick=\"window.location.href='?page=wifi'\"/>");
                 $('#uptime').text(String.format("%t", parseInt(data.uptime)));
                 $('#memory').text("" + data.free_memory + "/" + data.total_memory + " KB");
-                wifiStrength = parseInt((parseInt(data.wlan_strength) * 100) / 70);
+                wifiStrength = parseInt( parseInt(data.wlan_strength.split('/')[1]) / parseInt(data.wlan_strength.split('/')[2]) * 100);
                 if (wifiStrength >= 80) {
                     $('#wlan_strength').attr("src","images/wlan_strong_signal.png")
                     $('#wlan_strength_percent').text(" " + wifiStrength.toString() + " %")
