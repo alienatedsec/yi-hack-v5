@@ -37,7 +37,7 @@ NETMASK=$(ifconfig wlan0 | awk '/inet addr/{print substr($4,6)}')
 GATEWAY=$(route -n | awk 'NR==3{print $2}')
 MAC_ADDR=$(ifconfig wlan0 | awk '/HWaddr/{print substr($5,1)}')
 WLAN_ESSID=$(iwconfig wlan0 | grep ESSID | cut -d\" -f2)
-WLAN_STRENGTH=$(cat /proc/net/wireless | awk 'END { print $3 }' | sed 's/\.$//')
+WLAN_STRENGTH=iwconfig 2>&1 | grep Quality | sed -e 's/.*Link Quality=\([0-9]*\/[0-9]*\).*/\1/'
 
 # Yeah, it's pretty ugly.. but hey, it works.
 
