@@ -1,0 +1,81 @@
+#!/bin/sh
+
+while test $# -gt 0
+do
+    case "$1" in
+        '-c' ) shift
+                c=$1 ;;
+        '-url' ) shift
+                url=$1 ;;
+        '-key' ) shift
+                key=$1 ;;
+        '-keySec' ) shift
+                keysec=$1 ;;
+        '-uid' ) shift
+                uid=$1 ;;
+        '-version' ) shift
+                version=$1 ;;
+        '-mac' ) shift
+                mac=$1 ;;
+        '-ssid' ) shift
+                ssid=$1 ;;
+        '-ip' ) shift
+                ip=$1 ;;
+        '-signal_quality' ) shift
+                signal_quality=$1 ;;
+        '-packetloss' ) shift
+                packetloss=$1 ;;
+        '-p2pconnect' ) shift
+                p2pconnect=$1 ;;
+        '-p2pconnect_success' ) shift
+               p2pconnect_success=$1 ;;
+        '-tfstat' ) shift
+                tfst=$1 ;;
+        '-uid' ) shift
+                uid=$1 ;;
+        '-EventTime' ) shift
+                EventTime=$1 ;;
+        '-EventStat' ) shift
+                EventStat=$1 ;; 
+        '-pic_url' ) shift
+                pic_url=$1 ;;
+        '-video_url' ) shift
+                video_url=$1 ;;
+        '-pic_pwd' ) shift
+                pic_pwd=$1 ;;
+        '-video_pwd' ) shift
+                video_pwd=$1 ;;
+        '-type' ) shift
+                type=$1 ;; 
+        '-sub_type' ) shift
+                sub_type=$1 ;;
+        '-d' ) d=1 ;;
+        * ) echo $1;;
+    esac
+    shift
+done
+
+
+if [ "$c" = "138" ]; then
+    #CMD_do_login_v4
+    echo '{"code":"20000","appParam":"","css_flag":0,"css_mode":0,"codingProtocol":"265","abilityTable":""}'
+elif [ "$c" = "136" ]; then
+    #CMD_do_syntime
+    echo '{"code":"20000","time":'$(date +%s)'000}'
+elif [ "$c" = "141" ]; then
+    #CMD_do_tnp_on_line
+    echo '{"code":"20000","data":{"InitString":"ABGBJPLDIEEKKKHPODFPPOEJHNCHFCGAHHEDKFIJIDBCDIBDPKIIAONIPBCLBOKOPIKMDKPMNADGACDMBC","License":"FTTDHY:","DID":"'$uid'"}}'
+elif [ "$c" = "142" ]; then
+    #CMD_do_get_dev_info
+    echo '{"code":"20000","data":{"timezone":"GMT+02:00","language":"en-US","tz_offset":7200000,"css_flag":0,"css_mode":0,"appParam":"","doorbellCoolingDuration":"0"}}'
+elif [ "$c" = "304" ]; then
+    #CMD_do_update_event_v4
+    echo '{"code":"20000","data":{"id":"'$EventTime'","ipcSetTime":"180"}}'
+elif [ "$c" = "306" ]; then
+    #CMD_do_gen_presigned_url_v5
+    echo '{"code":"20000","data":{"jpg":{"method":"PUT","pwd":"unusedpassword_","url":"http://server/yyyy/mm/dd/xxx/xxx.jpg?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},"mp4":{"method":"PUT","pwd":"unusedpassword_","url":"http://server/yyyy/mm/dd/xxx/xxx.mp4?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},"ok":"true"}}'
+elif [ "$c" = "411" ]; then
+    #CMD_do_event_upload
+    echo ''
+fi
+
