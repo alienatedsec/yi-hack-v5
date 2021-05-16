@@ -1,5 +1,5 @@
 OBJECTS = imggrabber.o convert2jpg.o add_water.o water_mark.o
-FFMPEG = ffmpeg-4.4
+FFMPEG = ffmpeg-4.0.6
 FFMPEG_DIR = ./$(FFMPEG)
 INC_FF = -I$(FFMPEG_DIR)
 LIB_FF = $(FFMPEG_DIR)/libavcodec/libavcodec.a $(FFMPEG_DIR)/libavutil/libavutil.a -lpthread -lm
@@ -39,7 +39,7 @@ clean:
 
 distclean: clean
 	rm -rf SDK
-	rm -rf jpeg-9c
+	rm -rf jpeg-9d
 
 define build_ffmpeg
     # get archive
