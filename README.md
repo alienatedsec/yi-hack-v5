@@ -56,6 +56,7 @@ This firmware will add the following features:
 Currently this project supports the following cameras:
 
 - Yi 1080p Home 48US - confirmed
+- Yi 1080p Home 20US - confirmed
 - Yi Home 17CN / 27US / 47US - confirmed
 - Yi Dome - confirmed, but heavy performance issues with Snapshot and ONVIF is killing the CPU
 - Yi 1080p Dome - confirmed; however, I have no device to test
