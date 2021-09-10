@@ -96,6 +96,16 @@ You should now have a FAT32 partition on your microSD card that will allow the c
 
 ![example: 4 GB FAT32 on 64 GB](imgs/4gb-fat32-on-64gb-card.png)
 
+Alternative way:
+* open cmd with admin permissions
+* run diskpart
+* type "list disk"
+* find your sd card (for example Disk 7)
+* type "select disk 7"
+* if it has one partition - type "select partition 1". If more - delete all the partitions and then create one
+* type "format FS=FAT32 QUICK"
+* done. 32GB partition in FAT32.
+
 </p></details>
 
 3. Get the correct firmware files for your camera from this link: https://github.com/alienatedsec/yi-hack-v5/releases
