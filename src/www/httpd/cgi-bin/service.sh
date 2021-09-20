@@ -109,7 +109,7 @@ stop_onvif()
 
 start_wsdd()
 {
-    wsdd --pid_file /var/run/wsdd.pid --if_name wlan0 --type tdn:NetworkVideoTransmitter --xaddr http://%s$D_ONVIF_PORT --scope "onvif://www.onvif.org/name/Unknown onvif://www.onvif.org/Profile/Streaming"
+    wsdd --pid_file /var/run/wsdd.pid --if_name wlan0 --type tdn:NetworkVideoTransmitter --xaddr "http://%s$D_ONVIF_PORT" --scope "onvif://www.onvif.org/name/Unknown onvif://www.onvif.org/Profile/Streaming"
 }
 
 stop_wsdd()
@@ -119,18 +119,38 @@ stop_wsdd()
 
 start_ftpd()
 {
-    if [[ $1 == "busybox" ]] ; then
+    if [[ "$1" == "none" ]] ; then
+        if [[ $(get_config BUSYBOX_FTPD) == "yes" ]] ; then
+            FTPD_DAEMON="busybox"
+        else
+            FTPD_DAEMON="pure-ftpd"
+        fi
+    else
+        FTPD_DAEMON=$1
+    fi
+
+    if [[ $FTPD_DAEMON == "busybox" ]] ; then
         tcpsvd -vE 0.0.0.0 21 ftpd -w >/dev/null &
-    elif [[ $1 == "pure-ftpd" ]] ; then
+    elif [[ $FTPD_DAEMON == "pure-ftpd" ]] ; then
         pure-ftpd -B
     fi
 }
 
 stop_ftpd()
 {
-    if [[ $1 == "busybox" ]] ; then
+    if [[ "$1" == "none" ]] ; then
+        if [[ $(get_config BUSYBOX_FTPD) == "yes" ]] ; then
+            FTPD_DAEMON="busybox"
+        else
+            FTPD_DAEMON="pure-ftpd"
+        fi
+    else
+        FTPD_DAEMON=$1
+    fi
+
+    if [[ $FTPD_DAEMON == "busybox" ]] ; then
         killall tcpsvd
-    elif [[ $1 == "pure-ftpd" ]] ; then
+    elif [[ $FTPD_DAEMON == "pure-ftpd" ]] ; then
         killall pure-ftpd
     fi
 }
@@ -183,6 +203,14 @@ if [ "$ACTION" == "start" ] ; then
     elif [ "$NAME" == "mp4record" ]; then
         cd /home/app
         ./mp4record >/dev/null &
+    elif [ "$NAME" == "all" ]; then
+        start_rtsp
+        start_onvif
+        start_wsdd
+        start_ftpd
+        mqttv4 >/dev/null &
+        cd /home/app
+        ./mp4record >/dev/null &
     fi
 elif [ "$ACTION" == "stop" ] ; then
     if [ "$NAME" == "rtsp" ]; then
@@ -196,6 +224,13 @@ elif [ "$ACTION" == "stop" ] ; then
     elif [ "$NAME" == "mqtt" ]; then
         killall mqttv4
     elif [ "$NAME" == "mp4record" ]; then
+        killall mp4record
+    elif [ "$NAME" == "all" ]; then
+        stop_rtsp
+        stop_onvif
+        stop_wsdd
+        stop_ftpd
+        killall mqttv4
         killall mp4record
     fi
 elif [ "$ACTION" == "status" ] ; then
@@ -211,6 +246,8 @@ elif [ "$ACTION" == "status" ] ; then
         RES=$(ps_program mqttv4)
     elif [ "$NAME" == "mp4record" ]; then
         RES=$(ps_program mp4record)
+    elif [ "$NAME" == "all" ]; then
+        RES=$(ps_program rRTSPServer)
     fi
 fi
 
