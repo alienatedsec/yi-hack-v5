@@ -28,7 +28,7 @@ else
 fi
 
 read -r POST_DATA
-ROWS=$(echo "$POST_DATA" | jq -r '. | keys[] as $k | "\($k)=\(.[$k])❤"')
+ROWS=$(echo "$POST_DATA" | jq -jr '. | keys[] as $k | "\($k)=\(.[$k])❤"')
 IFS='❤'
 for ROW in $ROWS; do
     KEY=$(echo $ROW | cut -d'=' -f1)
