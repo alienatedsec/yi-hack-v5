@@ -1,13 +1,13 @@
 <p align="center">
-	<img height="200" src="https://raw.githubusercontent.com/alienatedsec/yi-hack-v5/master/imgs/yi-hack-v5-header.png">
+    <img height="200" src="https://raw.githubusercontent.com/alienatedsec/yi-hack-v5/master/imgs/yi-hack-v5-header.png">
 </p>
 <p align="center">
-	<a target="_blank" href="https://discord.gg/bsKncwvRU7">
-        	<img src="https://img.shields.io/discord/825822449449828414?logo=discord" alt="Official Discord Server">
-	</a>
-	<a target="_blank" href="https://github.com/alienatedsec/yi-hack-v5/releases">
-		<img src="https://img.shields.io/github/downloads/alienatedsec/yi-hack-v5/total.svg" alt="Releases Downloads">
-	</a>
+    <a target="_blank" href="https://discord.gg/bsKncwvRU7">
+        <img src="https://img.shields.io/discord/825822449449828414?logo=discord" alt="Official Discord Server">
+    </a>
+    <a target="_blank" href="https://github.com/alienatedsec/yi-hack-v5/releases">
+        <img src="https://img.shields.io/github/downloads/alienatedsec/yi-hack-v5/total.svg" alt="Releases Downloads">
+    </a>
 </p>
 
 ## Why this Yi-Hack-V5 firmware?
@@ -120,11 +120,11 @@ Alternative way:
 | **Yi 1080p Cloud Dome** | rootfs_y19 | home_y19 | Firmware files required for the Yi 1080p Cloud Dome camera. |
 | **Yi Outdoor** | rootfs_h30 | home_h30 | Firmware files required for the Yi Outdoor camera. |
 
-4. Save both files and the folder on root path of microSD card.
+4. Save both files and the `yi-hack-v5` folder on root path of microSD card.
 
 **_IMPORTANT: Make sure that the filename stored on microSD card are correct and didn't get changed. e.g. The firmware filenames for the Yi 1080p Dome camera must be home_h20 and rootfs_h20._**
 
-5. Remove power to the camera, insert the microSD card, turn the power back ON. 
+5. Remove power to the camera, insert the microSD card, turn the power back ON.
 
 6. The yellow light will come ON and flash for roughly 30 seconds, which means the firmware is being flashed successfully. The camera will boot up.
 
@@ -146,6 +146,15 @@ Access the web interface by entering the IP address of the came in a web browser
 
 ## Unbrick your camera
 _TO DO - (It happened a few times and it's often possible to recover from it)_
+
+## Troubleshooting
+
+### Wifi is connected, the camera responds to ping but I'm not able to connect to the web interface
+Verify that you did not forget to upload `yi-hack-v5` folder to the SD card when uploading firmware. If you did, upload it and restart the camera.
+
+### Cannot complete the pairing / wifi settings lost after reboot
+Make sure that you are using the correct app (Yi Home) to setup the wifi connection. For example, the "Xiaomi Home" app will also generate the correct QR code that will work with your camera for initial connection, but then after power is removed
+the settings will be lost.
 
 ## Acknowledgments
 Special thanks to the following people and projects, without them `yi-hack-v5` wouldn't be possible.
