@@ -51,7 +51,7 @@ check_rtsp()
     CPU=`top -b -n 1 | grep rRTSPServer | grep -v grep | tail -n 1 | awk '{print $8}'`
 
     if [ "$CPU" == "" ]; then
-        echo "$(date +'%Y-%m-%d %H:%M:%S') - No running processes, restarting..." >> $LOG_FILE
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - No running processes, restarting rRTSPServer ..." >> $LOG_FILE
         killall -q rRTSPServer
         sleep 1
         restart_rtsp
@@ -89,7 +89,7 @@ check_grabber()
     PS=`ps | grep h264grabber | grep -v grep | grep -c ^`
 
     if [ $PS -eq 0 ]; then
-        echo "$(date +'%Y-%m-%d %H:%M:%S') - No running processes, restarting..." >> $LOG_FILE
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - No running processes, restarting h264grabber ..." >> $LOG_FILE
         killall -q h264grabber
         sleep 1
         restart_grabber
