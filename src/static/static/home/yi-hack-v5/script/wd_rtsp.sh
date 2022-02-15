@@ -109,6 +109,7 @@ echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
 
 while true
 do
+    check_grabber
     check_rtsp
     check_rmm
     if [ $COUNTER -eq 0 ]; then
