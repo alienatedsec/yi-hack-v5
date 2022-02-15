@@ -38,7 +38,7 @@ if [[ $(get_config RTSP_STREAM) == "both" ]]; then
     h264grabber -r low -m $MODEL_SUFFIX -f &
     h264grabber -r high -m $MODEL_SUFFIX -f &
 fi
-    rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT &
+    rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT -a $RRTSP_AUDIO &
 }
 
 check_rtsp()
