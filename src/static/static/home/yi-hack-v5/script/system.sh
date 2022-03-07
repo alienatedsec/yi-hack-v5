@@ -56,7 +56,7 @@ export TZ=$(get_config TIMEZONE)
 
 if [[ $(get_config SWAP_FILE) == "yes" ]] || [[ $MODEL_SUFFIX == "yi_dome" ]] || [[ $MODEL_SUFFIX == "yi_home" ]] ; then
     SD_PRESENT=$(mount | grep mmc | grep -c ^)
-    if [[ $SD_PRESENT -eq 1 ]]; then
+    if [[ $SD_PRESENT -gt 1 ]]; then
         if [[ -f /tmp/sd/swapfile ]]; then
             swapon /tmp/sd/swapfile
         else
@@ -65,6 +65,14 @@ if [[ $(get_config SWAP_FILE) == "yes" ]] || [[ $MODEL_SUFFIX == "yi_dome" ]] ||
             mkswap /tmp/sd/swapfile
             swapon /tmp/sd/swapfile
         fi
+        sysctl -w vm.dirty_background_ratio=2
+        sysctl -w vm.dirty_ratio=5
+        sysctl -w vm.dirty_writeback_centisecs=100
+        sysctl -w vm.dirty_expire_centisecs=500
+        sysctl -w vm.vfs_cache_pressure=200
+        sysctl -w vm.swappiness=30
+        echo 5 > /proc/sys/vm/laptop_mode
+        echo 30 > /proc/sys/vm/swappiness
     fi
 fi
 
