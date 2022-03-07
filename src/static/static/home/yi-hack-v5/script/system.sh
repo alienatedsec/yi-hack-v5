@@ -71,8 +71,7 @@ if [[ $(get_config SWAP_FILE) == "yes" ]] || [[ $MODEL_SUFFIX == "yi_dome" ]] ||
         sysctl -w vm.dirty_expire_centisecs=500
         sysctl -w vm.vfs_cache_pressure=200
         sysctl -w vm.swappiness=30
-        echo 5 > /proc/sys/vm/laptop_mode
-        echo 30 > /proc/sys/vm/swappiness
+        sysctl -w vm.laptop_mode=5
     fi
 fi
 
