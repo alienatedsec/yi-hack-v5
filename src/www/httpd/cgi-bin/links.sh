@@ -20,7 +20,7 @@ elif [[ LOCAL_IP_WLAN != "" & LOCAL_IP_ETH =="" ]] ; then
     LOCAL_IP = LOCAL_IP_WLAN
 
 elif [[ LOCAL_IP_WLAN == "" & LOCAL_IP_ETH =="" ]] ; then
-    LOCAL_IP = LOCAL_IP_WLAN
+    LOCAL_IP = hostname
 
 case $(get_config RTSP_PORT) in
     ''|*[!0-9]*) RTSP_PORT=554 ;;
