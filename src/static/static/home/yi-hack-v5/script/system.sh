@@ -119,6 +119,9 @@ elif [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
         cd /home/app
         sleep 2
         ./mp4record &
+        ./cloud &
+        sleep 5
+        killall -1 cloud
     )
 fi
 
