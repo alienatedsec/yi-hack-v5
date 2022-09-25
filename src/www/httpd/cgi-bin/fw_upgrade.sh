@@ -46,6 +46,8 @@ elif [ "$VAL" == "upgrade" ] ; then
     rm -rf /tmp/sd/${MODEL_SUFFIX}.conf
     rm -rf /tmp/sd/Factory
     rm -rf /tmp/sd/newhome
+    rm /tmp/sd/rootfs*
+    rm /tmp/sd/home*
 
     mkdir -p /tmp/sd/${MODEL_SUFFIX}
     mkdir -p /tmp/sd/${MODEL_SUFFIX}.conf
