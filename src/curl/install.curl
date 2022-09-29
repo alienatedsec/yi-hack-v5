@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+# Compress the file
+#upx ./_install/sbin/curl
+
+mkdir -p ../../build/home/yi-hack-v5/bin/
+
+rsync -a ./_install/bin/curl ../../build/home/yi-hack-v5/bin/
+

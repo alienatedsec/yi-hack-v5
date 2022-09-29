@@ -28,3 +28,6 @@
 [submodule "src/mqtt/mqttv4"]
 	path = src/mqtt/mqttv4
 	url = https://github.com/roleoroleo/mqttv4.git
+[submodule "src/curl/curl"]
+	path = src/curl/curl
+	url = https://github.com/curl/curl
