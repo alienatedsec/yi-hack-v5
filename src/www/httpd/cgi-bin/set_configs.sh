@@ -48,7 +48,7 @@ for ROW in $ROWS; do
         fi
     else
         if [ "$KEY" == "TIMEZONE" ] ; then
-            echo $VALUE > $YI_HACK_PREFIX/etc/TZ
+            echo $VALUE > /etc/TZ
         fi
         VALUE=$(echo "$VALUE" | sedencode)
         sed -i "s/^\(${KEY}[[:blank:]]*=[[:blank:]]*\).*$/\1${VALUE}/" $CONF_FILE
