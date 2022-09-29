@@ -55,6 +55,13 @@ if [ -f $YI_HACK_UPGRADE_PATH/yi-hack-v5/fw_upgrade_in_progress ]; then
     exit
 fi
 
+# Manual Wi-Fi config
+if [ -f /tmp/sd/recover/configure_wifi.cfg ]; then
+	mv /tmp/sd/recover/configure_wifi.cfg /tmp/configure_wifi.cfg
+	sync
+	sh $YI_HACK_PREFIX/script/configure_wifi.sh
+fi
+
 $YI_HACK_PREFIX/script/check_conf.sh
 
 hostname -F $YI_HACK_PREFIX/etc/hostname
