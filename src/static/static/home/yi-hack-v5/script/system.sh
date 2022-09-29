@@ -30,6 +30,10 @@ if [ ! -L "~/.ash_history" ]; then
   ln -sf /dev/null ~/.ash_history
 fi
 
+if [ ! -L "/home/yi-hack-v5/.ash_history" ]; then
+  ln -sf /dev/null /home/yi-hack-v5/.ash_history
+fi
+
 ulimit -s 1024
 
 # Remove core files, if any
