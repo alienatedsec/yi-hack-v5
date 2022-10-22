@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ARCHIVE=live.2021.04.06.tar.gz
+ARCHIVE=live.2022.10.01.tar.gz
 
 export PATH=${PATH}:/opt/arm-hisiv300-linux/bin
 
@@ -36,3 +36,4 @@ cd live || exit 1
 ./genMakefiles linux-cross
 cp -f ../Makefile.rRTSPServer Makefile
 cp -rf ../src .
+cp -rf ../include .
