@@ -71,7 +71,7 @@ Currently this project supports the following cameras:
 **_IMPORTANT: The microSD card must be formatted in FAT32. exFAT formatted microSD cards will not work._**
 **I have not formatted any of my 32GB cards in order to load the firmware. Just copy files directly and it should work.**
 
-<details><summary>How to format microSD cards > 32GB as FAT32 in Windows 10</summary><p>
+<details><summary> (Click) How to format microSD cards > 32GB as FAT32 in Windows 10</summary><p>
 
 For microSD cards larger than 32 GB, Windows 10 only gives you the option to format as NTFS or exFAT. You can create a small partition (e.g 4 GB) on a large microSD card (e.g. 64 GB) to get the FAT32 formatting option.
 
