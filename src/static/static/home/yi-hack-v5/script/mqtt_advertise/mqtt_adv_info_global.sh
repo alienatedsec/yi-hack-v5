@@ -21,8 +21,14 @@ get_mqtt_advertise_config() {
 HOSTNAME=$(hostname)
 FW_VERSION=$(cat $YI_HACK_PREFIX/version)
 HOME_VERSION=$(cat /home/app/.appver)
-MODEL_SUFFIX=$(cat $YI_HACK_PREFIX/model_suffix)
-SERIAL_NUMBER=$(dd bs=1 count=20 skip=656 if=/tmp/mmap.info 2>/dev/null | cut -c1-20)
+MODEL_SUFFIX=$(cat /home/app/.camver)
+if [[ $MODEL_SUFFIX == "yi_dome_1080p" ]] || [[ $MODEL_SUFFIX == "yi_cloud_dome_1080p" ]] ; then
+    HARDWARE_ID=$(dd bs=1 count=4 skip=660 if=/tmp/mmap.info 2>/dev/null | cut -c1-4)
+    SERIAL_NUMBER=$(dd bs=1 count=16 skip=664 if=/tmp/mmap.info 2>/dev/null | cut -c1-16)
+else
+    HARDWARE_ID=$(dd bs=1 count=4 skip=592 if=/tmp/mmap.info 2>/dev/null | cut -c1-4)
+    SERIAL_NUMBER=$(dd bs=1 count=16 skip=596 if=/tmp/mmap.info 2>/dev/null | cut -c1-16)
+fi
 LOCAL_IP=$(ifconfig wlan0 | awk '/inet addr/{print substr($2,6)}')
 NETMASK=$(ifconfig wlan0 | awk '/inet addr/{print substr($4,6)}')
 GATEWAY=$(route -n | awk 'NR==3{print $2}')
@@ -68,6 +74,7 @@ CONTENT=$CONTENT'"hostname":"'$HOSTNAME'",'
 CONTENT=$CONTENT'"fw_version":"'$FW_VERSION'",'
 CONTENT=$CONTENT'"home_version":"'$HOME_VERSION'",'
 CONTENT=$CONTENT'"model_suffix":"'$MODEL_SUFFIX'",'
+CONTENT=$CONTENT'"hardware_id":"'$HARDWARE_ID'",'
 CONTENT=$CONTENT'"serial_number":"'$SERIAL_NUMBER'",'
 CONTENT=$CONTENT'"local_ip":"'$LOCAL_IP'",'
 CONTENT=$CONTENT'"netmask":"'$NETMASK'",'
