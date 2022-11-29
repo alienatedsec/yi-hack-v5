@@ -5,6 +5,7 @@ INC_FF = -I$(FFMPEG_DIR)
 LIB_FF = $(FFMPEG_DIR)/libavcodec/libavcodec.a $(FFMPEG_DIR)/libavutil/libavutil.a -lpthread -lm
 JPEGLIB = jpeg-9e
 JPEGLIB_DIR = ./$(JPEGLIB)
+JPEGSRC = jpegsrc.v9e
 INC_J = -I$(JPEGLIB_DIR)
 LIB_J = $(JPEGLIB_DIR)/.libs/libjpeg.a
 
@@ -68,7 +69,7 @@ define build_jpeglib
     # get archive
     if [ ! -f SDK/jpeg.tar.gz ]; then \
         mkdir -p SDK; \
-        wget -O ./SDK/jpeg.tar.gz.tmp "https://www.ijg.org/files/jpegsrc.v9d.tar.gz"; \
+        wget -O ./SDK/jpeg.tar.gz.tmp "https://www.ijg.org/files/$(JPEGSRC).tar.gz"; \
         mv ./SDK/jpeg.tar.gz.tmp ./SDK/jpeg.tar.gz; \
     fi
 
