@@ -210,7 +210,7 @@ fi
 RRTSP_MODEL=$MODEL_SUFFIX
 RRTSP_RES=$(get_config RTSP_STREAM)
 RRTSP_AUDIO=$(get_config RTSP_AUDIO)
-RRTSP_PORT=$RTSP_PORT
+RRTSP_PORT=$(get_config RTSP_PORT)
 RRTSP_USER=$USERNAME
 RRTSP_PWD=$PASSWORD
 
@@ -225,7 +225,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
         HIGHWIDTH="1920"
         HIGHHEIGHT="1080"
     fi
-        rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT &
+        rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT -a $RRTSP_AUDIO &
     if [[ $(get_config RTSP_STREAM) == "low" ]]; then
         h264grabber -r low -m $MODEL_SUFFIX -f &
         ONVIF_PROFILE_1="--name Profile_1 --width 640 --height 360 --url rtsp://%s$D_RTSP_PORT/ch0_1.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=low$WATERMARK --type H264"
