@@ -39,15 +39,6 @@ init_config()
 
 start_rtsp()
 {
-    RRTSP_MODEL=$MODEL_SUFFIX
-    RRTSP_RES=$(get_config RTSP_STREAM)
-    RRTSP_AUDIO=$(get_config RTSP_AUDIO)
-    RRTSP_PORT=$RTSP_PORT
-    RRTSP_USER=$USERNAME
-    RRTSP_PWD=$PASSWORD
-
-    h264grabber -r $RRTSP_RES -m $MODEL_SUFFIX -f &
-    rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT &
     $YI_HACK_PREFIX/script/wd_rtsp.sh >/dev/null &
 }
 
@@ -80,17 +71,23 @@ fi
 init_config
 
 if [ "$VALUE" == "on" ] ; then
-    touch /tmp/privacy
-    touch /tmp/snapshot.disabled
-    stop_rtsp
-    killall mp4record
+    if [ ! -f /tmp/privacy ]; then
+        touch /tmp/privacy
+        touch /tmp/snapshot.disabled
+        stop_rtsp
+        killall mp4record
+    fi
     RES="on"
 elif [ "$VALUE" == "off" ] ; then
-    rm -f /tmp/snapshot.disabled
-    start_rtsp
-    cd /home/app
-    ./mp4record >/dev/null &
-    rm -f /tmp/privacy
+    if [ -f /tmp/privacy ]; then
+        rm -f /tmp/snapshot.disabled
+        start_rtsp
+        if [[ $(get_config DISABLE_CLOUD) == "no" ]] || [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
+            cd /home/app
+            ./mp4record >/dev/null &
+        fi
+        rm -f /tmp/privacy
+    fi
     RES="off"
 elif [ "$VALUE" == "status" ] ; then
     if [ -f /tmp/privacy ]; then
@@ -106,4 +103,5 @@ printf "{\n"
 if [ ! -z "$RES" ]; then
     printf "\"status\": \"$RES\"\n"
 fi
+printf "\"%s\":\"%s\"\\n" "error" "false"
 printf "}"
