@@ -8,6 +8,12 @@ MODEL_SUFFIX=$(cat /home/app/.camver)
 LOG_FILE="/tmp/sd/wd_rtsp.log"
 #LOG_FILE="/dev/null"
 
+get_config()
+{
+    key=$1
+    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
+}
+
 COUNTER=0
 COUNTER_LIMIT=10
 INTERVAL=10
@@ -18,12 +24,6 @@ RRTSP_MODEL=$MODEL_SUFFIX
 RRTSP_PORT=$RTSP_PORT
 RRTSP_USER=$USERNAME
 RRTSP_PWD=$PASSWORD
-
-get_config()
-{
-    key=$1
-    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
-}
 
 restart_rtsp()
 # Including a restart for h264grabber
@@ -43,7 +43,7 @@ fi
 
 check_rtsp()
 {
-#  echo "$(date +'%Y-%m-%d %H:%M:%S') - Checking RTSP process..." >> $LOG_FILE
+  echo "$(date +'%Y-%m-%d %H:%M:%S') - Checking RTSP process..." >> $LOG_FILE
     SOCKET=`$YI_HACK_PREFIX/bin/netstat -an 2>&1 | grep ":$RTSP_PORT " | grep ESTABLISHED | grep -c ^`
     CPU=`top -b -n 2 -d 1 | grep rRTSPServer | grep -v grep | tail -n 1 | awk '{print $8}'`
 

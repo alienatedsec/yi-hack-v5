@@ -237,8 +237,8 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
             ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
         fi
     fi
-#Seems to be killing the resource
-    #$YI_HACK_PREFIX/script/wd_rtsp.sh &
+#Seems to be killing the resource - fixed via #153
+    $YI_HACK_PREFIX/script/wd_rtsp.sh &
 fi
 
 if [[ $MODEL_SUFFIX == "yi_dome_1080p" ]] || [[ $MODEL_SUFFIX == "yi_cloud_dome_1080p" ]] ; then
@@ -293,7 +293,7 @@ fi
 #rm -f "/tmp/sd/log/log_wifi_connected.tar.gz"
 
 if [[ $(get_config FTP_UPLOAD) == "yes" ]] ; then
-    /tmp/sd/yi-hack-v5/script/ftppush.sh start &
+    $YI_HACK_PREFIX/script/ftppush.sh start &
 fi
 
 if [ -f "/tmp/sd/yi-hack-v5/startup.sh" ]; then
