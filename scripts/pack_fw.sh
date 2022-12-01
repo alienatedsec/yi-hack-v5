@@ -2,8 +2,8 @@
 
 #
 #  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
-#  Copyright (c) 2018-2019 Davide Maggioni.
-#  Copyright (c) 2021 alienatedsec
+#  Copyright (c) 2018-2019 Davide Maggioni - v4 specific
+#  Copyright (c) 2021-2022 alienatedsec - v5 specific
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -65,6 +65,17 @@ pack_image()
     printf "done!\n\n"
 }
 
+pack_files()
+{
+    local WORK_DIR=$1
+    local CAMERA_NAME=$2
+    local VERSION_ID=$3
+    
+    printf "> Compressing"
+    tar -cvzf "${WORK_DIR}/${CAMERA_NAME}_${VERSION_ID}.tgz" --directory "$WORK_DIR" "$CAMERA_NAME"
+    printf "done!\n\n"
+}
+
 ###############################################################################
 
 source "$(get_script_dir)/common.sh"
@@ -91,18 +102,21 @@ SYSROOT_DIR=$BASE_DIR/sysroot/$CAMERA_NAME
 STATIC_DIR=$BASE_DIR/static
 BUILD_DIR=$BASE_DIR/build
 OUT_DIR=$BASE_DIR/out/$CAMERA_NAME
+WORK_DIR=$BASE_DIR/out/
+VERSION_ID=$(cat $(get_script_dir)/../VERSION)
 
 echo ""
 echo "------------------------------------------------------------------------"
-echo " YI-HACK-V4 - FIRMWARE PACKER"
+echo " YI-HACK-V5 - FIRMWARE PACKER"
 echo "------------------------------------------------------------------------"
 printf " camera_name      : %s\n" $CAMERA_NAME
 printf " camera_id        : %s\n" $CAMERA_ID
-printf "                      \n"
+printf " version_id       : %s\n" $VERSION_ID
 printf " sysroot_dir      : %s\n" $SYSROOT_DIR
 printf " static_dir       : %s\n" $STATIC_DIR
 printf " build_dir        : %s\n" $BUILD_DIR
 printf " out_dir          : %s\n" $OUT_DIR
+printf " work_dir         : %s\n" $WORK_DIR
 echo "------------------------------------------------------------------------"
 echo ""
 
@@ -200,7 +214,8 @@ printf "Compressing yi-hack-v5... "
 # copy files to the output dir
 echo ">>> Copying files to $OUT_DIR... "
 echo "    Copying files..."
-cp $TMP_DIR/home/yi-hack-v5/yi-hack-v5.7z $OUT_DIR
+cp -R $TMP_DIR/home/yi-hack-v5 $OUT_DIR
+rm $OUT_DIR/yi-hack-v5/yi-hack-v5.7z
 echo "Copying files to the output folder - done!"
 
 # delete yi-hack-v5.7z before packing
@@ -218,6 +233,9 @@ pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # rootfs
 pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
+
+# pack files for release
+pack_files $WORK_DIR $CAMERA_NAME $VERSION_ID
 
 # Cleanup
 printf "Cleaning up the tmp folder... "
