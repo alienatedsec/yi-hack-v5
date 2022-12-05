@@ -47,6 +47,7 @@ sed -i '/^\.\/watch_process/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/oss/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/p2p_tnp/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/cloud/s/^/#/' /home/app/init.sh
+sed -i '/^\.\/mp4record/s/^/#/' /home/app/init.sh
 # set swappiness from 0 to 60
 sed -i "s#echo 0 > /proc/sys/vm/swappiness#echo 60 > /proc/sys/vm/swappiness#" /home/app/init.sh
 
