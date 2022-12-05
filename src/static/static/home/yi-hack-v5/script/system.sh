@@ -283,7 +283,7 @@ if [ ! -z "$CRONTAB" ]; then
     echo "$CRONTAB" > /var/spool/cron/crontabs/root
 fi
 if [ "$FREE_SPACE" != "0" ]; then
-    echo "0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE" >> /var/spool/cron/crontabs/root
+    echo "0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE" > /var/spool/cron/crontabs/root
 fi
 
 /usr/sbin/crond -c /var/spool/cron/crontabs/
