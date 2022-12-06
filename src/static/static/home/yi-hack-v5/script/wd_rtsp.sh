@@ -1,5 +1,12 @@
 #!/bin/sh
 
+script_name=$(basename -- "$0")
+
+if pidof "$script_name" -o $$ >/dev/null;then
+   echo "Already Running - Quitting"
+   exit 1
+fi
+
 CONF_FILE="etc/system.conf"
 
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
