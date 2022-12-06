@@ -36,3 +36,4 @@ cd live || exit 1
 ./genMakefiles linux-cross
 cp -f ../Makefile.rRTSPServer Makefile
 cp -rf ../src .
+cp -rf ../include .
