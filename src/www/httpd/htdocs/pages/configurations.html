@@ -90,16 +90,17 @@
                             </span>
                         </td>
                     </tr>
-                    <!-- <tr class="row">
+                    <tr class="row">
                         <td>RTSP Audio</td>
                         <td>
                             <div class="standard-select">
                                 <select data-key="RTSP_AUDIO" id="RTSP_AUDIO">
                                     <option value="no">Disabled (default)</option>
-                                    <option value="pcm">pcm</option>
+                                    <option value="yes">Enabled</option>
+                                    <!-- <option value="pcm">pcm</option> 
                                     <option value="alaw">alaw</option>
                                     <option value="ulaw">ulaw</option>
-                                    <option value="aac">aac (cpu expensive)</option>
+                                    <option value="aac">aac (cpu expensive)</option>-->
                                 </select>
                             </div>
                             <span class="switch-description">
@@ -108,7 +109,7 @@
                                 <span class="strong">WARNING: this is an experimental feature.</span>
                             </span>
                         </td>
-                    </tr> -->
+                    </tr>
                     <tr class="row">
                         <td>ONVIF</td>
                         <td>
@@ -298,7 +299,7 @@
                                 <span class="switch-text"></span>
                             </label>
                             <span class="switch-description">
-                                Enable swap file on SD card. This option will create a file (/tmp/sd/swapfile) to expand your memory. (enforced by default on yi_home and yi_dome)
+                                Enable swap file on SD card. This option will create a file (/tmp/sd/swapfile) to expand your memory. (enforced by default on yi_home and yi_dome) - also recommended for mqtt and HomeAssistant integration.
                             </span>
                         </td>
                     </tr>

@@ -34,7 +34,7 @@ RRTSP_PWD=$PASSWORD
 
 restart_rtsp()
 {
-    rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT -a $RRTSP_AUDIO &
+    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
 }
 
 restart_grabber()
