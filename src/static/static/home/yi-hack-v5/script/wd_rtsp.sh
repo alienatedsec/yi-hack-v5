@@ -49,6 +49,9 @@ restart_grabber()
         h264grabber -r low -m $MODEL_SUFFIX -f &
         h264grabber -r high -m $MODEL_SUFFIX -f &
     fi
+    if [[ $(get_config RTSP_AUDIO) == "yes" ]]; then
+        h264grabber -r AUDIO -m $MODEL_SUFFIX -f &
+    fi
 }
 
 check_rtsp()

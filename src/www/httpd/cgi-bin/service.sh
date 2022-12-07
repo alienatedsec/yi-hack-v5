@@ -61,15 +61,32 @@ RRTSP_PORT=$RTSP_PORT
 RRTSP_USER=$USERNAME
 RRTSP_PWD=$PASSWORD
 #RRTSP_MODEL=$MODEL_SUFFIX RRTSP_RES=$1 RRTSP_PORT=$RTSP_PORT RRTSP_USER=$USERNAME RRTSP_PWD=$PASSWORD rRTSPServer >/dev/null &
-    h264grabber -r $RRTSP_RES -m $MODEL_SUFFIX -f &
+
+# The below section to be also copied to system.sh
     rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
-    $YI_HACK_PREFIX/script/wd_rtsp.sh >/dev/null &
+    if [[ $(get_config RTSP_AUDIO) == "yes" ]]; then
+        h264grabber -r audio -m $MODEL_SUFFIX -f &
+    fi
+    if [[ $(get_config RTSP_STREAM) == "low" ]]; then
+        h264grabber -r low -m $MODEL_SUFFIX -f &
+    fi
+    if [[ $(get_config RTSP_STREAM) == "high" ]]; then
+        h264grabber -r high -m $MODEL_SUFFIX -f &
+    fi
+    if [[ $(get_config RTSP_STREAM) == "both" ]]; then
+        h264grabber -r low -m $MODEL_SUFFIX -f &
+        h264grabber -r high -m $MODEL_SUFFIX -f &
+    fi
+#Seems to be killing the resource - fixed via #153
+    $YI_HACK_PREFIX/script/wd_rtsp.sh &
+#The above section to be also copied to service.sh
 }
 
 stop_rtsp()
 {
     killall wd_rtsp.sh
     killall rRTSPServer
+    killall h264grabber
 }
 
 start_onvif()
