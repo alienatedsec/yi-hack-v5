@@ -636,7 +636,7 @@ int main(int argc, char **argv) {
                     break;
                 }
             }
-            if (debug) fprintf(stderr, "%lld - found latest frame: id %d, frame_ts %d\n", current_timestamp(), current_frame, frame_ts);
+            if (debug) fprintf(stderr, "%lld - found latest frame: id %d, frame_ts %u\n", current_timestamp(), current_frame, frame_ts);
 
             // Wait 10 milliseconds
             usleep(MILLIS_10);
@@ -645,7 +645,7 @@ int main(int argc, char **argv) {
             for (;;) {
                 // Get pointer to the record
                 record_ptr = addr + table_offset + (current_frame * table_record_size);
-                if (debug) fprintf(stderr, "%lld - processing frame %d, frame_ts %d\n", current_timestamp(), current_frame, frame_ts);
+                if (debug) fprintf(stderr, "%lld - processing frame %d, frame_ts %u\n", current_timestamp(), current_frame, frame_ts);
                 // Check if we are at the end of the table
                 if (current_frame == table_record_num - 1) {
                     next_record_ptr = addr + table_offset;
@@ -658,7 +658,7 @@ int main(int argc, char **argv) {
                             (((int) *(next_record_ptr + frame_ts_offset + 2)) << 16) +
                             (((int) *(next_record_ptr + frame_ts_offset + 1)) << 8) +
                             ((int) *(next_record_ptr + frame_ts_offset));
-                if (debug) fprintf(stderr, "%lld - current frame timestamp is %d, next frame timestamp is %d\n", current_timestamp(), frame_ts, next_frame_ts);
+                if (debug) fprintf(stderr, "%lld - current frame timestamp is %u, next frame timestamp is %u\n", current_timestamp(), frame_ts, next_frame_ts);
                 // Check if the frame timestamp is valid
                 if (next_frame_ts >= frame_ts)
                     frame_ts_diff = next_frame_ts - frame_ts;
@@ -677,7 +677,7 @@ int main(int argc, char **argv) {
                                 (((int) *(record_ptr + frame_length_offset + 2)) << 16) +
                                 (((int) *(record_ptr + frame_length_offset + 1)) << 8) +
                                 ((int) *(record_ptr + frame_length_offset));
-                    if (debug) fprintf(stderr, "%lld - writing frame: frame_ts %d, frame_offset %d, frame_ptr %08x, frame_length %d\n", current_timestamp(), frame_ts, frame_offset, (unsigned int) frame_ptr, frame_length);
+                    if (debug) fprintf(stderr, "%lld - writing frame: frame_ts %u, frame_offset %d, frame_ptr %08x, frame_length %d\n", current_timestamp(), frame_ts, frame_offset, (unsigned int) frame_ptr, frame_length);
                     // Write the frame
                     fwrite(frame_ptr, 1, frame_length, fOut);
                     fflush(fOut);
