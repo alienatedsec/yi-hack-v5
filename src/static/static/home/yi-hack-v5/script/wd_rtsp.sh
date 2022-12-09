@@ -34,7 +34,7 @@ RRTSP_PWD=$PASSWORD
 
 restart_rtsp()
 {
-    rRTSPServer -r $RRTSP_RES -p $RRTSP_PORT -a $RRTSP_AUDIO &
+    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
 }
 
 restart_grabber()
@@ -48,6 +48,9 @@ restart_grabber()
     if [[ $(get_config RTSP_STREAM) == "both" ]]; then
         h264grabber -r low -m $MODEL_SUFFIX -f &
         h264grabber -r high -m $MODEL_SUFFIX -f &
+    fi
+    if [[ $(get_config RTSP_AUDIO) == "yes" ]]; then
+        h264grabber -r AUDIO -m $MODEL_SUFFIX -f &
     fi
 }
 
