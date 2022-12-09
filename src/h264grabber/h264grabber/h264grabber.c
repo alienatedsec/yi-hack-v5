@@ -664,7 +664,7 @@ int main(int argc, char **argv) {
                     frame_ts_diff = next_frame_ts - frame_ts;
                 else
                     frame_ts_diff = next_frame_ts + (0xffffffff - frame_ts + 1);
-                if ((frame_ts_diff >= 0) && (frame_ts_diff <= 10 * 128)) {
+                if ((frame_ts_diff >= 0) && (frame_ts_diff <= 10 * 64)) {    // 1 packet with 1024 samples every 64 ms
                     // Get the offset of the stream
                     frame_offset = (((int) *(record_ptr + frame_offset_offset + 3)) << 24) +
                                 (((int) *(record_ptr + frame_offset_offset + 2)) << 16) +
