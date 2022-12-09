@@ -688,7 +688,7 @@ int main(int argc, char **argv) {
                     } else {
                         current_frame++;
                     }
-                    frame_counter = next_frame_counter;
+                    frame_ts = next_frame_ts;
                     frame_counter_invalid = 0;
                 } else {
                     frame_counter_invalid++;
