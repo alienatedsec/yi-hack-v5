@@ -22,8 +22,14 @@ get_config()
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd:/tmp/sd/yi-hack-v5:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin:/home/yi-hack-v5/sbin
 
-if [ ! -L "/var/run/utmp" ]; then
-  ln -sf /dev/null /var/run/utmp
+#if [ ! -L "/var/run/utmp" ]; then
+#  ln -sf /dev/null /var/run/utmp
+#fi
+
+#reversing symlinks
+if [ -L "/var/run/utmp" ]; then
+  rm /var/run/utmp
+  reboot
 fi
 
 if [ ! -L "~/.ash_history" ]; then
