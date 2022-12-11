@@ -35,6 +35,8 @@
 #define RESOLUTION_HIGH 1080
 #define RESOLUTION_BOTH 1440
 
+int debug = 0;
+
 UsageEnvironment* env;
 
 // To make the second and subsequent client for each stream reuse the same
@@ -83,7 +85,7 @@ static void announceStream(RTSPServer* rtspServer, ServerMediaSession* sms,
 
 void print_usage(char *progname)
 {
-    fprintf(stderr, "\nUsage: %s [-r RES] [-a AUDIO] [-p PORT] [-u USER] [-w PASSWORD] [-d]\n\n", progname);
+    fprintf(stderr, "\nUsage: %s [-r RES] [-a AUDIO] [-p PORT] [-u USER] [-w PASSWORD] [-d LEVEL]\n\n", progname);
     fprintf(stderr, "\t-r RES,  --resolution RES\n");
     fprintf(stderr, "\t\tset resolution: low, high, both or none (default high)\n");
     fprintf(stderr, "\t-a AUDIO,  --audio AUDIO\n");
@@ -94,8 +96,8 @@ void print_usage(char *progname)
     fprintf(stderr, "\t\tset username\n");
     fprintf(stderr, "\t-w PASSWORD, --password PASSWORD\n");
     fprintf(stderr, "\t\tset password\n");
-    fprintf(stderr, "\t-d,      --debug\n");
-    fprintf(stderr, "\t\tenable debug\n");
+    fprintf(stderr, "\t-d LEVEL, --debug LEVEL\n");
+    fprintf(stderr, "\t\tenable debug, LEVEL = [1..7]\n");
     fprintf(stderr, "\t-h,      --help\n");
     fprintf(stderr, "\t\tprint this help\n");
 }
@@ -116,7 +118,6 @@ int main(int argc, char** argv)
     int resolution = RESOLUTION_HIGH;
     int audio = 1;
     int port = 554;
-    int debug = 0;
 
     memset(user, 0, sizeof(user));
     memset(pwd, 0, sizeof(pwd));
@@ -129,14 +130,14 @@ int main(int argc, char** argv)
             {"port",  required_argument, 0, 'p'},
             {"user",  required_argument, 0, 'u'},
             {"password",  required_argument, 0, 'w'},
-            {"debug",  no_argument, 0, 'd'},
+            {"debug",  required_argument, 0, 'd'},
             {"help",  no_argument, 0, 'h'},
             {0, 0, 0, 0}
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "r:a:p:u:w:dh",
+        c = getopt_long (argc, argv, "r:a:p:u:w:d:h",
                          long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -194,8 +195,22 @@ int main(int argc, char** argv)
             break;
 
         case 'd':
-            fprintf (stderr, "debug on\n");
-            debug = 1;
+            errno = 0;    /* To distinguish success/failure after call */
+            debug = strtol(optarg, &endptr, 10);
+
+            /* Check for various possible errors */
+            if ((errno == ERANGE && (debug == LONG_MAX || debug == LONG_MIN)) || (errno != 0)) {
+                print_usage(argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            if (endptr == optarg) {
+                print_usage(argv[0]);
+                exit(EXIT_FAILURE);
+            }
+            if ((debug < 0) || (debug > 7)) {
+                print_usage(argv[0]);
+                exit(EXIT_FAILURE);
+            }
             break;
 
         case 'h':

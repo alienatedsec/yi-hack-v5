@@ -26,6 +26,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 ////////// ADTSAudioFifoSource //////////
 
+extern int debug;
+
 static unsigned const samplingFrequencyTable[16] = {
     96000, 88200, 64000, 48000,
     44100, 32000, 24000, 22050,
@@ -103,14 +105,14 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
             i += fread(null, 1, 1, fid);
         }
 
-#ifdef DEBUG
-        fprintf(stderr, "Read first frame: profile %d, "
+        if (debug & 4) {
+            fprintf(stderr, "Read first frame: profile %d, "
                 "sampling_frequency_index %d => samplingFrequency %d, "
-            "channel_configuration %d\n",
-            profile,
-            sampling_frequency_index, samplingFrequencyTable[sampling_frequency_index],
-            channel_configuration);
-#endif
+                "channel_configuration %d\n",
+                profile,
+                sampling_frequency_index, samplingFrequencyTable[sampling_frequency_index],
+                channel_configuration);
+        }
         return new ADTSAudioFifoSource(env, fid, profile,
                                        sampling_frequency_index, channel_configuration);
     } while (0);
@@ -123,100 +125,98 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
 ADTSAudioFifoSource
 ::ADTSAudioFifoSource(UsageEnvironment& env, FILE* fid, u_int8_t profile,
 		      u_int8_t samplingFrequencyIndex, u_int8_t channelConfiguration)
-  : FramedFileSource(env, fid) {
-  fSamplingFrequency = samplingFrequencyTable[samplingFrequencyIndex];
-  fNumChannels = channelConfiguration == 0 ? 2 : channelConfiguration;
-  fuSecsPerFrame
-    = (1024/*samples-per-frame*/*1000000) / fSamplingFrequency/*samples-per-second*/;
+    : FramedFileSource(env, fid) {
+    fSamplingFrequency = samplingFrequencyTable[samplingFrequencyIndex];
+    fNumChannels = channelConfiguration == 0 ? 2 : channelConfiguration;
+    fuSecsPerFrame
+        = (1024/*samples-per-frame*/*1000000) / fSamplingFrequency/*samples-per-second*/;
 
-  // Construct the 'AudioSpecificConfig', and from it, the corresponding ASCII string:
-  unsigned char audioSpecificConfig[2];
-  u_int8_t const audioObjectType = profile + 1;
-  audioSpecificConfig[0] = (audioObjectType<<3) | (samplingFrequencyIndex>>1);
-  audioSpecificConfig[1] = (samplingFrequencyIndex<<7) | (channelConfiguration<<3);
-  sprintf(fConfigStr, "%02X%02X", audioSpecificConfig[0], audioSpecificConfig[1]);
+    // Construct the 'AudioSpecificConfig', and from it, the corresponding ASCII string:
+    unsigned char audioSpecificConfig[2];
+    u_int8_t const audioObjectType = profile + 1;
+    audioSpecificConfig[0] = (audioObjectType<<3) | (samplingFrequencyIndex>>1);
+    audioSpecificConfig[1] = (samplingFrequencyIndex<<7) | (channelConfiguration<<3);
+    sprintf(fConfigStr, "%02X%02X", audioSpecificConfig[0], audioSpecificConfig[1]);
 }
 
 ADTSAudioFifoSource::~ADTSAudioFifoSource() {
-  CloseInputFile(fFid);
+    CloseInputFile(fFid);
 }
 
 // Note: We should change the following to use asynchronous file reading, #####
 // as we now do with ByteStreamFileSource. #####
 void ADTSAudioFifoSource::doGetNextFrame() {
-  // Begin by reading the 7-byte fixed_variable headers:
-  unsigned char headers[7];
-  if (fread(headers, 1, sizeof headers, fFid) < sizeof headers) {
-//      || feof(fFid) || ferror(fFid)) {
-    // The input source has ended:
-    fprintf(stderr, "Input source ended\n");
-    handleClosure();
-    return;
-  }
-
-  // Extract important fields from the headers:
-  Boolean protection_absent = headers[1]&0x01;
-  u_int16_t frame_length
-    = ((headers[3]&0x03)<<11) | (headers[4]<<3) | ((headers[5]&0xE0)>>5);
-  u_int16_t syncword = (headers[0]<<4) | (headers[1]>>4);
-#ifdef DEBUG
-  fprintf(stderr, "Read frame: syncword 0x%x, protection_absent %d, frame_length %d\n", syncword, protection_absent, frame_length);
-#endif
-  if (syncword != 0xFFF) {
-    fprintf(stderr, "WARNING: Bad syncword!\n");
-    // Resync
-    while (1) {
-        fread(headers, 1, 1, fFid);
-        if (headers[0] == 0xFF) {
-            fread(&headers[1], 1, 1, fFid);
-            // Check the 'syncword':
-            if ((headers[1]&0xF0) == 0xF0) {
-                fread(&headers[2], 1, sizeof(headers) - 2, fFid);
-                break;
-            }
-        }
-        usleep(10000);
+    // Begin by reading the 7-byte fixed_variable headers:
+    unsigned char headers[7];
+    if (fread(headers, 1, sizeof headers, fFid) < sizeof headers) {
+//          || feof(fFid) || ferror(fFid)) {
+        // The input source has ended:
+        fprintf(stderr, "Input source ended\n");
+        handleClosure();
+        return;
     }
-  }
-  unsigned numBytesToRead
-    = frame_length > sizeof headers ? frame_length - sizeof headers : 0;
 
-  // If there's a 'crc_check' field, skip it:
-  if (!protection_absent) {
-    unsigned char null[2];
-    fread(null, 1, 2, fFid);
-    numBytesToRead = numBytesToRead > 2 ? numBytesToRead - 2 : 0;
-  }
+    // Extract important fields from the headers:
+    Boolean protection_absent = headers[1]&0x01;
+    u_int16_t frame_length
+        = ((headers[3]&0x03)<<11) | (headers[4]<<3) | ((headers[5]&0xE0)>>5);
+    u_int16_t syncword = (headers[0]<<4) | (headers[1]>>4);
+    if (debug & 4) fprintf(stderr, "Read frame: syncword 0x%x, protection_absent %d, frame_length %d\n", syncword, protection_absent, frame_length);
+    if (syncword != 0xFFF) {
+        fprintf(stderr, "WARNING: Bad syncword!\n");
+        // Resync
+        while (1) {
+            fread(headers, 1, 1, fFid);
+            if (headers[0] == 0xFF) {
+                fread(&headers[1], 1, 1, fFid);
+                // Check the 'syncword':
+                if ((headers[1]&0xF0) == 0xF0) {
+                    fread(&headers[2], 1, sizeof(headers) - 2, fFid);
+                    break;
+                }
+            }
+            usleep(10000);
+        }
+    }
+    unsigned numBytesToRead
+        = frame_length > sizeof headers ? frame_length - sizeof headers : 0;
 
-  // Next, read the raw frame data into the buffer provided:
-  if (numBytesToRead > fMaxSize) {
-    fNumTruncatedBytes = numBytesToRead - fMaxSize;
-    numBytesToRead = fMaxSize;
-  }
-  int numBytesRead = fread(fTo, 1, numBytesToRead, fFid);
-  if (numBytesRead < 0) numBytesRead = 0;
-  fFrameSize = numBytesRead;
-  fNumTruncatedBytes += numBytesToRead - numBytesRead;
+    // If there's a 'crc_check' field, skip it:
+    if (!protection_absent) {
+        unsigned char null[2];
+        fread(null, 1, 2, fFid);
+        numBytesToRead = numBytesToRead > 2 ? numBytesToRead - 2 : 0;
+    }
 
-  // Set the 'presentation time':
-  if (fPresentationTime.tv_sec == 0 && fPresentationTime.tv_usec == 0) {
-    // This is the first frame, so use the current time:
-    gettimeofday(&fPresentationTime, NULL);
-  } else {
+    // Next, read the raw frame data into the buffer provided:
+    if (numBytesToRead > fMaxSize) {
+        fNumTruncatedBytes = numBytesToRead - fMaxSize;
+        numBytesToRead = fMaxSize;
+    }
+    int numBytesRead = fread(fTo, 1, numBytesToRead, fFid);
+    if (numBytesRead < 0) numBytesRead = 0;
+    fFrameSize = numBytesRead;
+    fNumTruncatedBytes += numBytesToRead - numBytesRead;
+
+    // Set the 'presentation time':
+    if (fPresentationTime.tv_sec == 0 && fPresentationTime.tv_usec == 0) {
+        // This is the first frame, so use the current time:
+        gettimeofday(&fPresentationTime, NULL);
+    } else {
 #ifndef PRES_TIME_CLOCK
-    // Increment by the play time of the previous frame:
-    unsigned uSeconds = fPresentationTime.tv_usec + fuSecsPerFrame;
-    fPresentationTime.tv_sec += uSeconds/1000000;
-    fPresentationTime.tv_usec = uSeconds%1000000;
+        // Increment by the play time of the previous frame:
+        unsigned uSeconds = fPresentationTime.tv_usec + fuSecsPerFrame;
+        fPresentationTime.tv_sec += uSeconds/1000000;
+        fPresentationTime.tv_usec = uSeconds%1000000;
 #else
-    // Use system clock to set presentation time
-    gettimeofday(&fPresentationTime, NULL);
+        // Use system clock to set presentation time
+        gettimeofday(&fPresentationTime, NULL);
 #endif
-  }
+    }
 
-  fDurationInMicroseconds = fuSecsPerFrame;
+    fDurationInMicroseconds = fuSecsPerFrame;
 
-  // Switch to another task, and inform the reader that he has data:
-  nextTask() = envir().taskScheduler().scheduleDelayedTask(0,
+    // Switch to another task, and inform the reader that he has data:
+    nextTask() = envir().taskScheduler().scheduleDelayedTask(0,
 				(TaskFunc*)FramedSource::afterGetting, this);
 }

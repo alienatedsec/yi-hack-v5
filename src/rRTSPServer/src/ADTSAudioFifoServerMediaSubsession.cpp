@@ -24,6 +24,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 #include "MPEG4GenericRTPSink.hh"
 #include "FramedFilter.hh"
 
+extern int debug;
+
 ADTSAudioFifoServerMediaSubsession*
 ADTSAudioFifoServerMediaSubsession::createNew(UsageEnvironment& env,
 					     StreamReplicator *replicator,
@@ -113,17 +115,13 @@ FramedSource* ADTSAudioFifoServerMediaSubsession
     // has a sample frequency and expected to be a ADTSAudioFifoSource.
     for (int x = 0; x < 10; x++) {
         if (((ADTSAudioFifoSource*)(previousSource))->samplingFrequency() != 0) {
-#ifdef DEBUG
-            printf("AudioFramedMemorySource found at x = %d\n", x);
-#endif
+            if (debug & 4) printf("AudioFramedMemorySource found at x = %d\n", x);
             originalSource = (ADTSAudioFifoSource*)(previousSource);
             break;
         }
         previousSource = (FramedFilter*)previousSource->inputSource();
     }
-#ifdef DEBUG
-    printf("fReplicator->inputSource() = %p\n", originalSource);
-#endif
+    if (debug & 4) printf("fReplicator->inputSource() = %p\n", originalSource);
     resultSource = fReplicator->createStreamReplica();
     if (resultSource == NULL) {
         fprintf(stderr, "Failed to create stream replica\n");
@@ -131,9 +129,7 @@ FramedSource* ADTSAudioFifoServerMediaSubsession
         return NULL;
     } else {
         sprintf(fConfigStr, originalSource->configStr());
-#ifdef DEBUG
-        fprintf(stderr, "createStreamReplica completed successfully\n");
-#endif
+        if (debug & 4) fprintf(stderr, "createStreamReplica completed successfully\n");
 
         return resultSource;
     }
