@@ -85,7 +85,7 @@ void print_usage(char *progname)
 {
     fprintf(stderr, "\nUsage: %s [-r RES] [-a AUDIO] [-p PORT] [-u USER] [-w PASSWORD] [-d]\n\n", progname);
     fprintf(stderr, "\t-r RES,  --resolution RES\n");
-    fprintf(stderr, "\t\tset resolution: low, high or both (default high)\n");
+    fprintf(stderr, "\t\tset resolution: low, high, both or none (default high)\n");
     fprintf(stderr, "\t-a AUDIO,  --audio AUDIO\n");
     fprintf(stderr, "\t\tset audio: yes or no (default yes)\n");
     fprintf(stderr, "\t-p PORT, --port PORT\n");
@@ -151,6 +151,8 @@ int main(int argc, char** argv)
                 resolution = RESOLUTION_HIGH;
             } else if (strcasecmp("both", optarg) == 0) {
                 resolution = RESOLUTION_BOTH;
+            } else if (strcasecmp("none", optarg) == 0) {
+                resolution = RESOLUTION_NONE;
             }
             break;
 
@@ -220,6 +222,8 @@ int main(int argc, char** argv)
             resolution = RESOLUTION_HIGH;
         } else if (strcasecmp("both", str) == 0) {
             resolution = RESOLUTION_BOTH;
+        } else if (strcasecmp("none", str) == 0) {
+            resolution = RESOLUTION_NONE;
         }
     }
 
@@ -252,6 +256,11 @@ int main(int argc, char** argv)
     str = getenv("RRTSP_PWD");
     if ((str != NULL) && (strlen(str) < sizeof(pwd))) {
         strcpy(pwd, str);
+    }
+
+    if ((resolution == RESOLUTION_NONE) && (audio == 0)) {
+        fprintf(stderr, "Nothing to stream: select valid resolution or enable audio\n");
+        return -2;
     }
 
     // Begin by setting up our usage environment:
