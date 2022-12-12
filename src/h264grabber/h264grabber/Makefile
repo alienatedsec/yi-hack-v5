@@ -1,5 +1,6 @@
 OBJECTS = h264grabber.o
 OPTS = -march=armv5te -mcpu=arm926ej-s
+LIB = -lpthread
 
 all: h264grabber
 

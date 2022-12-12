@@ -33,6 +33,7 @@
 #include <sys/time.h>
 #include <getopt.h>
 #include <signal.h>
+#include <pthread.h>
 #include <errno.h>
 #include <limits.h>
 
@@ -160,6 +161,19 @@ void sigpipe_handler(int unused)
     // Do nothing
 }
 
+void* unlock_fifo_thread(void *data)
+{
+    int fd;
+    char *fifo_name = data;
+    unsigned char buffer_fifo[1024];
+
+    fd = open(fifo_name, O_RDONLY);
+    read(fd, buffer_fifo, 1024);
+    close(fd);
+
+    return NULL;
+}
+
 void print_usage(char *progname)
 {
     fprintf(stderr, "\nUsage: %s [-r RES] [-d]\n\n", progname);
@@ -228,6 +242,8 @@ int main(int argc, char **argv) {
     int resolution = RESOLUTION_HIGH;
     int debug = 0;
     int fifo = 0;
+
+    pthread_t unlock_low_thread, unlock_high_thread, unlock_aac_thread;
 
     // Settings default
     table_high_offset = TABLE_HIGH_OFFSET_YI_HOME_1080P;
@@ -504,6 +520,11 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "mkfifo failed for file %s\n", FIFO_NAME_LOW);
                 return -1;
             }
+            if(pthread_create(&unlock_low_thread, NULL, unlock_fifo_thread, (void *) FIFO_NAME_LOW)) {
+                fprintf(stderr, "Error creating thread\n");
+                return -1;
+            }
+            pthread_detach(unlock_low_thread);
             fOut = fopen(FIFO_NAME_LOW, "w");
             if (fOut == NULL) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_LOW);
@@ -515,6 +536,11 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "mkfifo failed for file %s\n", FIFO_NAME_HIGH);
                 return -1;
             }
+            if(pthread_create(&unlock_high_thread, NULL, unlock_fifo_thread, (void *) FIFO_NAME_HIGH)) {
+                fprintf(stderr, "Error creating thread\n");
+                return -1;
+            }
+            pthread_detach(unlock_high_thread);
             fOut = fopen(FIFO_NAME_HIGH, "w");
             if (fOut == NULL) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_HIGH);
@@ -526,6 +552,11 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "mkfifo failed for file %s\n", FIFO_NAME_AAC);
                 return -1;
             }
+            if(pthread_create(&unlock_aac_thread, NULL, unlock_fifo_thread, (void *) FIFO_NAME_AAC)) {
+                fprintf(stderr, "Error creating thread\n");
+                return -1;
+            }
+            pthread_detach(unlock_aac_thread);
             fOut = fopen(FIFO_NAME_AAC, "w");
             if (fOut == NULL) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_AAC);
