@@ -105,7 +105,7 @@ char const* ADTSAudioFifoServerMediaSubsession::getAuxSDPLine(RTPSink* rtpSink, 
 
 FramedSource* ADTSAudioFifoServerMediaSubsession
 ::createNewStreamSource(unsigned /*clientSessionId*/, unsigned& estBitrate) {
-    estBitrate = 96; // kbps, estimate
+    estBitrate = 32; // kbps, estimate
 
     FramedSource* resultSource = NULL;
     ADTSAudioFifoSource* originalSource = NULL;
