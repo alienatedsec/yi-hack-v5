@@ -14,9 +14,6 @@ do
         continue
     fi
     CONF_LAST=$CONF
-    CONF_UPPER="$(echo $CONF | tr '[a-z]' '[A-Z]')"
-
-    sed -i "s/^\(${CONF_UPPER}\s*=\s*\).*$/\1${VAL}/" $CONF_FILE
 
     if [ "$CONF" == "switch_on" ] ; then
         if [ "$VAL" == "no" ] ; then
@@ -75,4 +72,5 @@ done
 printf "Content-type: application/json\r\n\r\n"
 
 printf "{\n"
+printf "\"%s\":\"%s\"\\n" "error" "false"
 printf "}"
