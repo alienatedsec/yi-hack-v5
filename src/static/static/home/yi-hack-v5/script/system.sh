@@ -192,8 +192,8 @@ fi
 
 ipc_multiplexer &
 
+mqttv4 &
 if [[ $(get_config MQTT) == "yes" ]] ; then
-    mqttv4 &
     mqtt-config &
 fi
 
