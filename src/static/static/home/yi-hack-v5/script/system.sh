@@ -192,9 +192,10 @@ fi
 
 ipc_multiplexer &
 
+mqttv4 &
 if [[ $(get_config MQTT) == "yes" ]] ; then
-    mqttv4 &
     mqtt-config &
+    $YI_HACK_PREFIX/script/conf2mqtt.sh &
 fi
 
 if [[ $RTSP_PORT != "554" ]] ; then
