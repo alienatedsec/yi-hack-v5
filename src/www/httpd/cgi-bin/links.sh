@@ -13,14 +13,12 @@ get_config()
 LOCAL_IP_WLAN=$(ifconfig wlan0 | awk '/inet addr/{print substr($2,6)}')
 LOCAL_IP_ETH=$(ifconfig eth0 | awk '/inet addr/{print substr($2,6)}')
 
-if [[ LOCAL_IP_WLAN == "" & LOCAL_IP_ETH !="" ]] ; then
-    LOCAL_IP = LOCAL_IP_ETH
-
-elif [[ LOCAL_IP_WLAN != "" & LOCAL_IP_ETH =="" ]] ; then
-    LOCAL_IP = LOCAL_IP_WLAN
-
-elif [[ LOCAL_IP_WLAN == "" & LOCAL_IP_ETH =="" ]] ; then
-    LOCAL_IP = hostname
+if [[ $LOCAL_IP_WLAN == "" && $LOCAL_IP_ETH != "" ]]; then
+    LOCAL_IP=$LOCAL_IP_ETH
+elif [[ $LOCAL_IP_WLAN != "" && $LOCAL_IP_ETH == "" ]]; then
+    LOCAL_IP=$LOCAL_IP_WLAN
+elif [[ $LOCAL_IP_WLAN == "" && $LOCAL_IP_ETH == "" ]]; then
+    LOCAL_IP="127.0.0.1"
 fi
 
 case $(get_config RTSP_PORT) in
