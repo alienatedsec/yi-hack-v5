@@ -10,7 +10,7 @@
     </a>
 </p>
 
-## Why this Yi-Hack-V5 firmware?
+## Why this `YI-HACK-V5` firmware?
 
 The answer is simple: missing updates, RTSP and not based on the latest stock firmware (which features improvements and new cool stuff).
 Besides, there were no updates to Yi-Hack-V4, and I am really against that RTSP licensing model. I have contributed enough and will continue my work separately.
@@ -155,6 +155,9 @@ Verify that you did not forget to upload `yi-hack-v5` folder to the SD card when
 ### Cannot complete the pairing / wifi settings lost after reboot
 Make sure that you are using the correct app (Yi Home) to setup the wifi connection. For example, the "Xiaomi Home" app will also generate the correct QR code that will work with your camera for initial connection, but then after power is removed
 the settings will be lost.
+
+## Introducing pre-releases
+Please follow this [guide](https://github.com/alienatedsec/yi-hack-v5/discussions/248#discussion-5090628) if you want to test new features and improvements
 
 ## Acknowledgments
 Special thanks to the following people and projects, without them `yi-hack-v5` wouldn't be possible.
