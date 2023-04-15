@@ -27,6 +27,7 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
@@ -41,6 +42,9 @@
 #endif
 
 #include "libavcodec/avcodec.h"
+#include "libavutil/common.h"
+#include "libavutil/avutil.h"
+#include "libavutil/opt.h"
 
 #include "convert2jpg.h"
 #include "add_water.h"
@@ -183,7 +187,7 @@ long long current_timestamp() {
 
 int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
 {
-    AVCodec *codec;
+    const AVCodec *codec;
     AVCodecContext *c= NULL;
     AVFrame *picture;
     int got_picture, len;
@@ -209,14 +213,14 @@ int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
     c = avcodec_alloc_context3(codec);
     picture = av_frame_alloc();
 
-    if((codec->capabilities) & AV_CODEC_CAP_TRUNCATED)
-        (c->flags) |= AV_CODEC_FLAG_TRUNCATED;
+    // Removed check for truncated capabilities and flag assignment
 
     if (avcodec_open2(c, codec, NULL) < 0) {
         if (debug) fprintf(stderr, "Could not open codec h264\n");
         av_free(c);
         return -2;
     }
+
 
     // inbuf is already allocated in the main function
     inbuf = p;
@@ -270,6 +274,7 @@ int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
 
     return 0;
 }
+
 
 int add_watermark(char *buffer, int width, int height)
 {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ARCHIVE=live.2022.12.01.tar.gz
+ARCHIVE=live.2023.01.19.tar.gz
 
 export PATH=${PATH}:/opt/arm-hisiv300-linux/bin
 
