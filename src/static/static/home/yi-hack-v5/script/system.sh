@@ -19,7 +19,7 @@ get_config()
     grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
 }
 
-export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd:/tmp/sd/yi-hack-v5:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib
+export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin:/home/yi-hack-v5/sbin
 
 #if [ ! -L "/var/run/utmp" ]; then
@@ -132,11 +132,26 @@ case $(get_config HTTPD_PORT) in
     *) HTTPD_PORT=$(get_config HTTPD_PORT) ;;
 esac
 
+# Copy library files for older versions (just in case the below firmware check is failed)
+if [ ! -d "/home/yi-hack-v5/lib" ]; then
+        mkdir -p "/home/yi-hack-v5/lib"
+        cp -a /tmp/sd/yi-hack-v5/lib/. /home/yi-hack-v5/lib/
+fi
+
+# Version Firmware Check
+if [ ! -f "/home/yi-hack-v5/version" ]; then
+  echo "File does not exist. Your SD is not FAT32 to load the latest firmware"
+  echo "Your SD card is not FAT32 to load the latest firmware correctly. Go to https://github.com/alienatedsec/yi-hack-v5#getting-started" > "/tmp/sd/fat32error.txt"
+fi
+
 if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
     (
         cd /home/app
-#        LD_LIBRARY_PATH="/tmp/sd/yi-hack-v5/lib:/lib:/usr/lib:/home/lib:/home/app/locallib:/tmp/sd" ./rmm &
+        killall dispatch
+        LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
         sleep 2
+        LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
+        sleep 4
         ./mp4record &
         ./cloud &
         ./p2p_tnp &
@@ -148,7 +163,11 @@ if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
 elif [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
     (
         cd /home/app
+        killall dispatch
+        LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
         sleep 2
+        LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
+        sleep 4
         ./mp4record &
         ./cloud &
         sleep 5

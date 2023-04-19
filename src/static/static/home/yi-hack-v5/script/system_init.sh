@@ -44,11 +44,14 @@ mkdir -p $YI_HACK_V5_PREFIX/yi-hack-v5/etc/crontabs
 mkdir -p $YI_HACK_V5_PREFIX/yi-hack-v5/etc/dropbear
 
 # Comment out all the cloud stuff from base/init.sh
+sed -i '/^\.\/dispatch/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/watch_process/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/oss/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/p2p_tnp/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/cloud/s/^/#/' /home/app/init.sh
 sed -i '/^\.\/mp4record/s/^/#/' /home/app/init.sh
+sed -i '/^\.\/rmm/s/^/#/' /home/app/init.sh
+sed -i 's|^sleep 2$|#sleep 2|' /home/app/init.sh
 # set swappiness from 0 to 60
 sed -i "s#echo 0 > /proc/sys/vm/swappiness#echo 60 > /proc/sys/vm/swappiness#" /home/app/init.sh
 
