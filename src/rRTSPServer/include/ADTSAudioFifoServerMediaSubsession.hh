@@ -54,6 +54,8 @@ protected: // redefined virtual functions
 private:
     char* fAuxSDPLine;
     char fDoneFlag; // used when setting up "fAuxSDPLine"
+    unsigned fSamplingFrequency;
+    unsigned fNumChannels;
     char fConfigStr[5];
     RTPSink* fDummyRTPSink; // ditto
     StreamReplicator *fReplicator;

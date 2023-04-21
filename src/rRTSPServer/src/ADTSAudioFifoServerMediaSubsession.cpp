@@ -128,6 +128,8 @@ FramedSource* ADTSAudioFifoServerMediaSubsession
         Medium::close(resultSource);
         return NULL;
     } else {
+        fSamplingFrequency = originalSource->samplingFrequency();
+        fNumChannels = originalSource->numChannels();
         sprintf(fConfigStr, originalSource->configStr());
         if (debug & 4) fprintf(stderr, "createStreamReplica completed successfully\n");
 
@@ -142,7 +144,7 @@ RTPSink* ADTSAudioFifoServerMediaSubsession
   ADTSAudioFifoSource* adtsSource = (ADTSAudioFifoSource*)inputSource;
   return MPEG4GenericRTPSink::createNew(envir(), rtpGroupsock,
 					rtpPayloadTypeIfDynamic,
-					adtsSource->samplingFrequency(),
+					fSamplingFrequency,
 					"audio", "AAC-hbr", fConfigStr,
-					adtsSource->numChannels());
+					fNumChannels);
 }

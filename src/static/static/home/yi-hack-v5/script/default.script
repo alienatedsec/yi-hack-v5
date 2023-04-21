@@ -66,7 +66,8 @@ case "$1" in
                                 done                            
                         fi
                 
-						echo "1200" > /sys/class/net/wlan0/mtu
+						echo "1500" > /sys/class/net/wlan0/mtu
+						echo "1500" > /sys/class/net/eth0/mtu
 						
                         echo "Recreating $RESOLV_CONF"
                         echo -n > $RESOLV_CONF-$$
