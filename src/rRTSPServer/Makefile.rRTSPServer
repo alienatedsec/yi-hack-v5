@@ -71,7 +71,7 @@ livemedia:
 
 rRTSPServer_OBJS	= src/rRTSPServer.$(OBJ) \
 				src/ADTSAudioFifoServerMediaSubsession.$(OBJ) src/ADTSAudioFifoSource.$(OBJ) \
-				src/DummySink.$(OBJ)
+				src/DummySink.$(OBJ) src/ByteStreamFifoSource.$(OBJ) src/H264VideoFifoServerMediaSubsession.$(OBJ) \
 
 rRTSPServer$(EXE):	$(rRTSPServer_OBJS) $(LOCAL_LIBS)
 	$(LINK)$@ $(CONSOLE_LINK_OPTS) $(rRTSPServer_OBJS) $(LIBS) -lpthread

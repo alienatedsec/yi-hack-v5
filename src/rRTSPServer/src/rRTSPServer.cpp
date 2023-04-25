@@ -24,6 +24,7 @@
 #include "DummySink.hh"
 #include "ADTSAudioFifoServerMediaSubsession.hh"
 #include "ADTSAudioFifoSource.hh"
+#include "H264VideoFifoServerMediaSubsession.hh"
 
 #include <sys/stat.h>
 #include <getopt.h>
@@ -331,7 +332,7 @@ int main(int argc, char** argv)
         ServerMediaSession* sms_high
             = ServerMediaSession::createNew(*env, streamName, streamName,
                                     descriptionString);
-        sms_high->addSubsession(H264VideoFileServerMediaSubsession
+        sms_high->addSubsession(H264VideoFifoServerMediaSubsession
                                 ::createNew(*env, inputFileName, reuseFirstSource));
         if (audio == 1) {
             sms_high->addSubsession(ADTSAudioFifoServerMediaSubsession
@@ -351,7 +352,7 @@ int main(int argc, char** argv)
         ServerMediaSession* sms_low
         = ServerMediaSession::createNew(*env, streamName, streamName,
                                 descriptionString);
-        sms_low->addSubsession(H264VideoFileServerMediaSubsession
+        sms_low->addSubsession(H264VideoFifoServerMediaSubsession
                                 ::createNew(*env, inputFileName, reuseFirstSource));
         if (audio == 1) {
             sms_low->addSubsession(ADTSAudioFifoServerMediaSubsession
@@ -361,7 +362,7 @@ int main(int argc, char** argv)
 
         announceStream(rtspServer, sms_low, streamName, inputFileName, audio);
     }
-
+/*
     // An ADTS  audio elementary stream:
     if (audio != 0)
     {
@@ -378,7 +379,7 @@ int main(int argc, char** argv)
 
         announceStream(rtspServer, sms_audio, streamName, inputAudioFileName, audio);
     }
-
+*/
     // Also, attempt to create a HTTP server for RTSP-over-HTTP tunneling.
     // Try first with the default HTTP port (80), and then with the alternative HTTP
     // port numbers (8000 and 8080).
