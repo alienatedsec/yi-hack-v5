@@ -27,3 +27,5 @@ jobs:
         stale-pr-label: 'pr-stale'
         days-before-stale: 30
         days-before-close: 7
+        exempt-issue-labels: 'enhancement'
+        exempt-pr-labels: 'enhancement'
