@@ -224,8 +224,8 @@ echo "Deleteing of yi-hack-v5.7z - done!"
 
 # Delete all the compressed files except system_init.sh and yi-hack-v5.7z
 find $TMP_DIR/home/yi-hack-v5/script/ -maxdepth 0 ! -name 'system_init.sh' -type f -exec rm -f {} +
-find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' ! -name 'lib' ! -name 'version.txt' -exec rm -rf {} +
-#find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f -not -name 'yi-hack-v5.7z' -exec rm {} +
+find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -rf {} +
+find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {} +
 printf "done!\n\n"
 
 # home 
