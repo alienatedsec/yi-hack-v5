@@ -1,7 +1,11 @@
 #!/bin/sh
 
 CONF_FILE="etc/system.conf"
-YI_HACK_V5_PREFIX="/tmp/sd/yi-hack-v5"
+if [ -d "/tmp/sd/yi-hack-v5" ]; then
+        YI_HACK_V5_PREFIX="/tmp/sd/yi-hack-v5"
+elif [ -d "/home/yi-hack-v5" ]; then
+        YI_HACK_V5_PREFIX="/home/yi-hack-v5"
+fi
 
 get_config()
 {
