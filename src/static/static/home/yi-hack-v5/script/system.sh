@@ -160,6 +160,23 @@ if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
         fi
         ./watch_process &
     )
+fi
+if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
+    (
+        cd /home/app
+        killall dispatch
+        LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
+        sleep 2
+        LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
+        sleep 4
+        ./mp4record &
+        ./cloud &
+        #./p2p_tnp & <<< is this needed? It feels like those 5 seconds previews
+        if [[ $(cat /home/app/.camver) != "yi_dome" ]] ; then
+            ./oss & #not sure what is oss
+        fi
+        #./watch_process & <<< this makes sure all other services that we removed are working so not needed
+    )
 elif [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
     (
         cd /home/app
