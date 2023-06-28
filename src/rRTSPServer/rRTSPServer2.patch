@@ -1,6 +1,6 @@
-diff -Naur rRTSPServer.ori/include/ADTSAudioFifoServerMediaSubsession.hh rRTSPServer/include/ADTSAudioFifoServerMediaSubsession.hh
---- rRTSPServer.ori/include/ADTSAudioFifoServerMediaSubsession.hh	2023-04-15 23:22:04.964120526 +0200
-+++ rRTSPServer/include/ADTSAudioFifoServerMediaSubsession.hh	2023-04-20 19:18:14.115207781 +0200
+diff -Naur include.ori/ADTSAudioFifoServerMediaSubsession.hh include/ADTSAudioFifoServerMediaSubsession.hh
+--- include.ori/ADTSAudioFifoServerMediaSubsession.hh	2023-04-15 23:22:04.964120526 +0200
++++ include/ADTSAudioFifoServerMediaSubsession.hh	2023-04-20 19:18:14.115207781 +0200
 @@ -54,6 +54,8 @@
  private:
      char* fAuxSDPLine;
@@ -10,9 +10,9 @@ diff -Naur rRTSPServer.ori/include/ADTSAudioFifoServerMediaSubsession.hh rRTSPSe
      char fConfigStr[5];
      RTPSink* fDummyRTPSink; // ditto
      StreamReplicator *fReplicator;
-diff -Naur rRTSPServer.ori/src/ADTSAudioFifoServerMediaSubsession.cpp rRTSPServer/src/ADTSAudioFifoServerMediaSubsession.cpp
---- rRTSPServer.ori/src/ADTSAudioFifoServerMediaSubsession.cpp	2023-04-15 23:22:04.964120526 +0200
-+++ rRTSPServer/src/ADTSAudioFifoServerMediaSubsession.cpp	2023-04-20 21:46:20.842280500 +0200
+diff -Naur src.ori/ADTSAudioFifoServerMediaSubsession.cpp src/ADTSAudioFifoServerMediaSubsession.cpp
+--- src.ori/ADTSAudioFifoServerMediaSubsession.cpp	2023-04-15 23:22:04.964120526 +0200
++++ src/ADTSAudioFifoServerMediaSubsession.cpp	2023-04-20 21:46:20.842280500 +0200
 @@ -128,6 +128,8 @@
          Medium::close(resultSource);
          return NULL;
