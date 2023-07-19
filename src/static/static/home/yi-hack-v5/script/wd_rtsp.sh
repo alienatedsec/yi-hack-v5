@@ -115,7 +115,8 @@ if [[ "$(get_config USERNAME)" != "" ]] ; then
     PASSWORD=$(get_config PASSWORD)
 fi
 
-echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
+# Disabled due to size overtime
+#echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
 
 while true
 do

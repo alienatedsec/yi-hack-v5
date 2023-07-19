@@ -15,7 +15,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 **********/
 // "liveMedia"
 // Copyright (c) 1996-2022 Live Networks, Inc.  All rights reserved.
-// A source object for AAC audio files in ADTS format
+// A source object for AAC audio fifo in ADTS format
 // C++ header
 
 #ifndef _ADTS_AUDIO_FIFO_SOURCE_HH
@@ -35,6 +35,10 @@ public:
   char const* configStr() const { return fConfigStr; }
       // returns the 'AudioSpecificConfig' for this stream (in ASCII form)
 
+protected:
+  static void fileReadableHandler(ADTSAudioFifoSource* source, int mask);
+  virtual void doReadFromFile();
+
 private:
   ADTSAudioFifoSource(UsageEnvironment& env, FILE* fid, u_int8_t profile,
 		      u_int8_t samplingFrequencyIndex, u_int8_t channelConfiguration);
@@ -45,12 +49,14 @@ private:
 private:
   // redefined virtual functions:
   virtual void doGetNextFrame();
+  virtual void doStopGettingFrames();
 
 private:
   unsigned fSamplingFrequency;
   unsigned fNumChannels;
   unsigned fuSecsPerFrame;
   char fConfigStr[5];
+  Boolean fHaveStartedReading;
 };
 
 #endif

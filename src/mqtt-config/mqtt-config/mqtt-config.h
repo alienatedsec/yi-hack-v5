@@ -13,6 +13,7 @@
 
 #define MQTT_CONF_FILE    "/tmp/sd/yi-hack-v5/etc/mqttv4.conf"
 #define CONF_FILE_PATH    "/tmp/sd/yi-hack-v5/etc"
+#define CONF2MQTT_SCRIPT  "/tmp/sd/yi-hack-v5/script/conf2mqtt.sh"
 
 typedef struct
 {
@@ -37,6 +38,7 @@ void connect_callback(struct mosquitto *mosq, void *obj, int result);
 void disconnect_callback(struct mosquitto *mosq, void *obj, int result);
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message);
 void handle_config(const char *key, const char *value);
+int mqtt_free_conf(mqtt_conf_t *conf);
 int mqtt_init_conf(mqtt_conf_t *conf);
 void mqtt_check_connection();
 int mqtt_connect();

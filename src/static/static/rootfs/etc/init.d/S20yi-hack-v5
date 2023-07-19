@@ -12,6 +12,10 @@ else
     (  
         sleep 2
         cd /home/app
+        ./dispatch &
+        sleep 2
+        ./rmm &
+        sleep 4
         ./mp4record &
         ./cloud &
         ./p2p_tnp &

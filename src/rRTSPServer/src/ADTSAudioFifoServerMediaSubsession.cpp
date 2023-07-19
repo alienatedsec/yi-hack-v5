@@ -28,14 +28,14 @@ extern int debug;
 
 ADTSAudioFifoServerMediaSubsession*
 ADTSAudioFifoServerMediaSubsession::createNew(UsageEnvironment& env,
-					     StreamReplicator *replicator,
-					     Boolean reuseFirstSource) {
-  return new ADTSAudioFifoServerMediaSubsession(env, replicator, reuseFirstSource);
+                                              StreamReplicator *replicator,
+                                              Boolean reuseFirstSource) {
+    return new ADTSAudioFifoServerMediaSubsession(env, replicator, reuseFirstSource);
 }
 
 ADTSAudioFifoServerMediaSubsession
 ::ADTSAudioFifoServerMediaSubsession(UsageEnvironment& env,
-				    StreamReplicator *replicator, Boolean reuseFirstSource)
+                                     StreamReplicator *replicator, Boolean reuseFirstSource)
     : OnDemandServerMediaSubsession(env, reuseFirstSource),
         fAuxSDPLine(NULL), fDoneFlag(0), fDummyRTPSink(NULL), fReplicator(replicator) {
 }
@@ -128,8 +128,12 @@ FramedSource* ADTSAudioFifoServerMediaSubsession
         Medium::close(resultSource);
         return NULL;
     } else {
+        fSamplingFrequency = originalSource->samplingFrequency();
+        fNumChannels = originalSource->numChannels();
         sprintf(fConfigStr, originalSource->configStr());
         if (debug & 4) fprintf(stderr, "createStreamReplica completed successfully\n");
+        if (debug & 4) fprintf(stderr, "Sampling frequency: %d, Num channels: %d, Config string: %s\n",
+            fSamplingFrequency, fNumChannels, fConfigStr);
 
         return resultSource;
     }
@@ -137,12 +141,11 @@ FramedSource* ADTSAudioFifoServerMediaSubsession
 
 RTPSink* ADTSAudioFifoServerMediaSubsession
 ::createNewRTPSink(Groupsock* rtpGroupsock,
-		   unsigned char rtpPayloadTypeIfDynamic,
-		   FramedSource* inputSource) {
-  ADTSAudioFifoSource* adtsSource = (ADTSAudioFifoSource*)inputSource;
+                   unsigned char rtpPayloadTypeIfDynamic,
+                   FramedSource* inputSource) {
   return MPEG4GenericRTPSink::createNew(envir(), rtpGroupsock,
-					rtpPayloadTypeIfDynamic,
-					adtsSource->samplingFrequency(),
-					"audio", "AAC-hbr", fConfigStr,
-					adtsSource->numChannels());
+                                        rtpPayloadTypeIfDynamic,
+                                        fSamplingFrequency,
+                                        "audio", "AAC-hbr", fConfigStr,
+                                        fNumChannels);
 }

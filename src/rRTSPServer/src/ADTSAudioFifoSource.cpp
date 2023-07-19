@@ -19,8 +19,9 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // Implementation
 
 #include "ADTSAudioFifoSource.hh"
+#include "presentationTime.hh"
 #include "InputFile.hh"
-#include <GroupsockHelper.hh>
+#include "GroupsockHelper.hh"
 
 #include <fcntl.h>
 
@@ -37,9 +38,9 @@ static unsigned const samplingFrequencyTable[16] = {
 
 ADTSAudioFifoSource*
 ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
+    int flags;
     FILE* fid = NULL;
     unsigned char null[4];
-    int flags;
     do {
         fid = OpenInputFile(env, fileName);
         if (fid == NULL) break;
@@ -49,8 +50,7 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
             fclose(fid);
             break;
         };
-        flags |= O_NONBLOCK;
-        if (fcntl(fileno(fid), F_SETFL, flags) != 0) {
+        if (fcntl(fileno(fid), F_SETFL, flags | O_NONBLOCK) != 0) {
             fclose(fid);
             break;
         };
@@ -58,8 +58,7 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
         // Clean fifo content
         while (fread(null, 1, sizeof(null), fid) > 0) {}
 
-        // Set blocking
-        flags &= ~O_NONBLOCK;
+        // Restore old blocking
         if (fcntl(fileno(fid), F_SETFL, flags) != 0) {
             fclose(fid);
             break;
@@ -124,8 +123,8 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
 
 ADTSAudioFifoSource
 ::ADTSAudioFifoSource(UsageEnvironment& env, FILE* fid, u_int8_t profile,
-		      u_int8_t samplingFrequencyIndex, u_int8_t channelConfiguration)
-    : FramedFileSource(env, fid) {
+                      u_int8_t samplingFrequencyIndex, u_int8_t channelConfiguration)
+    : FramedFileSource(env, fid), fHaveStartedReading(False) {
     fSamplingFrequency = samplingFrequencyTable[samplingFrequencyIndex];
     fNumChannels = channelConfiguration == 0 ? 2 : channelConfiguration;
     fuSecsPerFrame
@@ -137,21 +136,65 @@ ADTSAudioFifoSource
     audioSpecificConfig[0] = (audioObjectType<<3) | (samplingFrequencyIndex>>1);
     audioSpecificConfig[1] = (samplingFrequencyIndex<<7) | (channelConfiguration<<3);
     sprintf(fConfigStr, "%02X%02X", audioSpecificConfig[0], audioSpecificConfig[1]);
+
+#ifndef READ_FROM_FILES_SYNCHRONOUSLY
+    makeSocketNonBlocking(fileno(fFid));
+#endif
 }
 
 ADTSAudioFifoSource::~ADTSAudioFifoSource() {
+    if (fFid == NULL) return;
+
+#ifndef READ_FROM_FILES_SYNCHRONOUSLY
+    envir().taskScheduler().disableBackgroundHandling(fileno(fFid));
+#endif
+
     CloseInputFile(fFid);
 }
 
-// Note: We should change the following to use asynchronous file reading, #####
-// as we now do with ByteStreamFileSource. #####
 void ADTSAudioFifoSource::doGetNextFrame() {
+    if (feof(fFid)) {
+        handleClosure();
+        return;
+    }
+
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+    doReadFromFile();
+#else
+    if (!fHaveStartedReading) {
+        // Await readable data from the file:
+        envir().taskScheduler().setBackgroundHandling(fileno(fFid), SOCKET_READABLE,
+                   (TaskScheduler::BackgroundHandlerProc*)&fileReadableHandler, this);
+        fHaveStartedReading = True;
+    }
+#endif
+}
+
+void ADTSAudioFifoSource::doStopGettingFrames() {
+    envir().taskScheduler().unscheduleDelayedTask(nextTask());
+#ifndef READ_FROM_FILES_SYNCHRONOUSLY
+    envir().taskScheduler().disableBackgroundHandling(fileno(fFid));
+    fHaveStartedReading = False;
+#endif
+}
+
+void ADTSAudioFifoSource::fileReadableHandler(ADTSAudioFifoSource* source, int /*mask*/) {
+    if (!source->isCurrentlyAwaitingData()) {
+        source->doStopGettingFrames(); // we're not ready for the data yet
+        return;
+    }
+    source->doReadFromFile();
+}
+
+void ADTSAudioFifoSource::doReadFromFile() {
     // Begin by reading the 7-byte fixed_variable headers:
     unsigned char headers[7];
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
     if (fread(headers, 1, sizeof headers, fFid) < sizeof headers) {
-//          || feof(fFid) || ferror(fFid)) {
+#else
+    if (read(fileno(fFid), headers, sizeof headers) < (signed) sizeof headers) {
+#endif
         // The input source has ended:
-        fprintf(stderr, "Input source ended\n");
         handleClosure();
         return;
     }
@@ -163,15 +206,27 @@ void ADTSAudioFifoSource::doGetNextFrame() {
     u_int16_t syncword = (headers[0]<<4) | (headers[1]>>4);
     if (debug & 4) fprintf(stderr, "Read frame: syncword 0x%x, protection_absent %d, frame_length %d\n", syncword, protection_absent, frame_length);
     if (syncword != 0xFFF) {
-        fprintf(stderr, "WARNING: Bad syncword!\n");
+        fprintf(stderr, "WARNING: Bad syncword! Try to recover sync.\n");
         // Resync
         while (1) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
             fread(headers, 1, 1, fFid);
+#else
+            read(fileno(fFid), headers, 1);
+#endif
             if (headers[0] == 0xFF) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
                 fread(&headers[1], 1, 1, fFid);
+#else
+                read(fileno(fFid), &headers[1], 1);
+#endif
                 // Check the 'syncword':
                 if ((headers[1]&0xF0) == 0xF0) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
                     fread(&headers[2], 1, sizeof(headers) - 2, fFid);
+#else
+                    read(fileno(fFid), &headers[2], sizeof(headers) - 2);
+#endif
                     break;
                 }
             }
@@ -184,7 +239,11 @@ void ADTSAudioFifoSource::doGetNextFrame() {
     // If there's a 'crc_check' field, skip it:
     if (!protection_absent) {
         unsigned char null[2];
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
         fread(null, 1, 2, fFid);
+#else
+        read(fileno(fFid), null, 2);
+#endif
         numBytesToRead = numBytesToRead > 2 ? numBytesToRead - 2 : 0;
     }
 
@@ -193,7 +252,11 @@ void ADTSAudioFifoSource::doGetNextFrame() {
         fNumTruncatedBytes = numBytesToRead - fMaxSize;
         numBytesToRead = fMaxSize;
     }
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
     int numBytesRead = fread(fTo, 1, numBytesToRead, fFid);
+#else
+    int numBytesRead = read(fileno(fFid), fTo, numBytesToRead);
+#endif
     if (numBytesRead < 0) numBytesRead = 0;
     fFrameSize = numBytesRead;
     fNumTruncatedBytes += numBytesToRead - numBytesRead;
@@ -217,6 +280,13 @@ void ADTSAudioFifoSource::doGetNextFrame() {
     fDurationInMicroseconds = fuSecsPerFrame;
 
     // Switch to another task, and inform the reader that he has data:
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+    // To avoid possible infinite recursion, we need to return to the event loop to do this:
     nextTask() = envir().taskScheduler().scheduleDelayedTask(0,
-				(TaskFunc*)FramedSource::afterGetting, this);
+                                  (TaskFunc*)FramedSource::afterGetting, this);
+#else
+    // Because the file read was done from the event loop, we can call the
+    // 'after getting' function directly, without risk of infinite recursion:
+    FramedSource::afterGetting(this);
+#endif
 }

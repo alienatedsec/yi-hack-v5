@@ -3,7 +3,7 @@
 #
 #  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
 #  Copyright (c) 2018-2019 Davide Maggioni - v4 specific
-#  Copyright (c) 2021-2022 alienatedsec - v5 specific
+#  Copyright (c) 2021-2023 alienatedsec - v5 specific
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -225,7 +225,7 @@ echo "Deleteing of yi-hack-v5.7z - done!"
 # Delete all the compressed files except system_init.sh and yi-hack-v5.7z
 find $TMP_DIR/home/yi-hack-v5/script/ -maxdepth 0 ! -name 'system_init.sh' -type f -exec rm -f {} +
 find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -rf {} +
-find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f -not -name 'yi-hack-v5.7z' -exec rm {} +
+find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {} +
 printf "done!\n\n"
 
 # home 

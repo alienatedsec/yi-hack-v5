@@ -103,6 +103,17 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
     strcpy(topic, &(message->topic)[len + 1]);
     slash = strchr(topic, '/');
     if (slash == NULL) {
+        strcpy(file, topic);
+        if (strlen(file) == 0) {
+            if (debug) printf("Wrong message subtopic\n");
+            return;
+        }
+        if ((message->payload == NULL) || (strlen(message->payload) == 0)) {
+            // Send response with a dump of the configuration
+            sprintf(cmd_line, "%s %s", CONF2MQTT_SCRIPT, file);
+            if (debug) printf("Running system command \"%s\"\n", cmd_line);
+            system(cmd_line);
+        }
         return;
     }
     if (slash - topic >= MAX_KEY_LENGTH) {
@@ -173,6 +184,16 @@ void handle_config(const char *key, const char *value)
             printf("Ignoring key: %s - value: %s\n", key, value);
         }
     }
+}
+
+int mqtt_free_conf(mqtt_conf_t *conf){
+    if (conf != NULL) {
+        if (conf->client_id != NULL) free(conf->client_id);
+        if (conf->mqtt_prefix_cmnd != NULL) free(conf->mqtt_prefix_cmnd);
+        if (conf->user != NULL) free(conf->user);
+        if (conf->password != NULL) free(conf->password);
+    }
+    return 0;
 }
 
 int mqtt_init_conf(mqtt_conf_t *conf)
@@ -299,7 +320,11 @@ int main(int argc, char *argv[])
     run = 1;
 
     if (mqtt_init_conf(&conf) < 0)
+    {
+        mqtt_free_conf(&conf);
         return -2;
+    }
+
 
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
@@ -315,7 +340,10 @@ int main(int argc, char *argv[])
 
     if(mosq) {
         if (mqtt_connect() != 0)
+        {
+            mqtt_free_conf(&conf);
             return -3;
+        }
 
         while(run)
         {
@@ -326,6 +354,6 @@ int main(int argc, char *argv[])
 
         stop_mqtt();
     }
-
+    mqtt_free_conf(&conf);
     return 0;
 }
