@@ -139,9 +139,15 @@ if [ ! -d "/home/yi-hack-v5/lib" ]; then
 fi
 
 # Version Firmware Check
-if [ ! -f "/home/yi-hack-v5/version" ]; then
-  echo "File does not exist. Your SD is not FAT32 to load the latest firmware"
-  echo "Your SD card is not FAT32 to load the latest firmware correctly. Go to https://github.com/alienatedsec/yi-hack-v5#getting-started" > "/tmp/sd/fat32error.txt"
+if [ -f "/home/yi-hack-v5/version" ]; then
+  version=$(cat /home/yi-hack-v5/version)
+  if [[ "$version" != "0.3.8" ]]; then
+    echo "Your baseline $version (rootfs and home partitions) is incorrect. Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267"
+    echo "Your baseline $version (rootfs and home partitions) is incorrect, Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267" > "/tmp/sd/hackerror.txt"
+  fi
+else
+  echo "Version file does not exist. Your SD card is not FAT32 to load the latest firmware correctly. Go to https://github.com/alienatedsec/yi-hack-v5/discussions/267"
+  echo "Version file does not exist. Your SD card is not FAT32 to load the latest firmware correctly. Go to https://github.com/alienatedsec/yi-hack-v5/discussions/267" > "/tmp/sd/fat32error.txt"
 fi
 
 if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
