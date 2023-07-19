@@ -261,7 +261,6 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
         HIGHHEIGHT="1080"
     fi
 # The below section (except ONVIF) to be also copied to service.sh
-        rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
     if [[ $(get_config RTSP_AUDIO) == "yes" ]]; then
         h264grabber -r audio -m $MODEL_SUFFIX -f &
     fi
@@ -282,6 +281,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
         if [[ $(get_config ONVIF_PROFILE) == "high" ]] || [[ $(get_config ONVIF_PROFILE) == "both" ]] ; then
             ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
         fi
+    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
     fi
 #Seems to be killing the resource - fixed via #153
     $YI_HACK_PREFIX/script/wd_rtsp.sh &
