@@ -34,11 +34,14 @@ RRTSP_PWD=$(get_config PASSWORD)
 
 restart_rtsp()
 {
+    killall -q rRTSPServer
     rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
 }
 
 restart_grabber()
 {
+    killall -q rRTSPServer
+    killall -q h264grabber
     if [[ $(get_config RTSP_STREAM) == "low" ]]; then
         h264grabber -r low -m $MODEL_SUFFIX -f &
     fi
@@ -52,11 +55,11 @@ restart_grabber()
     if [[ $(get_config RTSP_AUDIO) == "yes" ]]; then
         h264grabber -r AUDIO -m $MODEL_SUFFIX -f &
     fi
+    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
 }
 
 check_rtsp()
 {
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - Checking RTSP process..." >> $LOG_FILE
     SOCKET=`/bin/netstat -an 2>&1 | grep ":$RTSP_PORT " | grep LISTEN | grep -c ^`
     CPU=`top -b -n 1 | grep rRTSPServer | grep -v grep | tail -n 1 | awk '{print $8}'`
 
@@ -86,10 +89,10 @@ check_rtsp()
 
 check_rmm()
 {
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - Checking rmm process..." >> $LOG_FILE
     PS=`ps | grep rmm | grep -v grep | grep -c ^`
 
     if [ $PS -eq 0 ]; then
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - ./rmm is not running, restarting the camera  ..." >> $LOG_FILE
         reboot
     fi
 }
@@ -115,8 +118,8 @@ if [[ "$(get_config USERNAME)" != "" ]] ; then
     PASSWORD=$(get_config PASSWORD)
 fi
 
-# Disabled due to size overtime
-#echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
+# Re-enabled when its starting
+echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
 
 while true
 do
