@@ -8,6 +8,7 @@ APP.maintenance = (function($) {
         registerEventHandler();
         setRebootStatus("Camera is online.");
         getFwStatus();
+        getPreFwStatus();
     }
 
     function registerEventHandler() {
@@ -25,6 +26,9 @@ APP.maintenance = (function($) {
         });
         $(document).on("click", '#button-upgrade', function(e) {
             upgradeFirmware();
+        });
+        $(document).on("click", '#button-preupgrade', function(e) {
+            preupgradeFirmware();
         });
     }
 
@@ -140,29 +144,53 @@ APP.maintenance = (function($) {
             },
             success: function(response) {
                 setFwStatus(response);
-                waitForUpgrade();
+                waitForUpgrade("button-upgrade");
             }
         });
     }
-
-    function waitForUpgrade() {
+    
+    function preupgradeFirmware() {
+        $('#button-preupgrade').attr("disabled", true);
+        setPreFwStatus("Pre-Release Firmware download in progress.");
+        $.ajax({
+            type: "GET",
+            url: 'cgi-bin/fw_upgrade.sh?get=preupgrade',
+            error: function(response) {
+                console.log('error', response);
+                $('#button-preupgrade').attr("disabled", false);
+            },
+            success: function(response) {
+                setPreFwStatus(response);
+                waitForUpgrade("button-preupgrade");
+            }
+        });
+    }
+    
+    function waitForUpgrade(buttonType) {
         setInterval(function() {
             $.ajax({
                 url: 'index.html',
                 cache: false,
                 success: function(data) {
-                    setFwStatus("Camera is upgrading.");
-                    $('#button-upgrade').attr("disabled", false);
+                    if (buttonType === "button-upgrade") {
+                        setFwStatus("Camera is upgrading.");
+                    } else if (buttonType === "button-preupgrade") {
+                        setPreFwStatus("Pre-upgrade in progress...");
+                    }
+
+                    $('#' + buttonType).attr("disabled", false);
                     window.location.href = "index.html";
                 },
                 error: function(data) {
                     setFwStatus("Waiting for the camera to come back online...");
+                    setPreFwStatus("Waiting for the camera to come back online...");
                 },
                 timeout: 3000,
             });
         }, 5000);
     }
 
+    
     function setRebootStatus(text) {
         $('input[type="text"][data-key="STATUS"]').prop('value', text);
     }
@@ -173,6 +201,10 @@ APP.maintenance = (function($) {
 
     function setFwStatus(text) {
         $('input[type="text"][data-key="FW"]').prop('value', text);
+    }
+    
+    function setPreFwStatus(text) {
+        $('input[type="text"][data-key="PREFW"]').prop('value', text);
     }
 
     function getFwStatus() {
@@ -192,7 +224,25 @@ APP.maintenance = (function($) {
             }
         });
     }
-
+    
+    function getPreFwStatus() {
+        $.ajax({
+            type: "GET",
+            url: 'cgi-bin/fw_upgrade.sh?get=info',
+            dataType: "json",
+            error: function(response) {
+                console.log('error', response);
+                setPreFwStatus("Error getting fw info");
+            },
+            success: function(data) {
+                setPreFwStatus("Installed: " + data.fw_version + " - Available: " + data.prerelease_fw);
+                if (data.fw_version == data.prelease_fw) {
+                    $('#button-preupgrade').attr("disabled", true);
+                }
+            }
+        });
+    }
+    
     return {
         init: init
     };

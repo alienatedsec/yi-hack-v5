@@ -5,6 +5,7 @@ printf "Content-type: application/json\r\n\r\n"
 NAME="yi-hack-v5"
 HOSTNAME=$(hostname)
 FW_VERSION=$(cat /tmp/sd/yi-hack-v5/version)
+BASEFW_VERSION=$(cat /home/yi-hack-v5/version)
 HOME_VERSION=$(cat /home/app/.appver)
 MODEL_SUFFIX=$(cat /home/app/.camver)
 if [[ $MODEL_SUFFIX == "yi_dome_1080p" ]] || [[ $MODEL_SUFFIX == "yi_cloud_dome_1080p" ]] ; then
@@ -45,6 +46,7 @@ printf "{\n"
 printf "\"%s\":\"%s\",\n" "name"            "$NAME"
 printf "\"%s\":\"%s\",\n" "hostname"        "$HOSTNAME"
 printf "\"%s\":\"%s\",\n" "fw_version"      "$FW_VERSION"
+printf "\"%s\":\"%s\",\n" "basefw_version"  "$BASEFW_VERSION"
 printf "\"%s\":\"%s\",\n" "home_version"    "$HOME_VERSION"
 printf "\"%s\":\"%s\",\n" "model_suffix"    "$MODEL_SUFFIX"
 printf "\"%s\":\"%s\",\n" "hardware_id"     $HARDWARE_ID
