@@ -176,11 +176,11 @@ if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
         LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
         sleep 4
         ./cloud &
-    )
-elif [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
-    (
-        cd /home/app
-        ./mp4record &
+
+        if [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
+            cd /home/app
+            ./mp4record &
+        fi
     )
 fi
 
