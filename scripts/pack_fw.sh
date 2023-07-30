@@ -228,11 +228,13 @@ find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -r
 find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {} +
 printf "done!\n\n"
 
-# home 
-pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
+# home
+# Disabled after 0.3.8
+#pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # rootfs
-pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
+# Disabled after 0.3.8
+#pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # pack files for release
 pack_files $WORK_DIR $CAMERA_NAME $VERSION_ID
