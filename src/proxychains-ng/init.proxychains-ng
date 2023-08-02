@@ -8,5 +8,5 @@ rm -rf ./_install
 cd proxychains-ng || exit 1
 git reset --hard || exit 1
 
-cp ../config.mak ./
+#cp ../config.mak ./
 
