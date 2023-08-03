@@ -12,6 +12,11 @@ CC="arm-hisiv300-linux-uclibcgnueabi-gcc" \
 make clean
 make -j$(nproc) || exit 1
 make DESTDIR=$SCRIPT_DIR/_install install
+mkdir -p $SCRIPT_DIR/_install/etc
 
 arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/bin/proxychains4
 arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/lib/libproxychains4.so
+
+cd ..
+cp -f proxychains.conf $SCRIPT_DIR/_install/etc/proxychains.conf.template
+cp -f proxychains.conf $SCRIPT_DIR/_install/etc/proxychains.conf
