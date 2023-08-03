@@ -10,6 +10,6 @@ var APP = (function () {
 
 })(jQuery);
 
-$(function () {
+$(function() {
     APP.init();
 });
