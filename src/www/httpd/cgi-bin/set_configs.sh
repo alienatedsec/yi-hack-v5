@@ -95,10 +95,6 @@ for ROW in $ROWS; do
             hostname $VALUE
             echo "$VALUE" > $YI_HACK_PREFIX/etc/hostname
         fi
-    elif
-        if [ "$KEY" == "TIMEZONE" ] ; then
-            echo $VALUE > /etc/TZ
-        fi
     elif [ "$KEY" == "MOTION_IMAGE_DELAY" ] ; then
         if $(validateNumber $VALUE); then
             VALUE=$(echo $VALUE | sed 's/,/./g')
@@ -118,6 +114,9 @@ for ROW in $ROWS; do
             sed -i "s/^\(${KEY}\s*=\s*\).*$/\1${VALUE}/" $CONF_FILE
         fi
 	else
+        if [ "$KEY" == "TIMEZONE" ] ; then
+            echo $VALUE > /etc/TZ
+        fi
         VALUE=$(echo "$VALUE" | sedencode)
         sed -i "s/^\(${KEY}[[:blank:]]*=[[:blank:]]*\).*$/\1${VALUE}/" $CONF_FILE
     fi
