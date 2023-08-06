@@ -6,17 +6,18 @@ cd $SCRIPT_DIR
 
 cd proxychains-ng || exit 1
 
-CFLAGS="-march=armv5te -mcpu=arm926ej-s -I/opt/arm-hisiv300-linux/target/usr/include -L/opt/arm-hisiv300-linux/target/usr/lib" \
-CC="arm-hisiv300-linux-uclibcgnueabi-gcc" \
-  ./configure --prefix=
+#CFLAGS="-march=armv5te -mcpu=arm926ej-s -I/opt/arm-hisiv300-linux/target/usr/include -L/opt/arm-hisiv300-linux/target/usr/lib" \
+#CC="arm-hisiv300-linux-uclibcgnueabi-gcc" \
+#  ./configure --prefix=
 make clean
 make -j$(nproc) || exit 1
 make DESTDIR=$SCRIPT_DIR/_install install
-mkdir -p $SCRIPT_DIR/_install/etc
+mkdir -p $SCRIPT_DIR/_install/tmp/sd/yi-hack-v5/etc
 
-arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/bin/proxychains4
-arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/lib/libproxychains4.so
+arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/tmp/sd/yi-hack-v5/bin/proxychains4
+arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/tmp/sd/yi-hack-v5/bin/proxychains4-daemon
+arm-hisiv300-linux-uclibcgnueabi-strip $SCRIPT_DIR/_install/tmp/sd/yi-hack-v5/lib/libproxychains4.so
 
 cd ..
-cp -f proxychains.conf $SCRIPT_DIR/_install/etc/proxychains.conf.template
-cp -f proxychains.conf $SCRIPT_DIR/_install/etc/proxychains.conf
+cp -f proxychains.conf $SCRIPT_DIR/_install/tmp/sd/yi-hack-v5/etc/proxychains.conf.template
+cp -f proxychains.conf $SCRIPT_DIR/_install/tmp/sd/yi-hack-v5/etc/proxychains.conf
