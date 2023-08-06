@@ -3,19 +3,18 @@ var APP = APP || {};
 APP.proxy = (function($) {
 
     function init() {
-        registerEventHandler();
+        registerEventHandlers();
         updateProxyPage();
     }
-
-    function registerEventHandler() {
-        $(document).on("click", '#button-save-proxy', function(e) {
-            saveAndTestProxy();
-        });
-    }
-
-    function saveAndTestProxy() {
+    
+    function registerEventHandlers() {
+    $(document).on("click", '#button-save-proxy', function(e) {
         saveProxy();
+    });
+
+    $(document).on("click", '#button-test-proxy', function(e) {
         testProxy();
+    });
     }
 
     function saveProxy() {
