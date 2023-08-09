@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.0c
+
 CONF_FILE="etc/system.conf"
 
 if [ -d "/tmp/sd/yi-hack-v5" ]; then
@@ -63,6 +65,11 @@ if [ -f $YI_HACK_UPGRADE_PATH/yi-hack-v5/fw_upgrade_in_progress ]; then
     echo "reboot" >> /tmp/fw_upgrade_2p.sh
     sh /tmp/fw_upgrade_2p.sh
     exit
+fi
+
+# Update cloudAPI_fake if necessary
+if [[ "$(grep -m 3 -n '' /home/app/cloudAPI_fake | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" != "$(grep -m 3 -n '' $YI_HACK_PREFIX/script/cloudAPI_fake | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" ]]; then
+  cp -f $YI_HACK_PREFIX/script/cloudAPI_fake /home/app/
 fi
 
 # Manual Wi-Fi config
@@ -150,6 +157,11 @@ else
   echo "Version file does not exist. Your SD card is not FAT32 to load the latest firmware correctly. Go to https://github.com/alienatedsec/yi-hack-v5/discussions/267" > "/tmp/sd/fat32error.txt"
 fi
 
+if [[ $(get_config NTPD) == "yes" ]] ; then
+    # Wait until all the other processes have been initialized
+    sleep 5 && ntpd -p $(get_config NTP_SERVER) &
+fi
+
 if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
     (
         cd /home/app
@@ -157,7 +169,7 @@ if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
         LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
         sleep 2
         LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
-        sleep 4
+        sleep 8
         ./mp4record &
         ./cloud &
         ./p2p_tnp &
@@ -174,13 +186,13 @@ if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
         LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
         sleep 2
         LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
-        sleep 4
-        ./cloud &
-
+		sleep 8
         if [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
             cd /home/app
             ./mp4record &
         fi
+		sleep 4
+        ./cloud &
     )
 fi
 
@@ -211,11 +223,6 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     fi
     chmod 0600 $YI_HACK_PREFIX/etc/dropbear/*
     dropbear -R -B
-fi
-
-if [[ $(get_config NTPD) == "yes" ]] ; then
-    # Wait until all the other processes have been initialized
-    sleep 5 && ntpd -p $(get_config NTP_SERVER) &
 fi
 
 ipc_multiplexer &
