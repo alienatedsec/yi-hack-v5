@@ -24,7 +24,7 @@ mkdir -p ./_install/www/pages
 
 echo "Compressing CSS files..."
 #find ./httpd/htdocs/css/* ! -name all.css -exec cat {} \+  > ./_install/www/htdocs/css/tmp.css
-cat ./httpd/htdocs/css/normalize.css ./httpd/htdocs/css/skeleton.css ./httpd/htdocs/css/custom.css > ./_install/www/css/tmp.css
+cat ./httpd/htdocs/css/normalize.min.css ./httpd/htdocs/css/skeleton.min.css ./httpd/htdocs/css/custom.css > ./_install/www/css/tmp.css
 yui-compressor --type css -o ./_install/www/css/all.css ./_install/www/css/tmp.css
 rm ./_install/www/css/tmp.css
 

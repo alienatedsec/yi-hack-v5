@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.0c
+
 CONF_FILE="etc/system.conf"
 if [ -d "/tmp/sd/yi-hack-v5" ]; then
         YI_HACK_V5_PREFIX="/tmp/sd/yi-hack-v5"
@@ -85,8 +87,8 @@ elif [ "$c" = "136" ]; then
     echo '{"code":"20000","time":'$(date +%s)'000}'
 elif [ "$c" = "141" ]; then
     #CMD_do_tnp_on_line
-    echo '{"code":"20000"}'
-    #echo '{"code":"20000","data":{"InitString":"ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCD","License":"ABDCDE:","DID":"'$uid'"}}'
+    #echo '{"code":"20000"}'
+    echo '{"code":"20000","data":{"InitString":"ABGBJPLDIEEKKKHPODFPPOEJHNCHFCGAHHEDKFIJIDBCDIBDPKIIAONIPBCLBOKOPIKMDKPMNADGACDMBC","License":"FTTDHY:","DID":"'$uid'"}}'
 elif [ "$c" = "142" ]; then
     #CMD_do_get_dev_info
     TIMEZONE=$(get_config TIMEZONE)
@@ -98,12 +100,12 @@ elif [ "$c" = "142" ]; then
     #{"code":"20000","data":{"timezone":"GMT+01:00","language":"en-US","tz_offset":3600000,"css_flag":0,"css_mode":0,"appParam":{"schedule_power":{"schedule_power_on":{"enable":0,"repeater":"","time":"2212220800"},"schedule_power_off":{"enable":0,"repeater":"","time":"2212222200"}}},"doorbellCoolingDuration":"0","model":"38","allowFeature":{"Vehicle":0,"Animal":0,"Person":1}}}
 elif [ "$c" = "304" ]; then
     #CMD_do_update_event_v4
-    echo '{"code":"20000"}'
-    #echo '{"code":"20000","data":{"id":"'$EventTime'","ipcSetTime":"180"}}'
+    #echo '{"code":"20000"}'
+    echo '{"code":"20000","data":{"id":"'$EventTime'","ipcSetTime":"180"}}'
 elif [ "$c" = "306" ]; then
     #CMD_do_gen_presigned_url_v5
-    echo '{"code":"20000"}'
-    #echo '{"code":"20000","data":{"jpg":{"method":"PUT","pwd":"unusedpassword_","url":"http://server/yyyy/mm/dd/xxx/xxx.jpg?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},"mp4":{"method":"PUT","pwd":"unusedpassword_","url":"http://server/yyyy/mm/dd/xxx/xxx.mp4?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},"ok":"true"}}'
+    #echo '{"code":"20000"}'
+    echo '{"code":"20000","data":{"jpg":{"method":"PUT","pwd":"unusedpassword_","url":"http://server/yyyy/mm/dd/xxx/xxx.jpg?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},"mp4":{"method":"PUT","pwd":"unusedpassword_","url":"http://server/yyyy/mm/dd/xxx/xxx.mp4?Expires=xxx&OSSAccessKeyId=xxx&Signature=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"},"ok":"true"}}'
 elif [ "$c" = "411" ]; then
     #CMD_do_event_upload
     echo ''

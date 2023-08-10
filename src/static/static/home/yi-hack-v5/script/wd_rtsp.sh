@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.0d
+
 script_name=$(basename -- "$0")
 
 if pidof "$script_name" -o $$ >/dev/null;then
@@ -58,6 +60,16 @@ restart_grabber()
     rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
 }
 
+restart_cloud()
+{
+    if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
+    (
+        cd /home/app
+        ./cloud &
+    )
+    fi
+}
+
 check_rtsp()
 {
     SOCKET=`/bin/netstat -an 2>&1 | grep ":$RTSP_PORT " | grep LISTEN | grep -c ^`
@@ -84,6 +96,20 @@ check_rtsp()
         else
             COUNTER=0
         fi
+    fi
+}
+
+check_cloud()
+{
+    CPU=`top -b -n 1 | grep cloud | grep -v grep | tail -n 1 | awk '{print $8}'`
+    if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
+    (
+    if [ "$CPU" == "" ]; then
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - No running processes, restarting ./cloud & ..." >> $LOG_FILE
+        restart_cloud
+        COUNTER=0
+    fi
+    )
     fi
 }
 
@@ -126,6 +152,7 @@ do
     check_grabber
     check_rtsp
     check_rmm
+    check_cloud
     if [ $COUNTER -eq 0 ]; then
         sleep $INTERVAL
     fi

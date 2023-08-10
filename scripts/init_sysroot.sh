@@ -279,7 +279,7 @@ FIRMWARE_DIR=$(normalize_path $(get_script_dir)/../stock_firmware)/$CAMERA_NAME
 
 echo ""
 echo "------------------------------------------------------------------------"
-echo " YI-HACK-V4 - INIT SYSROOT"
+echo " YI-HACK-V5 - INIT SYSROOT"
 echo "------------------------------------------------------------------------"
 printf " camera_name      : %s\n" $CAMERA_NAME
 printf " camera_id        : %s\n" $CAMERA_ID

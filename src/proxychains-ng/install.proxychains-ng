@@ -11,6 +11,6 @@ mkdir -p ../../build/home/yi-hack-v5/bin/
 mkdir -p ../../build/home/yi-hack-v5/lib/
 mkdir -p ../../build/home/yi-hack-v5/etc/
 
-rsync -a ./_install/bin/* ../../build/home/yi-hack-v5/bin/
-rsync -a ./_install/lib/* ../../build/home/yi-hack-v5/lib/
-rsync -a ./proxychains.conf ../../build/home/yi-hack-v5/etc/
+rsync -a ./_install/tmp/sd/yi-hack-v5/bin/* ../../build/home/yi-hack-v5/bin/
+rsync -a ./_install/tmp/sd/yi-hack-v5/lib/* ../../build/home/yi-hack-v5/lib/
+rsync -a ./_install/tmp/sd/yi-hack-v5/etc/* ../../build/home/yi-hack-v5/etc/
