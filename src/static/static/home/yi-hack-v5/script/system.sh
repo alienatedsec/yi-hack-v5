@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.0c
+# 0.4.1a
 
 CONF_FILE="etc/system.conf"
 
@@ -75,6 +75,11 @@ fi
 # Manual Wi-Fi config
 if [ -f /tmp/sd/recover/configure_wifi.cfg ]; then
 	mv /tmp/sd/recover/configure_wifi.cfg /tmp/configure_wifi.cfg
+	sync
+	sh $YI_HACK_PREFIX/script/configure_wifi.sh
+fi
+
+if [ -f "/tmp/sd/recover/mtdblock2_recover.bin" ]; then
 	sync
 	sh $YI_HACK_PREFIX/script/configure_wifi.sh
 fi
