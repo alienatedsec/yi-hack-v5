@@ -8,9 +8,11 @@ function print_help {
 }
 
 if [ -f "/tmp/sd/recover/mtdblock2_recover.bin" ]; then
-	dd if=/tmp/sd/recover/mtdblock2_recover.bin of=/dev/mtdblock2 2>/dev/null
-	mv /tmp/sd/recover/mtdblock2_recover.bin /tmp/sd/recover/mtdblock2_recover_done.bin
-	reboot
+    DATE=$(date '+%Y%m%d%H%M%S')
+    dd if=/dev/mtdblock2 of=/tmp/sd/recover/mtdblock2_prerecover_$DATE.bin 2>/dev/null
+    dd if=/tmp/sd/recover/mtdblock2_recover.bin of=/dev/mtdblock2 2>/dev/null
+    mv /tmp/sd/recover/mtdblock2_recover.bin /tmp/sd/recover/mtdblock2_recover_done.bin
+    reboot
 fi
 
 CFG_FILE=/tmp/configure_wifi.cfg
