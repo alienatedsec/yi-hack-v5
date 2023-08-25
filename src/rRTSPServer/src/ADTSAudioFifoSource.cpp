@@ -56,19 +56,33 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
         };
 
         // Clean fifo content
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+        if (debug & 4) fprintf(stderr, "Read synchronously\n");
         while (fread(null, 1, sizeof(null), fid) > 0) {}
+#else
+        if (debug & 4) fprintf(stderr, "Read asynchronously\n");
+        while (read(fileno(fid), null, sizeof(null)) > 0) {}
+#endif
 
         // Restore old blocking
         if (fcntl(fileno(fid), F_SETFL, flags) != 0) {
             fclose(fid);
             break;
-        };
+        }
 
         unsigned char fixedHeader[7];
         while (1) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
             fread(fixedHeader, 1, 1, fid);
+#else
+            read(fileno(fid), fixedHeader, 1);
+#endif
             if (fixedHeader[0] == 0xFF) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
                 fread(&fixedHeader[1], 1, 1, fid);
+#else
+                read(fileno(fid), &fixedHeader[1], 1);
+#endif
                 // Check the 'syncword':
                 if ((fixedHeader[1]&0xF0) == 0xF0) {
                     break;
@@ -76,7 +90,11 @@ ADTSAudioFifoSource::createNew(UsageEnvironment& env, char const* fileName) {
             }
             usleep(10000);
         }
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
         fread(&fixedHeader[2], 1, 5, fid);
+#else
+        read(fileno(fid), &fixedHeader[2], 5);
+#endif
         u_int16_t frame_length = ((fixedHeader[3]&0x03)<<11) | (fixedHeader[4]<<3) | ((fixedHeader[5]&0xE0)>>5);
 
         // Get and check the 'profile':
