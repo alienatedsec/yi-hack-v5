@@ -130,16 +130,20 @@
                             <input class="u-full-width" type="text" placeholder="" id="motion_start_msg" data-key="MOTION_START_MSG"/>
                             <label for="motion_stop_msg">Motion Stop Message</label>
                             <input class="u-full-width" type="text" placeholder="" id="motion_stop_msg" data-key="MOTION_STOP_MSG"/>
+                            <label for="baby_crying_msg">Baby Crying Message</label>
+                            <input class="u-full-width" type="text" placeholder="" id="baby_crying_msg" data-key="BABY_CRYING_MSG"/>
                             <label for="topic_motion_image">Topic Suffix for jpeg image</label>
                             <input class="u-full-width" type="text" placeholder="" id="topic_motion_image" data-key="TOPIC_MOTION_IMAGE"/>
                             <span class="switch-description">
                                 A raw jpeg image is sent to this topic when a motion is detected.
                             </span>
+                            <label for="motion_image_delay">Delay between motion detection and snapshot (s)</label>
+                            <input class="u-full-width" type="text" placeholder="" id="motion_image_delay" data-key="MOTION_IMAGE_DELAY">
                             <label for="topic_motion_files">Topic Suffix for video list message</label>
                             <input class="u-full-width" type="text" placeholder="" id="topic_motion_files" data-key="TOPIC_MOTION_FILES">
                         </td>
                     </tr>
-                    <tr class="row">
+<!--                    <tr class="row">
                         <td>AI Human Detection</td>
                         <td>
                             <label for="topic_ai_human_detection">Topic Suffix</label>
@@ -147,7 +151,7 @@
                             <label for="ai_human_detection_msg">AI Human Detection Message</label>
                             <input class="u-full-width" type="text" placeholder="" id="ai_human_detection_msg" data-key="AI_HUMAN_DETECTION_MSG"/>
                         </td>
-                    </tr>
+                    </tr> -->
                     <tr class="row">
                         <td>Sound Detection</td>
                         <td>
@@ -157,7 +161,7 @@
                             <input class="u-full-width" type="text" placeholder="" id="sound_detection_msg" data-key="SOUND_DETECTION_MSG"/>
                         </td>
                     </tr>
-                    <tr class="row">
+<!--                    <tr class="row">
                         <td>Baby Crying</td>
                         <td>
                             <label for="topic_baby_crying">Topic Suffix</label>
@@ -177,7 +181,7 @@
                                 Leave empty if you don't want to start the mqtt config process.
                             </span>
                         </td>
-                    </tr>
+                    </tr> -->
                     </tbody>
                 </table>
             </div>
@@ -242,7 +246,7 @@
                             </span>
                         </td>
                     </tr>
-                    <tr class="row">
+<!--                    <tr class="row">
                         <td>Retain for AI Human Detection messages</td>
                         <td>
                             <input class="u-full-width" type="text" placeholder="1" data-key="MQTT_RETAIN_AI_HUMAN_DETECTION"/>
@@ -250,7 +254,7 @@
                                 A retained message is a normal MQTT message with the retained flag set to true. The broker stores the last retained message and the corresponding QoS for that topic. (1 = enabled, 0 = disabled)
                             </span>
                         </td>
-                    </tr>
+                    </tr> -->
                     <tr class="row">
                         <td>Retain for Sound Detection messages</td>
                         <td>
