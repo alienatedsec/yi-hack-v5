@@ -249,6 +249,14 @@ if [[ $(get_config ONVIF_WM_SNAPSHOT) == "yes" ]] ; then
     WATERMARK="&watermark=yes"
 fi
 
+if [[ $(get_config SNAPSHOT) == "no" ]] ; then
+    touch /tmp/snapshot.disabled
+fi
+
+if [[ $(get_config SNAPSHOT_LOW) == "yes" ]] ; then
+    touch /tmp/snapshot.low
+fi
+
 RRTSP_MODEL=$MODEL_SUFFIX
 RRTSP_RES=$(get_config RTSP_STREAM)
 RRTSP_AUDIO=$(get_config RTSP_AUDIO)
