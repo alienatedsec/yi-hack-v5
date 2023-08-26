@@ -57,9 +57,9 @@ APP.camera_settings = (function ($) {
             url: 'cgi-bin/camera_settings.sh?' +
                 'save_video_on_motion=' + configs["SAVE_VIDEO_ON_MOTION"] +
                 '&sensitivity=' + configs["SENSITIVITY"] +
-                '&ai_human_detection=' + configs["AI_HUMAN_DETECTION"] +
                 '&sound_detection=' + configs["SOUND_DETECTION"] +
                 '&sound_sensitivity=' + configs["SOUND_SENSITIVITY"] +
+                '&baby_crying_detect=' + configs["BABY_CRYING_DETECT"] +
                 '&led=' + configs["LED"] +
                 '&ir=' + configs["IR"] +
                 '&rotate=' + configs["ROTATE"] +
