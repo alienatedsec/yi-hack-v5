@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 roleo.
+ * Copyright (c) 2023 roleo.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <dirent.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <sys/types.h>
@@ -312,6 +313,49 @@ int add_watermark(char *buffer, int width, int height)
     }
 
     return 0;
+}
+
+pid_t proc_find(const char* process_name, pid_t process_pid)
+{
+    DIR* dir;
+    struct dirent* ent;
+    char* endptr;
+    char buf[512];
+
+    if (!(dir = opendir("/proc"))) {
+        perror("can't open /proc");
+        return -1;
+    }
+
+    while((ent = readdir(dir)) != NULL) {
+        /* if endptr is not a null character, the directory is not
+         * entirely numeric, so ignore it */
+        long lpid = strtol(ent->d_name, &endptr, 10);
+        if (*endptr != '\0') {
+            continue;
+        }
+
+        /* try to open the cmdline file */
+        snprintf(buf, sizeof(buf), "/proc/%ld/cmdline", lpid);
+        FILE* fp = fopen(buf, "r");
+
+        if (fp) {
+            if (fgets(buf, sizeof(buf), fp) != NULL) {
+                /* check the first token in the file, the program name */
+                char* first = strtok(buf, " ");
+                if ((strcmp(first, process_name) == 0) && ((pid_t) lpid != process_pid)) {
+                    fclose(fp);
+                    closedir(dir);
+                    return (pid_t) lpid;
+                }
+            }
+            fclose(fp);
+        }
+
+    }
+
+    closedir(dir);
+    return -1;
 }
 
 void print_usage(char *prog_name)
@@ -613,6 +657,25 @@ int main(int argc, char **argv) {
     }
 
     if (debug) fprintf(stderr, "Starting program\n");
+
+    // Check if snapshot is disabled
+    if (access("/tmp/snapshot.disabled", F_OK ) == 0 ) {
+        fprintf(stderr, "Snapshot is disabled\n");
+        return 0;
+    }
+
+    // Check if snapshot is low res
+    if (access("/tmp/snapshot.low", F_OK ) == 0 ) {
+        fprintf(stderr, "Snapshot is low res\n");
+        resolution = RESOLUTION_LOW;
+    }
+
+    // Check if the process is already running
+    pid_t my_pid = getpid();
+    if (proc_find(basename(argv[0]), my_pid) != -1) {
+        fprintf(stderr, "Process is already running\n");
+        return 0;
+    }
 
     if (resolution == RESOLUTION_LOW) {
         table_offset = table_low_offset;

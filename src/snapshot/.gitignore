@@ -1,8 +1,8 @@
 # Ignore the install dir
 _install/
 snapshot/SDK
-snapshot/jpeg-9c
-snapshot/ffmpeg-4.0.4
+snapshot/jpeg-9e
+snapshot/ffmpeg-6.0
 snapshot/add_water.o
 snapshot/convert2jpg.o
 snapshot/imggrabber
