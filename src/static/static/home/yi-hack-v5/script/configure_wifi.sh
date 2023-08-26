@@ -1,9 +1,19 @@
 #!/bin/sh
 
+# 0.4.1a
+
 function print_help {
     echo "configure_wifi.sh"
     echo "will be used on next boot"
 }
+
+if [ -f "/tmp/sd/recover/mtdblock2_recover.bin" ]; then
+    DATE=$(date '+%Y%m%d%H%M%S')
+    dd if=/dev/mtdblock2 of=/tmp/sd/recover/mtdblock2_prerecover_$DATE.bin 2>/dev/null
+    dd if=/tmp/sd/recover/mtdblock2_recover.bin of=/dev/mtdblock2 2>/dev/null
+    mv /tmp/sd/recover/mtdblock2_recover.bin /tmp/sd/recover/mtdblock2_recover_done.bin
+    reboot
+fi
 
 CFG_FILE=/tmp/configure_wifi.cfg
 if [ ! -f "$CFG_FILE" ]; then
