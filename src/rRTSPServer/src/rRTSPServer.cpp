@@ -362,7 +362,7 @@ int main(int argc, char** argv)
 
         announceStream(rtspServer, sms_low, streamName, inputFileName, audio);
     }
-/*
+
     // An ADTS  audio elementary stream:
     if (audio != 0)
     {
@@ -379,7 +379,7 @@ int main(int argc, char** argv)
 
         announceStream(rtspServer, sms_audio, streamName, inputAudioFileName, audio);
     }
-*/
+
     // Also, attempt to create a HTTP server for RTSP-over-HTTP tunneling.
     // Try first with the default HTTP port (80), and then with the alternative HTTP
     // port numbers (8000 and 8080).
