@@ -166,6 +166,8 @@
 
 #define BUFFER_FILE "/tmp/view"
 
+#define USE_NATIVE_API 1
+
 typedef struct {
     int sps_addr;
     int sps_len;
@@ -666,8 +668,9 @@ int main(int argc, char **argv) {
 
     // Check if snapshot is low res
     if (access("/tmp/snapshot.low", F_OK ) == 0 ) {
-        fprintf(stderr, "Snapshot is low res\n");
+        fprintf(stderr, "Snapshot is low res and watermark is disabled\n");
         resolution = RESOLUTION_LOW;
+        watermark = 0;
     }
 
     // Check if the process is already running
@@ -676,6 +679,35 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Process is already running\n");
         return 0;
     }
+
+// This method doesn't have performace issue
+// But:
+//   - is not available for high resolution
+//   - it's not possible to add watermarks
+#ifdef USE_NATIVE_API
+    if ((resolution == RESOLUTION_LOW) && (watermark == 0)) {
+        int old_stdout = dup(1);
+        int nj;
+        char sj[1024];
+        FILE *aj;
+
+        fprintf(stderr, "Using native api\n");
+
+        freopen ("/dev/null", "w", stdout);
+        main_cloud_cap_pic("/tmp/sd/snapshot.tmp");
+        usleep(500000);
+        fclose(stdout);
+        stdout = fdopen(old_stdout, "w"); 
+
+        aj = fopen("/tmp/sd/snapshot.tmp", "r");
+        while ((nj = fread(sj, 1, sizeof(sj), aj))) {
+            fwrite(sj, 1, nj, stdout);
+        }
+        fclose(aj);
+        remove("/tmp/sd/snapshot.tmp");
+        return 0;
+    }
+#endif
 
     if (resolution == RESOLUTION_LOW) {
         table_offset = table_low_offset;
