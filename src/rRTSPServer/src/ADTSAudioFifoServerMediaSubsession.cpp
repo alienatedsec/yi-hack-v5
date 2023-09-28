@@ -20,6 +20,7 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 // Implementation
 
 #include "ADTSAudioFifoServerMediaSubsession.hh"
+#include "ADTSAudioStreamDiscreteFramer.hh"
 #include "ADTSAudioFifoSource.hh"
 #include "MPEG4GenericRTPSink.hh"
 #include "FramedFilter.hh"

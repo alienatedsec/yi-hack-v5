@@ -212,90 +212,94 @@ void ADTSAudioFifoSource::doReadFromFile() {
 #else
     if (read(fileno(fFid), headers, sizeof headers) < (signed) sizeof headers) {
 #endif
-        // The input source has ended:
-        handleClosure();
-        return;
-    }
-
-    // Extract important fields from the headers:
-    Boolean protection_absent = headers[1]&0x01;
-    u_int16_t frame_length
-        = ((headers[3]&0x03)<<11) | (headers[4]<<3) | ((headers[5]&0xE0)>>5);
-    u_int16_t syncword = (headers[0]<<4) | (headers[1]>>4);
-    if (debug & 4) fprintf(stderr, "Read frame: syncword 0x%x, protection_absent %d, frame_length %d\n", syncword, protection_absent, frame_length);
-    if (syncword != 0xFFF) {
-        fprintf(stderr, "WARNING: Bad syncword! Try to recover sync.\n");
-        // Resync
-        while (1) {
-#ifdef READ_FROM_FILES_SYNCHRONOUSLY
-            fread(headers, 1, 1, fFid);
-#else
-            read(fileno(fFid), headers, 1);
-#endif
-            if (headers[0] == 0xFF) {
-#ifdef READ_FROM_FILES_SYNCHRONOUSLY
-                fread(&headers[1], 1, 1, fFid);
-#else
-                read(fileno(fFid), &headers[1], 1);
-#endif
-                // Check the 'syncword':
-                if ((headers[1]&0xF0) == 0xF0) {
-#ifdef READ_FROM_FILES_SYNCHRONOUSLY
-                    fread(&headers[2], 1, sizeof(headers) - 2, fFid);
-#else
-                    read(fileno(fFid), &headers[2], sizeof(headers) - 2);
-#endif
-                    break;
-                }
-            }
-            usleep(10000);
-        }
-    }
-    unsigned numBytesToRead
-        = frame_length > sizeof headers ? frame_length - sizeof headers : 0;
-
-    // If there's a 'crc_check' field, skip it:
-    if (!protection_absent) {
-        unsigned char null[2];
-#ifdef READ_FROM_FILES_SYNCHRONOUSLY
-        fread(null, 1, 2, fFid);
-#else
-        read(fileno(fFid), null, 2);
-#endif
-        numBytesToRead = numBytesToRead > 2 ? numBytesToRead - 2 : 0;
-    }
-
-    // Next, read the raw frame data into the buffer provided:
-    if (numBytesToRead > fMaxSize) {
-        fNumTruncatedBytes = numBytesToRead - fMaxSize;
-        numBytesToRead = fMaxSize;
-    }
-#ifdef READ_FROM_FILES_SYNCHRONOUSLY
-    int numBytesRead = fread(fTo, 1, numBytesToRead, fFid);
-#else
-    int numBytesRead = read(fileno(fFid), fTo, numBytesToRead);
-#endif
-    if (numBytesRead < 0) numBytesRead = 0;
-    fFrameSize = numBytesRead;
-    fNumTruncatedBytes += numBytesToRead - numBytesRead;
-
-    // Set the 'presentation time':
-    if (fPresentationTime.tv_sec == 0 && fPresentationTime.tv_usec == 0) {
-        // This is the first frame, so use the current time:
-        gettimeofday(&fPresentationTime, NULL);
+        fFrameSize = 0;
+        fNumTruncatedBytes = 0;
+//        // The input source has ended:
+//        handleClosure();
+//        return;
     } else {
-#ifndef PRES_TIME_CLOCK
-        // Increment by the play time of the previous frame:
-        unsigned uSeconds = fPresentationTime.tv_usec + fuSecsPerFrame;
-        fPresentationTime.tv_sec += uSeconds/1000000;
-        fPresentationTime.tv_usec = uSeconds%1000000;
-#else
-        // Use system clock to set presentation time
-        gettimeofday(&fPresentationTime, NULL);
-#endif
-    }
 
-    fDurationInMicroseconds = fuSecsPerFrame;
+        // Extract important fields from the headers:
+        Boolean protection_absent = headers[1]&0x01;
+        u_int16_t frame_length
+            = ((headers[3]&0x03)<<11) | (headers[4]<<3) | ((headers[5]&0xE0)>>5);
+        u_int16_t syncword = (headers[0]<<4) | (headers[1]>>4);
+        if (debug & 4) fprintf(stderr, "Read frame: syncword 0x%x, protection_absent %d, frame_length %d\n", syncword, protection_absent, frame_length);
+        if (syncword != 0xFFF) {
+            fprintf(stderr, "WARNING: Bad syncword! Try to recover sync.\n");
+            // Resync
+            while (1) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+                fread(headers, 1, 1, fFid);
+#else
+                read(fileno(fFid), headers, 1);
+#endif
+                if (headers[0] == 0xFF) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+                    fread(&headers[1], 1, 1, fFid);
+#else
+                    read(fileno(fFid), &headers[1], 1);
+#endif
+                    // Check the 'syncword':
+                    if ((headers[1]&0xF0) == 0xF0) {
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+                        fread(&headers[2], 1, sizeof(headers) - 2, fFid);
+#else
+                        read(fileno(fFid), &headers[2], sizeof(headers) - 2);
+#endif
+                        break;
+                    }
+                }
+                usleep(1000);
+            }
+        }
+        unsigned numBytesToRead
+            = frame_length > sizeof headers ? frame_length - sizeof headers : 0;
+
+        // If there's a 'crc_check' field, skip it:
+        if (!protection_absent) {
+            unsigned char null[2];
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+            fread(null, 1, 2, fFid);
+#else
+            read(fileno(fFid), null, 2);
+#endif
+            numBytesToRead = numBytesToRead > 2 ? numBytesToRead - 2 : 0;
+        }
+
+        // Next, read the raw frame data into the buffer provided:
+        if (numBytesToRead > fMaxSize) {
+            fNumTruncatedBytes = numBytesToRead - fMaxSize;
+            numBytesToRead = fMaxSize;
+        }
+#ifdef READ_FROM_FILES_SYNCHRONOUSLY
+        int numBytesRead = fread(fTo, 1, numBytesToRead, fFid);
+#else
+        int numBytesRead = read(fileno(fFid), fTo, numBytesToRead);
+#endif
+        if (numBytesRead < 0) numBytesRead = 0;
+        fFrameSize = numBytesRead;
+        fNumTruncatedBytes += numBytesToRead - numBytesRead;
+
+        // Set the 'presentation time':
+        if (fPresentationTime.tv_sec == 0 && fPresentationTime.tv_usec == 0) {
+            // This is the first frame, so use the current time:
+            gettimeofday(&fPresentationTime, NULL);
+        } else {
+#ifndef PRES_TIME_CLOCK
+            // Increment by the play time of the previous frame:
+            unsigned uSeconds = fPresentationTime.tv_usec + fuSecsPerFrame;
+            fPresentationTime.tv_sec += uSeconds/1000000;
+            fPresentationTime.tv_usec = uSeconds%1000000;
+#else
+            // Use system clock to set presentation time
+            gettimeofday(&fPresentationTime, NULL);
+#endif
+        }
+        if (debug & 4) fprintf(stderr, "AAC frame  - fPresentationTime, sec = %ld, usec = %ld\n", fPresentationTime.tv_sec, fPresentationTime.tv_usec);
+
+        fDurationInMicroseconds = fuSecsPerFrame;
+    }
 
     // Switch to another task, and inform the reader that he has data:
 #ifdef READ_FROM_FILES_SYNCHRONOUSLY

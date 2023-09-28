@@ -64,10 +64,10 @@ StreamReplicator* startReplicatorStream(const char* inputAudioFileName) {
     FramedSource* source = replicator->createStreamReplica();
 
     // Then create a 'dummy sink' object to receive the replica stream:
-    MediaSink* sink = DummySink::createNew(*env, "dummy");
+//    MediaSink* sink = DummySink::createNew(*env, "dummy");
 
     // Now, start playing, feeding the sink object from the source:
-    sink->startPlaying(*source, NULL, NULL);
+//    sink->startPlaying(*source, NULL, NULL);
 
     return replicator;
 }
