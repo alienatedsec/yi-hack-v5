@@ -230,8 +230,6 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-ipc_multiplexer &
-
 mqttv4 &
 if [[ $(get_config MQTT) == "yes" ]] ; then
     mqtt-config &
