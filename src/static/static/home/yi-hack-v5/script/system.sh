@@ -260,8 +260,12 @@ RRTSP_MODEL=$MODEL_SUFFIX
 RRTSP_RES=$(get_config RTSP_STREAM)
 RRTSP_AUDIO=$(get_config RTSP_AUDIO)
 RRTSP_PORT=$(get_config RTSP_PORT)
-RRTSP_USER=$USERNAME
-RRTSP_PWD=$PASSWORD
+if [ ! -z $USERNAME ]; then
+    RRTSP_USER="-u $USERNAME"
+fi
+if [ ! -z $PASSWORD ]; then
+    RRTSP_PWD="-w $PASSWORD"
+fi
 
 # some non-working functions to be added later
 
@@ -295,7 +299,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
         if [[ $(get_config ONVIF_PROFILE) == "high" ]] || [[ $(get_config ONVIF_PROFILE) == "both" ]] ; then
             ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high&watermark=yes --type H264"
         fi
-    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
+    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT $RRTSP_USER $RRTSP_PWD &
     fi
 #Seems to be killing the resource - fixed via #153
     $YI_HACK_PREFIX/script/wd_rtsp.sh &
