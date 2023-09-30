@@ -160,15 +160,19 @@
                         </td>
                     </tr>
                     <tr class="row">
-                        <td>ONVIF watermark</td>
+                        <td>Enable/disable time OSD</td>
                         <td>
                             <label class="switch small">
-                                <input type="checkbox" data-key="ONVIF_WM_SNAPSHOT"/>
+                                <input type="checkbox" data-key="TIME_OSD"/>
                                 <span class="slider round"></span>
                                 <span class="switch-text"></span>
                             </label>
                             <span class="switch-description">
-                                Add watermark to snapshot.
+                                Enable/disable time OSD in the upper left corner.
+                            </span>
+                                <br/>
+                            <span class="italic">
+                                It works only if the cam doesn't show osd natively.
                             </span>
                         </td>
                     </tr>
@@ -196,7 +200,7 @@
                                 <span class="switch-text"></span>
                             </label>
                             <span class="switch-description">
-                                Take low resolution snapshots only (useful for avoiding memory problems).
+                                Take low resolution snapshots only and no watermark (useful for avoiding memory problems).
                             </span>
                         </td>
                     </tr>

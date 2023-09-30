@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 roleo.
+ * Copyright (c) 2023 roleo.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -139,6 +139,10 @@
 #define FIFO_NAME_LOW "/tmp/h264_low_fifo"
 #define FIFO_NAME_HIGH "/tmp/h264_high_fifo"
 #define FIFO_NAME_AAC  "/tmp/aac_audio_fifo"
+
+#define F_LINUX_SPECIFIC_BASE	1024
+#define F_SETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 7)
+#define F_GETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 8)
 
 // Unused vars
 unsigned char IDR[]               = {0x65, 0xB8};
@@ -530,6 +534,10 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_LOW);
                 return -1;
             }
+            if (fcntl(fileno(fOut), F_SETPIPE_SZ, 65536) != 65536) {
+                fprintf(stderr, "Cannot set size of fifo\n");
+                return -1;
+            };
         } else if (resolution == RESOLUTION_HIGH) {
             unlink(FIFO_NAME_HIGH);
             if (mkfifo(FIFO_NAME_HIGH, mode) < 0) {
@@ -546,6 +554,10 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_HIGH);
                 return -1;
             }
+            if (fcntl(fileno(fOut), F_SETPIPE_SZ, 262144) != 262144) {
+                fprintf(stderr, "Cannot set size of fifo\n");
+                return -1;
+            };
         } else if (resolution == RESOLUTION_AUDIO) {
             unlink(FIFO_NAME_AAC);
             if (mkfifo(FIFO_NAME_AAC, mode) < 0) {
@@ -562,6 +574,10 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_AAC);
                 return -1;
             }
+            if (fcntl(fileno(fOut), F_SETPIPE_SZ, 8192) != 8192) {
+                fprintf(stderr, "Cannot set size of fifo\n");
+                return -1;
+            };
         }
     }
 

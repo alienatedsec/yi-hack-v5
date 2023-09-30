@@ -172,7 +172,10 @@ if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
         cd /home/app
         killall dispatch
         LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
-        sleep 2
+        sleep 3
+        if [[ $(get_config TIME_OSD) == "yes" ]] ; then
+            echo -ne '\x01\x00\x00\x00' | dd of=/tmp/mmap.info bs=1 seek=0 count=4 conv=notrunc
+        fi
         LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
         sleep 8
         ./mp4record &
@@ -189,7 +192,10 @@ if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
         cd /home/app
         killall dispatch
         LD_PRELOAD=/home/yi-hack-v5/lib/ipc_multiplex.so ./dispatch &
-        sleep 2
+        sleep 3
+        if [[ $(get_config TIME_OSD) == "yes" ]] ; then
+            echo -ne '\x01\x00\x00\x00' | dd of=/tmp/mmap.info bs=1 seek=0 count=4 conv=notrunc
+        fi
         LD_LIBRARY_PATH="/home/yi-hack-v5/lib:/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib" ./rmm &
 		sleep 8
         if [[ $(get_config REC_WITHOUT_CLOUD) == "yes" ]] ; then
@@ -230,8 +236,6 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-ipc_multiplexer &
-
 mqttv4 &
 if [[ $(get_config MQTT) == "yes" ]] ; then
     mqtt-config &
@@ -250,10 +254,6 @@ if [[ $ONVIF_PORT != "80" ]] ; then
     D_ONVIF_PORT=:$ONVIF_PORT
 fi
 
-if [[ $(get_config ONVIF_WM_SNAPSHOT) == "yes" ]] ; then
-    WATERMARK="&watermark=yes"
-fi
-
 if [[ $(get_config SNAPSHOT) == "no" ]] ; then
     touch /tmp/snapshot.disabled
 fi
@@ -266,8 +266,12 @@ RRTSP_MODEL=$MODEL_SUFFIX
 RRTSP_RES=$(get_config RTSP_STREAM)
 RRTSP_AUDIO=$(get_config RTSP_AUDIO)
 RRTSP_PORT=$(get_config RTSP_PORT)
-RRTSP_USER=$USERNAME
-RRTSP_PWD=$PASSWORD
+if [ ! -z $USERNAME ]; then
+    RRTSP_USER="-u $USERNAME"
+fi
+if [ ! -z $PASSWORD ]; then
+    RRTSP_PWD="-w $PASSWORD"
+fi
 
 # some non-working functions to be added later
 
@@ -286,22 +290,22 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
     fi
     if [[ $(get_config RTSP_STREAM) == "low" ]]; then
         h264grabber -r low -m $MODEL_SUFFIX -f &
-        ONVIF_PROFILE_1="--name Profile_1 --width 640 --height 360 --url rtsp://%s$D_RTSP_PORT/ch0_1.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=low$WATERMARK --type H264"
+        ONVIF_PROFILE_1="--name Profile_1 --width 640 --height 360 --url rtsp://%s$D_RTSP_PORT/ch0_1.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=low&watermark=yes --type H264"
     fi
     if [[ $(get_config RTSP_STREAM) == "high" ]]; then
         h264grabber -r high -m $MODEL_SUFFIX -f &
-        ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
+        ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high&watermark=yes --type H264"
     fi
     if [[ $(get_config RTSP_STREAM) == "both" ]]; then
          h264grabber -r low -m $MODEL_SUFFIX -f &
          h264grabber -r high -m $MODEL_SUFFIX -f &
         if [[ $(get_config ONVIF_PROFILE) == "low" ]] || [[ $(get_config ONVIF_PROFILE) == "both" ]] ; then
-            ONVIF_PROFILE_1="--name Profile_1 --width 640 --height 360 --url rtsp://%s$D_RTSP_PORT/ch0_1.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=low$WATERMARK --type H264"
+            ONVIF_PROFILE_1="--name Profile_1 --width 640 --height 360 --url rtsp://%s$D_RTSP_PORT/ch0_1.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=low&watermark=yes --type H264"
         fi
         if [[ $(get_config ONVIF_PROFILE) == "high" ]] || [[ $(get_config ONVIF_PROFILE) == "both" ]] ; then
-            ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high$WATERMARK --type H264"
+            ONVIF_PROFILE_0="--name Profile_0 --width $HIGHWIDTH --height $HIGHHEIGHT --url rtsp://%s$D_RTSP_PORT/ch0_0.h264 --snapurl http://%s$D_HTTPD_PORT/cgi-bin/snapshot.sh?res=high&watermark=yes --type H264"
         fi
-    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
+    rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT $RRTSP_USER $RRTSP_PWD &
     fi
 #Seems to be killing the resource - fixed via #153
     $YI_HACK_PREFIX/script/wd_rtsp.sh &
