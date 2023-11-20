@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd `dirname $0` && pwd)
 PREFIX=$(pwd)/sysroot
 cd $SCRIPT_DIR
 
-rsync -r ./openssl-1.1.1w/include/openssl/ wpa_supplicant-2.10/wpa_supplicant/src
+cp -r openssl-1.1.1w/include/openssl wpa_supplicant-2.10/src/
 cd wpa_supplicant-2.10/wpa_supplicant || exit 1
 
 export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
