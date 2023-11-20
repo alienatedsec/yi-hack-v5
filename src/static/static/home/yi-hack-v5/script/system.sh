@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1a
+# 0.4.1c
 
 CONF_FILE="etc/system.conf"
 
@@ -27,6 +27,23 @@ export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:
 #if [ ! -L "/var/run/utmp" ]; then
 #  ln -sf /dev/null /var/run/utmp
 #fi
+
+# Upgrade wpa_supplicant modules
+ifconfig wlan0 up
+if [ -f /tmp/sd/yi-hack-v5/wpa/wpa_supplicant ]; then
+    echo "---backing up wpa---"
+    cp /home/base/tools/wpa_supplicant /tmp/sd/yi-hack-v5/wpa/wpa_supplicant_backup
+    cp /home/base/tools/wpa_cli /tmp/sd/yi-hack-v5/wpa/wpa_cli_backup
+    cp /home/base/tools/wpa_passphrase /tmp/sd/yi-hack-v5/wpa/wpa_passphrase_backup
+    killall watch_process
+    killall wpa*
+    mv /tmp/sd/yi-hack-v5/wpa/*.so* /home/lib/
+    mv /tmp/sd/yi-hack-v5/wpa/wpa_* /home/base/tools/
+    reboot
+	echo "---wpa upgrade done---"
+else
+	echo "---no wpa upgrade---"
+fi
 
 #reversing symlinks
 if [ -L "/var/run/utmp" ]; then

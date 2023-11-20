@@ -10,9 +10,9 @@ rm -rf ./openssl*
 
 #git reset --hard || exit 1
 
-wget https://www.openssl.org/source/openssl-1.1.1q.tar.gz
-tar zxf openssl-1.1.1q.tar.gz
-pushd openssl-1.1.1q
+wget https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+tar zxf openssl-1.1.1w.tar.gz
+pushd openssl-1.1.1w
 ./Configure linux-generic32 shared -DL_ENDIAN --prefix=${PREFIX} --openssldir=${PREFIX} shared
 make CROSS_COMPILE=arm-hisiv300-linux- LD=arm-hisiv300-linux-ld AR=arm-hisiv300-linux-ar NM=arm-hisiv300-linux-nm AS=arm-hisiv300-linux-as install
 

@@ -1,0 +1,64 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+PREFIX=$(pwd)/sysroot
+cd $SCRIPT_DIR
+
+rm -rf ./_install
+rm -rf ./sysroot
+rm -rf ./openssl*
+rm -rf ./expat*
+rm -rf ./dbus*
+rm -rf ./libnl*
+
+#git reset --hard || exit 1
+
+wget -c https://www.openssl.org/source/openssl-1.1.1w.tar.gz
+wget -c https://www.infradead.org/~tgr/libnl/files/libnl-3.2.25.tar.gz
+wget -c https://w1.fi/releases/wpa_supplicant-2.10.tar.gz
+wget -c https://dbus.freedesktop.org/releases/dbus/dbus-1.15.8.tar.xz
+wget -c https://github.com/libexpat/libexpat/releases/download/R_2_5_0/expat-2.5.0.tar.gz
+
+tar zxf openssl-1.1.1w.tar.gz
+tar -xf libnl-3.2.25.tar.gz
+tar zxf wpa_supplicant-2.10.tar.gz
+tar -xf dbus-1.15.8.tar.xz
+tar zxf expat-2.5.0.tar.gz
+cp .config wpa_supplicant-2.10/wpa_supplicant
+
+#cp wpa_supplicant-2.10/wpa_supplicant/defconfig wpa_supplicant-2.10/wpa_supplicant/.config
+
+pushd openssl-1.1.1w
+
+#./Configure --cross-compile-prefix=arm-hisiv300-linux- linux-generic32 -DL_ENDIAN --prefix=/${PREFIX} --openssldir=/${PREFIX}
+#make CC=arm-hisiv300-linux-gcc LD=arm-hisiv300-linux-ld RANLIB=arm-hisiv300-linux-ranlib MAKEDEPPROG=arm-hisiv300-linux-gcc PROCESSOR=ARM install  
+
+./Configure --cross-compile-prefix=arm-hisiv300-linux- linux-generic32 -DL_ENDIAN -no-async --prefix=/${PREFIX} --openssldir=/${PREFIX}
+make install
+
+popd
+
+pushd libnl-3.2.25
+
+./configure --host=arm-hisiv300-linux --prefix=${PREFIX}
+make CROSS_COMPILE=arm-hisiv300-linux- LD=arm-hisiv300-linux-ld AR=arm-hisiv300-linux-ar NM=arm-hisiv300-linux-nm AS=arm-hisiv300-linux-as install
+export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
+
+popd
+
+pushd expat-2.5.0
+
+./configure --host=arm-hisiv300-linux --prefix=${PREFIX} CC=arm-hisiv300-linux-gcc
+make
+make install 
+
+popd
+
+pushd dbus-1.15.8
+
+./autogen.sh
+./configure --prefix=${PREFIX} --host=arm-hisiv300-linux --with-x=no ac_cv_have_abstract_sockets=yes "CC=arm-hisiv300-linux-gcc -I${PREFIX}/include -L${PREFIX}/lib"
+make
+make install
+
+popd

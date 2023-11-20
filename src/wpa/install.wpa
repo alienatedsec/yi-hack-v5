@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+# Compress the file
+#upx ./_install/sbin/curl
+
+mkdir -p ../../build/home/yi-hack-v5/wpa/
+
+rsync -a ./_install/usr/local/sbin ../../build/home/yi-hack-v5/wpa/
+cp ./sysroot/lib/libcryopto.so.1.1 ../../build/home/yi-hack-v5/wpa/
