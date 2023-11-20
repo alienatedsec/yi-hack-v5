@@ -10,6 +10,7 @@ rm -rf ./openssl*
 rm -rf ./expat*
 rm -rf ./dbus*
 rm -rf ./libnl*
+rm -rf ./wpa_*
 
 #git reset --hard || exit 1
 
