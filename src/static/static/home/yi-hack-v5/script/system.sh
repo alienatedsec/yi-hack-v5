@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1c
+# 0.4.1d
 
 CONF_FILE="etc/system.conf"
 
@@ -89,6 +89,11 @@ fi
 # Update cloudAPI_fake if necessary
 if [[ "$(grep -m 3 -n '' /home/app/cloudAPI_fake | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" != "$(grep -m 3 -n '' $YI_HACK_PREFIX/script/cloudAPI_fake | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" ]]; then
   cp -f $YI_HACK_PREFIX/script/cloudAPI_fake /home/app/
+fi
+
+# Update cloudAPI if necessary
+if [[ "$(grep -m 3 -n '' /home/app/cloudAPI | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" != "$(grep -m 3 -n '' $YI_HACK_PREFIX/script/cloudAPI | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" ]]; then
+  cp -f $YI_HACK_PREFIX/script/cloudAPI /home/app/
 fi
 
 # Manual Wi-Fi config
