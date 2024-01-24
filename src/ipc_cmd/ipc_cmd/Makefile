@@ -1,11 +1,14 @@
-OBJECTS_C = ipc_cmd.o
+OBJECTS_C = ipc_cmd.o ptz.o
 OBJECTS_R = ipc_read.o
 OBJECTS_N = ipc_notify.o
-LIBS = -lpthread -lrt
+LIBS = -lpthread -lrt -lm
 
 all: ipc_cmd ipc_read ipc_notify ipc_multiplex.so
 
 ipc_cmd.o: ipc_cmd.c $(HEADERS)
+	$(CC) -c $< -D_GNU_SOURCE -std=c99 -fPIC -O2 -o $@
+
+ptz.o: ptz.c $(HEADERS)
 	$(CC) -c $< -D_GNU_SOURCE -std=c99 -fPIC -O2 -o $@
 
 ipc_read.o: ipc_read.c $(HEADERS)
