@@ -61,7 +61,7 @@ APP.ptz = (function ($) {
         $(button).attr("disabled", true);
         $.ajax({
             type: "GET",
-            url: 'cgi-bin/preset.sh?num='+$(select + " option:selected").text(),
+            url: 'cgi-bin/preset.sh?action=go_preset&num='+$(select + " option:selected").text(),
             dataType: "json",
             error: function(response) {
                 console.log('error', response);
