@@ -8,5 +8,7 @@ rm -rf ./_install
 cd busybox 
 git reset --hard || exit 1
 
+patch -p1 < ../onvif.patch
+
 cp ../.config ./ || exit 1
 

@@ -1,0 +1,17 @@
+diff -Naur busybox.ori/networking/httpd.c busybox/networking/httpd.c
+--- busybox.ori/networking/httpd.c	2024-01-25 11:34:58.935415874 +0100
++++ busybox/networking/httpd.c	2024-01-25 21:14:16.277287558 +0100
+@@ -2316,6 +2316,13 @@
+ 		}
+ 		cgi_type = CGI_NORMAL;
+ 	}
++	else if (is_prefixed_with(tptr, "onvif/")) {
++		if (tptr[6] == '\0') {
++			/* protect listing "cgi-bin/" */
++			send_headers_and_exit(HTTP_FORBIDDEN);
++		}
++		cgi_type = CGI_NORMAL;
++	}
+ #endif
+ 
+ 	if (urlp[-1] == '/') {
