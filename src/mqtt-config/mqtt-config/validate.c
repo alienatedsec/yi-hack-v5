@@ -18,15 +18,21 @@ char *config_params[PARAM_NUM][PARAM_OPTIONS] = {
     { "system", "SNAPSHOT", "bool", "", "", "" , "", "", "" },
     { "system", "SNAPSHOT_VIDEO", "bool", "", "", "" , "", "", "" },
     { "system", "SNAPSHOT_LOW", "bool", "", "", "" , "", "", "" },
+    { "system", "TIMELAPSE", "bool", "", "", "" , "", "", "" },
+    { "system", "TIMELAPSE_FTP", "bool", "", "", "" , "", "", "" },
+    { "system", "TIMELAPSE_DT", "int", "1", "1440", "" , "", "", "" },
+    { "system", "TIMELAPSE_VDT", "string", "1", "1440", "" , "", "", "" },
     { "system", "ONVIF", "bool", "", "", "" , "", "", "" },
     { "system", "ONVIF_WSDD", "bool", "", "", "" , "", "", "" },
     { "system", "ONVIF_PROFILE", "enum", "high", "low", "both" , "", "", "" },
     { "system", "ONVIF_WM_SNAPSHOT", "bool", "", "", "" , "", "", "" },
     { "system", "ONVIF_NETIF", "string", "", "", "" , "", "", "" },
+    { "system", "TIME_OSD", "bool", "", "", "" , "", "", "" },
     { "system", "NTPD", "bool", "", "", "" , "", "", "" },
     { "system", "NTP_SERVER", "string" "", "", "" , "", "", "" },
     { "system", "PROXYCHAINSNG", "bool", "", "", "" , "", "", "" },
     { "system", "SWAP_FILE", "bool", "", "", "" , "", "", "" },
+    { "system", "SWAP_SWAPPINESS", "int", "0", "100", "" , "", "", "" },
     { "system", "RTSP_PORT", "int", "1", "65535", "" , "", "", "" },
     { "system", "ONVIF_PORT", "int", "1", "65535", "" , "", "", "" },
     { "system", "HTTPD_PORT", "int", "1", "65535", "" , "", "", "" },
@@ -43,6 +49,7 @@ char *config_params[PARAM_NUM][PARAM_OPTIONS] = {
     { "system", "FTP_FILE_DELETE_AFTER_UPLOAD", "bool", "", "", "" , "", "", "" },
     { "system", "SSH_PASSWORD", "string", "", "", "" , "", "", "" },
     { "system", "CRONTAB", "string", "", "", "" , "", "", "" },
+    { "system", "DEBUG_LOG", "bool", "", "", "" , "", "", "" },
 
     { "camera", "SWITCH_ON", "bool", "", "", "" , "", "", "-t" },
     { "camera", "SAVE_VIDEO_ON_MOTION", "bool", "", "", "" , "", "", "-v" },
@@ -60,6 +67,12 @@ char *config_params[PARAM_NUM][PARAM_OPTIONS] = {
     { "camera", "SOUND_SENSITIVITY", "int", "30", "90", "", "", "", "-n" },
     { "camera", "MOTION_TRACKING", "bool", "", "", "", "", "", "-o" },
     { "camera", "CRUISE", "enum", "no", "presets", "360", "", "", "-C" }
+
+    { "ptz", "MOVE", "enum", "right", "left", "down", "up", "stop", "QUERY_STRING=\"action=step&dir=%s\" /home/yi-hack/www/cgi-bin/ptz.sh" },
+    { "ptz", "GOTO_PRESET", "int", "0", "7", "", "", "", "/home/yi-hack/script/ptz_presets.sh -a go_preset -n %s" },
+    { "ptz", "ADD_PRESET", "string", "", "", "", "", "", "/home/yi-hack/script/ptz_presets.sh -a add_preset -m %s" },
+    { "ptz", "SET_HOME_POSITION", "string", "", "", "", "", "", "/home/yi-hack/script/ptz_presets.sh -a set_home_position" },
+    { "ptz", "REMOVE_PRESET", "int", "0", "7", "", "", "", "/home/yi-hack/script/ptz_presets.sh -a del_preset -n %s" },
 };
 
 int validate_param(char *file, char *key, char *value)
