@@ -42,3 +42,6 @@
 	path = src/curl/curl
 	url = https://github.com/curl/curl
 	ignore = dirty
+[submodule "src/onvif_simple_server/onvif_simple_server"]
+	path = src/onvif_simple_server/onvif_simple_server
+	url = https://github.com/roleoroleo/onvif_simple_server

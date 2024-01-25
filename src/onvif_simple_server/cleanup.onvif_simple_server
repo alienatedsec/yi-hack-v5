@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+cd onvif_simple_server
+
+make clean
+
+cd ..
+
+rm -rf libtomcrypt*
+rm crypt*.tar.xz
