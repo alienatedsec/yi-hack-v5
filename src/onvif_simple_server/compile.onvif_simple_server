@@ -36,10 +36,15 @@ mkdir -p ../_install/etc/onvif_notify_server || exit 1
 mkdir -p ../_install/etc/wsd_simple_server || exit 1
 
 cp ./onvif_simple_server ../_install/www/onvif || exit 1
-ln -s onvif_simple_server ../_install/www/onvif/device_service
-ln -s onvif_simple_server ../_install/www/onvif/events_service
-ln -s onvif_simple_server ../_install/www/onvif/media_service
-ln -s onvif_simple_server ../_install/www/onvif/ptz_service
+cp ./onvif_simple_server ../_install/www/onvif || exit 1
+echo "#!/tmp/sd/yi-hack-v5/www/onvif/onvif_simple_server" > ../_install/www/onvif/device_service
+chmod 0755 ../_install/www/onvif/device_service
+echo "#!/tmp/sd/yi-hack-v5/www/onvif/onvif_simple_server" > ../_install/www/onvif/events_service
+chmod 0755 ../_install/www/onvif/events_service
+echo "#!/tmp/sd/yi-hack-v5/www/onvif/onvif_simple_server" > ../_install/www/onvif/media_service
+chmod 0755 ../_install/www/onvif/media_service
+echo "#!/tmp/sd/yi-hack-v5/www/onvif/onvif_simple_server" > ../_install/www/onvif/ptz_service
+chmod 0755 ../_install/www/onvif/ptz_service
 cp -R ./device_service_files ../_install/www/onvif
 cp -R ./events_service_files ../_install/www/onvif
 cp -R ./generic_files ../_install/www/onvif
