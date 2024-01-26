@@ -34,7 +34,6 @@ char *config_params[PARAM_NUM][PARAM_OPTIONS] = {
     { "system", "SWAP_FILE", "bool", "", "", "" , "", "", "" },
     { "system", "SWAP_SWAPPINESS", "int", "0", "100", "" , "", "", "" },
     { "system", "RTSP_PORT", "int", "1", "65535", "" , "", "", "" },
-    { "system", "ONVIF_PORT", "int", "1", "65535", "" , "", "", "" },
     { "system", "HTTPD_PORT", "int", "1", "65535", "" , "", "", "" },
     { "system", "USERNAME", "string", "", "", "" , "", "", "" },
     { "system", "PASSWORD", "string", "", "", "" , "", "", "" },
