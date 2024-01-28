@@ -227,7 +227,7 @@ fi
 
 ipc_multiplexer &
 
-mqttv4 &
+sleep 30 && mqttv4 &
 if [[ $(get_config MQTT) == "yes" ]] ; then
     mqtt-config &
     $YI_HACK_PREFIX/script/conf2mqtt.sh &
