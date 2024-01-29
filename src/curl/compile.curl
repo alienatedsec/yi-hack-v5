@@ -1,16 +1,19 @@
 #!/bin/bash
 
 SCRIPT_DIR=$(cd `dirname $0` && pwd)
+PREFIX=$(pwd)/sysroot
 cd $SCRIPT_DIR
 
 cd curl || exit 1
 
 ./buildconf || exit 1
 
-./configure --host=arm-hisiv300-linux --without-ssl --disable-shared --disable-libcurl-option \
-    --prefix=$SCRIPT_DIR/_install \
-   DESTDIR="$SCRIPT_DIR/_install/" && make install-strip \
-   install \
-   || exit 1
+./configure --with-openssl=${PREFIX} --host=arm-hisiv300-linux-uclibcgnueabi --prefix=$SCRIPT_DIR/_install --disable-shared DESTDIR="$SCRIPT_DIR/_install/" && make install-strip install || exit 1
+
+#./configure --host=arm-hisiv300-linux --with-openssl --disable-shared --disable-libcurl-option \
+#    --prefix=$SCRIPT_DIR/_install \
+#   DESTDIR="$SCRIPT_DIR/_install/" && make install-strip \
+#   install \
+#   || exit 1
 
 
