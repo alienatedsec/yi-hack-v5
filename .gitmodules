@@ -6,10 +6,6 @@
 	path = src/uClibc/uClibc
 	url = https://github.com/kraj/uClibc.git
 	ignore = dirty
-[submodule "src/busybox/busybox"]
-	path = src/busybox/busybox
-	url = https://github.com/mirror/busybox.git
-	ignore = dirty
 [submodule "src/proxychains-ng/proxychains-ng"]
 	path = src/proxychains-ng/proxychains-ng
 	url = https://github.com/rofl0r/proxychains-ng.git
