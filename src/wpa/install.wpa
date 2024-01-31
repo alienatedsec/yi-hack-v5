@@ -6,12 +6,12 @@ cd $SCRIPT_DIR
 # Compress the file
 #upx ./_install/sbin/curl
 
-mkdir -p ../../build/home/yi-hack-v5/wpa/
+#mkdir -p ../../build/home/yi-hack-v5/wpa/
 mkdir -p ../../build/home/base/tools/
 mkdir -p ../../build/home/lib/
 
-rsync -r ./_install/usr/local/sbin/ ../../build/home/yi-hack-v5/wpa/
-cp sysroot/lib/libcrypto.so.1.1 ../../build/home/yi-hack-v5/wpa/
+#rsync -r ./_install/usr/local/sbin/ ../../build/home/yi-hack-v5/wpa/
+#cp sysroot/lib/libcrypto.so.1.1 ../../build/home/yi-hack-v5/wpa/
 
 rsync -r ./_install/usr/local/sbin/ ../../build/home/base/tools/
 cp sysroot/lib/libcrypto.so.1.1 ../../build/home/lib/
