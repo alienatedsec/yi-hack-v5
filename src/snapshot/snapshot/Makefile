@@ -1,8 +1,8 @@
-OBJECTS = imggrabber.o convert2jpg.o add_water.o water_mark.o
+OBJECTS = imggrabber.o convert2jpg.o add_water.o water_mark.o cap_pic.o
 FFMPEG = ffmpeg-6.0
 FFMPEG_DIR = ./$(FFMPEG)
 INC_FF = -I$(FFMPEG_DIR)
-LIB_FF = $(FFMPEG_DIR)/libavcodec/libavcodec.a $(FFMPEG_DIR)/libavutil/libavutil.a -lpthread -lm
+LIB_FF = $(FFMPEG_DIR)/libavcodec/libavcodec.a $(FFMPEG_DIR)/libavutil/libavutil.a -lpthread -lm -lrt
 JPEGLIB = jpeg-9e
 JPEGLIB_DIR = ./$(JPEGLIB)
 JPEGSRC = jpegsrc.v9e
@@ -26,6 +26,9 @@ add_water.o: add_water.c $(HEADERS)
 	$(CC) -c $< $(INC_J) -fPIC -O2 -o $@
 
 water_mark.o: water_mark.c $(HEADERS)
+	$(CC) -c $< $(INC_J) -fPIC -O2 -o $@
+
+cap_pic.o: cap_pic.c $(HEADERS)
 	$(CC) -c $< $(INC_J) -fPIC -O2 -o $@
 
 imggrabber: $(OBJECTS)

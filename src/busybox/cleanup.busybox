@@ -5,7 +5,6 @@ cd $SCRIPT_DIR
 
 source config.busybox
 
-cd "${BUILD_FOLDER}"
+rm -rf "${BUILD_FOLDER}"
 
-make -j$(nproc) ARCH=arm || exit 1
-make install || exit 1
+make clean

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 roleo.
+ * Copyright (c) 2023 roleo.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,6 +140,10 @@
 #define FIFO_NAME_HIGH "/tmp/h264_high_fifo"
 #define FIFO_NAME_AAC  "/tmp/aac_audio_fifo"
 
+#define F_LINUX_SPECIFIC_BASE	1024
+#define F_SETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 7)
+#define F_GETPIPE_SZ	(F_LINUX_SPECIFIC_BASE + 8)
+
 // Unused vars
 unsigned char IDR[]               = {0x65, 0xB8};
 unsigned char NAL_START[]         = {0x00, 0x00, 0x00, 0x01};
@@ -214,7 +218,7 @@ int main(int argc, char **argv) {
     FILE *fFid = NULL;
     FILE *fOut = NULL;
 
-    int current_frame, frame_counter, frame_counter_tmp, next_frame_counter;
+    int current_frame, frame_counter, frame_counter_tmp, next_frame_counter, frame_start, next_frame_start;
     int table_offset, stream_offset;
     unsigned int frame_ts = 0;
     unsigned int frame_ts_tmp, next_frame_ts, frame_ts_diff;
@@ -530,6 +534,10 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_LOW);
                 return -1;
             }
+            if (fcntl(fileno(fOut), F_SETPIPE_SZ, 65536) != 65536) {
+                fprintf(stderr, "Cannot set size of fifo\n");
+                return -1;
+            };
         } else if (resolution == RESOLUTION_HIGH) {
             unlink(FIFO_NAME_HIGH);
             if (mkfifo(FIFO_NAME_HIGH, mode) < 0) {
@@ -546,6 +554,10 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_HIGH);
                 return -1;
             }
+            if (fcntl(fileno(fOut), F_SETPIPE_SZ, 262144) != 262144) {
+                fprintf(stderr, "Cannot set size of fifo\n");
+                return -1;
+            };
         } else if (resolution == RESOLUTION_AUDIO) {
             unlink(FIFO_NAME_AAC);
             if (mkfifo(FIFO_NAME_AAC, mode) < 0) {
@@ -562,6 +574,10 @@ int main(int argc, char **argv) {
                 fprintf(stderr, "Error opening fifo %s\n", FIFO_NAME_AAC);
                 return -1;
             }
+            if (fcntl(fileno(fOut), F_SETPIPE_SZ, 8192) != 8192) {
+                fprintf(stderr, "Cannot set size of fifo\n");
+                return -1;
+            };
         }
     }
 
@@ -573,16 +589,23 @@ int main(int argc, char **argv) {
             for (i = 0; i < table_record_num; i++) {
                 // Get pointer to the record
                 record_ptr = addr + table_offset + (i * table_record_size);
+                // Get the frame start and check if '01'
+                frame_start = (int) *(record_ptr);
+                if (frame_start != 1) continue;
                 // Get the frame counter
                 frame_counter_tmp = (((int) *(record_ptr + frame_counter_offset + 1)) << 8) +
                             ((int) *(record_ptr + frame_counter_offset));
                 // Check if it is the largest frame_counter
                 if (frame_counter_tmp > frame_counter) {
                     frame_counter = frame_counter_tmp;
-                } else {
                     current_frame = i;
+                } else {
                     break;
                 }
+            }
+            if (current_frame == -1) {
+                usleep(MILLIS_10);
+                continue;
             }
             if (debug) fprintf(stderr, "%lld - found latest frame: id %d, frame_counter %d\n", current_timestamp(), current_frame, frame_counter);
 
@@ -600,6 +623,12 @@ int main(int argc, char **argv) {
                     if (debug) fprintf(stderr, "%lld - rewinding circular table\n", current_timestamp());
                 } else {
                     next_record_ptr = record_ptr + table_record_size;
+                }
+                // Get the frame start and check if '01'
+                next_frame_start = (int) *(next_record_ptr);
+                if (next_frame_start != 1) {
+                    usleep(MILLIS_10);
+                    continue;
                 }
                 // Get the frame counter of the next record
                 next_frame_counter = ((int) *(next_record_ptr + frame_counter_offset + 1)) * 256 + ((int) *(next_record_ptr + frame_counter_offset));
@@ -635,7 +664,7 @@ int main(int argc, char **argv) {
                 } else {
                     frame_counter_invalid++;
                     if (frame_counter_invalid < 10) {
-                        if (debug) fprintf(stderr, "%lld - frame counter invalid %d\n", current_timestamp(), frame_counter_invalid);
+                        if (debug) fprintf(stderr, "%lld - frame counter invalid %d, wait for the next frame\n", current_timestamp(), frame_counter_invalid);
                     } else {
                         if (debug) fprintf(stderr, "%lld - frame counter invalid %d, sync lost\n", current_timestamp(), frame_counter_invalid);
                         break;
@@ -650,10 +679,13 @@ int main(int argc, char **argv) {
         for(;;) {
             // Find the record with the largest timestamp
             current_frame = -1;
-            frame_counter = -1;
+            frame_ts = 0;
             for (i = 0; i < table_record_num; i++) {
                 // Get pointer to the record
                 record_ptr = addr + table_offset + (i * table_record_size);
+                // Get the frame start and check if '01'
+                frame_start = (int) *(record_ptr);
+                if (frame_start != 1) continue;
                 // Get the frame timestamp
                 frame_ts_tmp = (((int) *(record_ptr + frame_ts_offset + 3)) << 24) +
                             (((int) *(record_ptr + frame_ts_offset + 2)) << 16) +
@@ -662,10 +694,14 @@ int main(int argc, char **argv) {
                 // Check if it is the largest timestamp
                 if (frame_ts_tmp > frame_ts) {
                     frame_ts = frame_ts_tmp;
-                } else {
                     current_frame = i;
+                } else {
                     break;
                 }
+            }
+            if (current_frame == -1) {
+                usleep(MILLIS_10);
+                continue;
             }
             if (debug) fprintf(stderr, "%lld - found latest frame: id %d, frame_ts %u\n", current_timestamp(), current_frame, frame_ts);
 
@@ -684,18 +720,24 @@ int main(int argc, char **argv) {
                 } else {
                     next_record_ptr = record_ptr + table_record_size;
                 }
+                // Get the frame start and check if '01'
+                next_frame_start = (int) *(next_record_ptr);
+                if (next_frame_start != 1) {
+                    usleep(MILLIS_10);
+                    continue;
+                }
                 // Get the frame timestamp of the next record
                 next_frame_ts = (((int) *(next_record_ptr + frame_ts_offset + 3)) << 24) +
                             (((int) *(next_record_ptr + frame_ts_offset + 2)) << 16) +
                             (((int) *(next_record_ptr + frame_ts_offset + 1)) << 8) +
                             ((int) *(next_record_ptr + frame_ts_offset));
-                if (debug) fprintf(stderr, "%lld - current frame timestamp is %u, next frame timestamp is %u\n", current_timestamp(), frame_ts, next_frame_ts);
+                if (debug) fprintf(stderr, "%lld - current frame timestamp is %u, next frame timestamp is %u, duration is %u\n", current_timestamp(), frame_ts, next_frame_ts, next_frame_ts - frame_ts);
                 // Check if the frame timestamp is valid
                 if (next_frame_ts >= frame_ts)
                     frame_ts_diff = next_frame_ts - frame_ts;
                 else
                     frame_ts_diff = next_frame_ts + (0xffffffff - frame_ts + 1);
-                if ((frame_ts_diff >= 0) && (frame_ts_diff <= 10 * 64)) {    // 1 packet with 1024 samples every 64 ms
+                if ((frame_ts_diff >= 0) && (frame_ts_diff <= 2 * 128)) {    // 1 packet with 1024 samples every 128 ms
                     // Get the offset of the stream
                     frame_offset = (((int) *(record_ptr + frame_offset_offset + 3)) << 24) +
                                 (((int) *(record_ptr + frame_offset_offset + 2)) << 16) +
@@ -724,9 +766,9 @@ int main(int argc, char **argv) {
                 } else {
                     frame_counter_invalid++;
                     if (frame_counter_invalid < 10) {
-                        if (debug) fprintf(stderr, "%lld - frame counter invalid %d\n", current_timestamp(), frame_counter_invalid);
+                        if (debug) fprintf(stderr, "%lld - frame timestamp invalid %d, wait for the next frame\n", current_timestamp(), frame_counter_invalid);
                     } else {
-                        if (debug) fprintf(stderr, "%lld - frame counter invalid %d, sync lost\n", current_timestamp(), frame_counter_invalid);
+                        if (debug) fprintf(stderr, "%lld - frame timestamp invalid %d, sync lost\n", current_timestamp(), frame_counter_invalid);
                         break;
                     }
                 }
