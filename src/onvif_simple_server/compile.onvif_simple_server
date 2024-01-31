@@ -36,7 +36,6 @@ mkdir -p ../_install/etc/onvif_notify_server || exit 1
 mkdir -p ../_install/etc/wsd_simple_server || exit 1
 
 cp ./onvif_simple_server ../_install/www/onvif || exit 1
-cp ./onvif_simple_server ../_install/www/onvif || exit 1
 echo "#!/tmp/sd/yi-hack-v5/www/onvif/onvif_simple_server" > ../_install/www/onvif/device_service
 chmod 0755 ../_install/www/onvif/device_service
 echo "#!/tmp/sd/yi-hack-v5/www/onvif/onvif_simple_server" > ../_install/www/onvif/events_service

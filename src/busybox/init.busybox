@@ -3,7 +3,26 @@
 SCRIPT_DIR=$(cd `dirname $0` && pwd)
 cd $SCRIPT_DIR
 
+source config.busybox
+
 rm -rf ./_install
+
+if [ ! -f "${ARCHIVE}" ]; then
+    wget "${MAIN_URL}"
+fi
+
+tar xvf "${ARCHIVE}"
+
+cd "${BUILD_FOLDER}"
+
+patch -p1 < ../gzdef.patch
+patch -p1 < ../onvif.patch
+patch -p1 < ../auth.patch
+
+cp ../.config ./ || exit 1#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
 
 source config.busybox
 
