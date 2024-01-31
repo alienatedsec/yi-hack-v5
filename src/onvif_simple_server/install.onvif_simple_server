@@ -3,6 +3,7 @@
 SCRIPT_DIR=$(cd `dirname $0` && pwd)
 cd $SCRIPT_DIR
 
+mkdir -p ../../build/home/yi-hack-v5/www/onvif || exit 1
 mkdir -p ../../build/home/yi-hack-v5/bin/ || exit 1
 
-rsync -a ./_install/bin/wsdd ../../build/home/yi-hack-v5/bin/
+rsync -av ./_install/* ../../build/home/yi-hack-v5/ || exit 1

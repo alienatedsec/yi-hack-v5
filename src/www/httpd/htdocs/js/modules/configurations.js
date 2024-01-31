@@ -1,6 +1,6 @@
 var APP = APP || {};
 
-APP.configurations = (function($) {
+APP.configurations = (function ($) {
 
     function init() {
         registerEventHandler();
@@ -8,7 +8,7 @@ APP.configurations = (function($) {
     }
 
     function registerEventHandler() {
-        $(document).on("click", '#button-save', function(e) {
+        $(document).on("click", '#button-save', function (e) {
             saveConfigs();
         });
     }
@@ -24,17 +24,17 @@ APP.configurations = (function($) {
             success: function(response) {
                 loadingStatusElem.fadeOut(500);
 
-                $.each(response, function(key, state) {
-                    if (key == "HOSTNAME" || key == "TIMEZONE" || key == "NTP_SERVER" || key == "HTTPD_PORT" || key == "RTSP_PORT" || key == "ONVIF_PORT" || key == "USERNAME")
-                        $('input[type="text"][data-key="' + key + '"]').prop('value', state);
-                    else if (key == "RTSP_STREAM" || key == "RTSP_AUDIO" || key == "ONVIF_PROFILE" || key == "ONVIF_NETIF")
-                        $('select[data-key="' + key + '"]').prop('value', state);
-                    else if (key == "PASSWORD" || key == "SSH_PASSWORD")
-                        $('input[type="password"][data-key="' + key + '"]').prop('value', state);
-                    else if (key == "CRONTAB")
+                $.each(response, function (key, state) {
+                    if(key=="HOSTNAME" || key=="TIMEZONE" || key=="NTP_SERVER" || key=="HTTPD_PORT" || key=="RTSP_PORT" || key=="USERNAME")
+                        $('input[type="text"][data-key="' + key +'"]').prop('value', state);
+                    else if(key=="RTSP_STREAM" || key=="RTSP_AUDIO" || key=="ONVIF_PROFILE" || key=="ONVIF_NETIF")
+                        $('select[data-key="' + key +'"]').prop('value', state);
+                    else if(key=="PASSWORD" || key=="SSH_PASSWORD")
+                        $('input[type="password"][data-key="' + key +'"]').prop('value', state);
+                    else if(key=="CRONTAB")
                         $('textarea#' + key).prop('value', state);
                     else
-                        $('input[type="checkbox"][data-key="' + key + '"]').prop('checked', state === 'yes');
+                        $('input[type="checkbox"][data-key="' + key +'"]').prop('checked', state === 'yes');
                 });
             },
             error: function(response) {
@@ -51,7 +51,7 @@ APP.configurations = (function($) {
 
         saveStatusElem.text("Saving...");
 
-        $('.configs-switch input[type="checkbox"]').each(function() {
+        $('.configs-switch input[type="checkbox"]').each(function () {
             configs[$(this).attr('data-key')] = $(this).prop('checked') ? 'yes' : 'no';
         });
 
@@ -70,7 +70,6 @@ APP.configurations = (function($) {
         configs["RTSP_STREAM"] = $('select[data-key="RTSP_STREAM"]').prop('value');
         configs["RTSP_AUDIO"] = $('select[data-key="RTSP_AUDIO"]').prop('value');
         configs["RTSP_PORT"] = $('input[type="text"][data-key="RTSP_PORT"]').prop('value');
-        configs["ONVIF_PORT"] = $('input[type="text"][data-key="ONVIF_PORT"]').prop('value');
         configs["ONVIF_PROFILE"] = $('select[data-key="ONVIF_PROFILE"]').prop('value');
         configs["ONVIF_NETIF"] = $('select[data-key="ONVIF_NETIF"]').prop('value');
         configs["USERNAME"] = $('input[type="text"][data-key="USERNAME"]').prop('value');

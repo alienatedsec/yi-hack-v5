@@ -5,6 +5,7 @@ APP.ptz = (function ($) {
     function init() {
         updatePage();
         registerEventHandler();
+        initPage();
         snapshotTimer();
     }
 
@@ -61,7 +62,7 @@ APP.ptz = (function ($) {
         $(button).attr("disabled", true);
         $.ajax({
             type: "GET",
-            url: 'cgi-bin/preset.sh?num='+$(select + " option:selected").text(),
+            url: 'cgi-bin/preset.sh?action=go_preset&num='+$(select + " option:selected").text(),
             dataType: "json",
             error: function(response) {
                 console.log('error', response);
@@ -69,6 +70,89 @@ APP.ptz = (function ($) {
             },
             success: function(data) {
                 $(button).attr("disabled", false);
+            }
+        });
+    }
+
+    function addPreset(button) {
+        $(button).attr("disabled", true);
+        $.ajax({
+            type: "POST",
+            url: 'cgi-bin/preset.sh?action=add_preset&name='+$('input[type="text"][data-key="PRESET_NAME"]').prop('value'),
+            dataType: "json",
+            error: function(response) {
+                console.log('error', response);
+                $(button).attr("disabled", false);
+            },
+            success: function(data) {
+                $(button).attr("disabled", false);
+                window.location.reload();
+            }
+        });
+    }
+
+    function delPreset(button, select) {
+        $(button).attr("disabled", true);
+        $.ajax({
+            type: "POST",
+            url: 'cgi-bin/preset.sh?action=del_preset&num='+$(select + " option:selected").val(),
+            dataType: "json",
+            error: function(response) {
+                console.log('error', response);
+                $(button).attr("disabled", false);
+            },
+            success: function(data) {
+                $(button).attr("disabled", false);
+                window.location.reload();
+            }
+        });
+    }
+
+    function delAllPreset(button) {
+        $(button).attr("disabled", true);
+        $.ajax({
+            type: "POST",
+            url: 'cgi-bin/preset.sh?action=del_preset&num=all',
+            dataType: "json",
+            error: function(response) {
+                console.log('error', response);
+                $(button).attr("disabled", false);
+            },
+            success: function(data) {
+                $(button).attr("disabled", false);
+                window.location.reload();
+            }
+        });
+    }
+
+    function initPage() {
+        $.ajax({
+            type: "GET",
+            url: 'cgi-bin/get_configs.sh?conf=ptz_presets',
+            dataType: "json",
+            success: function(data) {
+                html = "<select id=\"select-goto\">\n";
+                for (let key in data) {
+                    if (key != "NULL") {
+                        fields = data[key].split(',');
+                        html += "<option value=\"" + key + "\">" + key + " - " + fields[0] + "</option>\n";
+                    }
+                }
+                html += "</select>\n";
+                document.getElementById("select-goto-container").innerHTML = html;
+
+                html = "<select id=\"select-del\">\n";
+                for (let key in data) {
+                    if (key != "NULL") {
+                        fields = data[key].split(',');
+                        html += "<option value=\"" + key + "\">" + key + " - " + fields[0] + "</option>\n";
+                    }
+                }
+                html += "</select>\n";
+                document.getElementById("select-del-container").innerHTML = html;
+            },
+            error: function(response) {
+                console.log('error', response);
             }
         });
     }
