@@ -43,6 +43,7 @@ if [ ! -L "/home/yi-hack-v5/.ash_history" ]; then
 fi
 
 ulimit -s 1024
+mkdir /dev/shm
 
 # Remove core files, if any
 rm -f $YI_HACK_PREFIX/bin/core
@@ -333,6 +334,7 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
         echo "#PTZ" >> $ONVIF_SRVD_CONF
         echo "ptz=1" >> $ONVIF_SRVD_CONF
         echo "get_position=/tmp/sd/yi-hack-v5/bin/ipc_cmd -g" >> $ONVIF_SRVD_CONF
+        echo "is_running=/tmp/sd/yi-hack-v5/bin/ipc_cmd -u" >> $ONVIF_SRVD_CONF
         echo "move_left=/tmp/sd/yi-hack-v5/bin/ipc_cmd -m left" >> $ONVIF_SRVD_CONF
         echo "move_right=/tmp/sd/yi-hack-v5/bin/ipc_cmd -m right" >> $ONVIF_SRVD_CONF
         echo "move_up=/tmp/sd/yi-hack-v5/bin/ipc_cmd -m up" >> $ONVIF_SRVD_CONF
