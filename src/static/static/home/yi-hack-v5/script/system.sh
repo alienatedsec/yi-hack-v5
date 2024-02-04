@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.0c
+# 0.4.1e
 
 CONF_FILE="etc/system.conf"
 
@@ -148,7 +148,7 @@ fi
 # Version Firmware Check
 if [ -f "/home/yi-hack-v5/version" ]; then
   version=$(cat /home/yi-hack-v5/version)
-  if [[ "$version" != "0.3.8" ]]; then
+  if [[ "$version" != "0.4.1" ]]; then
     echo "Your baseline $version (rootfs and home partitions) is incorrect. Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267"
     echo "Your baseline $version (rootfs and home partitions) is incorrect, Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267" > "/tmp/sd/hackerror.txt"
   fi
