@@ -106,7 +106,7 @@ FramedSource* H264VideoFifoServerMediaSubsession::createNewStreamSource(unsigned
     estBitrate = 500; // kbps, estimate
 
     // Create the video source:
-    ByteStreamFifoSource* fileSource = ByteStreamFifoSource::createNew(envir(), fFileName);
+    ByteStreamFifoSource* fileSource = ByteStreamFifoSource::createNew(envir(), fFileName, 0, 50000);
     if (fileSource == NULL) return NULL;
     fFileSize = fileSource->fileSize();
 

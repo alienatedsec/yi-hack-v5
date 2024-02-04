@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 roleo.
+ * Copyright (c) 2023 roleo.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <dirent.h>
 #include <stdint.h>
 #include <inttypes.h>
 #include <sys/types.h>
@@ -165,6 +166,8 @@
 
 #define BUFFER_FILE "/tmp/view"
 
+#define USE_NATIVE_API 1
+
 typedef struct {
     int sps_addr;
     int sps_len;
@@ -276,7 +279,7 @@ int frame_decode(unsigned char *outbuffer, unsigned char *p, int length)
 }
 
 
-int add_watermark(char *buffer, int width, int height)
+int add_watermark(char *buffer, int width, int height, struct tm *watermark_tm)
 {
     int w_res, h_res;
     char path_res[1024];
@@ -300,18 +303,61 @@ int add_watermark(char *buffer, int width, int height)
     } else {
         if (width == 640) {
             AddWM(&WM_info, width, height, buffer,
-                buffer + width*height, width-230, height-20, NULL);
+                buffer + width*height, width-230, height-20, watermark_tm);
         } else if (width == 1280) {
             AddWM(&WM_info, w_res, h_res, buffer,
-                buffer + width*height, width-345, height-30, NULL);
+                buffer + width*height, width-345, height-30, watermark_tm);
         } else {
             AddWM(&WM_info, w_res, h_res, buffer,
-                buffer + width*height, width-460, height-40, NULL);
+                buffer + width*height, width-460, height-40, watermark_tm);
         }
         WMRelease(&WM_info);
     }
 
     return 0;
+}
+
+pid_t proc_find(const char* process_name, pid_t process_pid)
+{
+    DIR* dir;
+    struct dirent* ent;
+    char* endptr;
+    char buf[512];
+
+    if (!(dir = opendir("/proc"))) {
+        perror("can't open /proc");
+        return -1;
+    }
+
+    while((ent = readdir(dir)) != NULL) {
+        /* if endptr is not a null character, the directory is not
+         * entirely numeric, so ignore it */
+        long lpid = strtol(ent->d_name, &endptr, 10);
+        if (*endptr != '\0') {
+            continue;
+        }
+
+        /* try to open the cmdline file */
+        snprintf(buf, sizeof(buf), "/proc/%ld/cmdline", lpid);
+        FILE* fp = fopen(buf, "r");
+
+        if (fp) {
+            if (fgets(buf, sizeof(buf), fp) != NULL) {
+                /* check the first token in the file, the program name */
+                char* first = strtok(buf, " ");
+                if ((strcmp(first, process_name) == 0) && ((pid_t) lpid != process_pid)) {
+                    fclose(fp);
+                    closedir(dir);
+                    return (pid_t) lpid;
+                }
+            }
+            fclose(fp);
+        }
+
+    }
+
+    closedir(dir);
+    return -1;
 }
 
 void print_usage(char *prog_name)
@@ -331,6 +377,7 @@ void print_usage(char *prog_name)
     fprintf(stderr, "\t    --frame_length_offset VAL    Set the offset of the frame lenght in the record\n");
     fprintf(stderr, "\t    --frame_type_offset VAL      Set the offset of the frame type in the record\n");
     fprintf(stderr, "\t-w, --watermark                  Add watermark to image\n");
+    fprintf(stderr, "\t-t, --watermark_time             Set the time of the watermark\n");
     fprintf(stderr, "\t-d, --debug                      Enable debug\n");
     fprintf(stderr, "\t-h, --help                       Show this help\n");
 }
@@ -368,6 +415,8 @@ int main(int argc, char **argv) {
     unsigned char *addr;
     int resolution = RESOLUTION_HIGH;
     int watermark = 0;
+    int watermark_time = 0;
+    struct tm watermark_tm;
 
     unsigned char *bufferh264, *bufferyuv;
     int bufferh264_size;
@@ -411,6 +460,7 @@ int main(int argc, char **argv) {
             {"frame_length_offset",  required_argument, 0, '7'},
             {"frame_type_offset",  required_argument, 0, '8'},
             {"watermark",  no_argument, 0, 'w'},
+            {"watermark_time",  required_argument, 0, 't'},
             {"debug",  no_argument, 0, 'd'},
             {"help",  no_argument, 0, 'h'},
             {0, 0, 0, 0}
@@ -418,7 +468,7 @@ int main(int argc, char **argv) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
 
-        c = getopt_long (argc, argv, "r:9:a:m:0:1:2:3:4:5:6:7:8:wdh",
+        c = getopt_long (argc, argv, "r:9:a:m:0:1:2:3:4:5:6:7:8:wt:dh",
                          long_options, &option_index);
 
         /* Detect the end of the options. */
@@ -538,6 +588,25 @@ int main(int argc, char **argv) {
             watermark = 1;
             break;
 
+        case 't':
+            {
+                int d0, d1, d2, d3, d4, d5, d6;
+                d0 = sscanf(optarg, "%d-%d-%d %d:%d:%d", &d1, &d2, &d3, &d4, &d5 ,&d6);
+                if (d0 == 6) {
+                    watermark_tm.tm_year = d1 - 1900;
+                    watermark_tm.tm_mon = d2 - 1;
+                    watermark_tm.tm_mday = d3;
+                    watermark_tm.tm_hour = d4;
+                    watermark_tm.tm_min = d5;
+                    watermark_tm.tm_sec = d6;
+                    watermark_time = 1;
+                } else {
+                    print_usage(argv[0]);
+                    exit(EXIT_FAILURE);
+                }
+                break;
+            }
+
         case '0':
         case '1':
         case '2':
@@ -613,6 +682,55 @@ int main(int argc, char **argv) {
     }
 
     if (debug) fprintf(stderr, "Starting program\n");
+
+    // Check if snapshot is disabled
+    if (access("/tmp/snapshot.disabled", F_OK ) == 0 ) {
+        fprintf(stderr, "Snapshot is disabled\n");
+        return 0;
+    }
+
+    // Check if snapshot is low res
+    if (access("/tmp/snapshot.low", F_OK ) == 0 ) {
+        fprintf(stderr, "Snapshot is low res and watermark is disabled\n");
+        resolution = RESOLUTION_LOW;
+        watermark = 0;
+    }
+
+    // Check if the process is already running
+    pid_t my_pid = getpid();
+    if (proc_find(basename(argv[0]), my_pid) != -1) {
+        fprintf(stderr, "Process is already running\n");
+        return 0;
+    }
+
+// This method doesn't have performace issue
+// But:
+//   - is not available for high resolution
+//   - it's not possible to add watermarks
+#ifdef USE_NATIVE_API
+    if ((resolution == RESOLUTION_LOW) && (watermark == 0)) {
+        int old_stdout = dup(1);
+        int nj;
+        char sj[1024];
+        FILE *aj;
+
+        fprintf(stderr, "Using native api\n");
+
+        freopen ("/dev/null", "w", stdout);
+        main_cloud_cap_pic("/tmp/sd/snapshot.tmp");
+        usleep(500000);
+        fclose(stdout);
+        stdout = fdopen(old_stdout, "w"); 
+
+        aj = fopen("/tmp/sd/snapshot.tmp", "r");
+        while ((nj = fread(sj, 1, sizeof(sj), aj))) {
+            fwrite(sj, 1, nj, stdout);
+        }
+        fclose(aj);
+        remove("/tmp/sd/snapshot.tmp");
+        return 0;
+    }
+#endif
 
     if (resolution == RESOLUTION_LOW) {
         table_offset = table_low_offset;
@@ -773,9 +891,16 @@ int main(int argc, char **argv) {
 
     if (watermark) {
         if (debug) fprintf(stderr, "Adding watermark\n");
-        if (add_watermark(bufferyuv, width, height) < 0) {
-            fprintf(stderr, "Error adding watermark\n");
-            return -8;
+        if (watermark_time == 1) {
+            if (add_watermark(bufferyuv, width, height, &watermark_tm) < 0) {
+                fprintf(stderr, "Error adding watermark\n");
+                return -8;
+            }
+        } else {
+            if (add_watermark(bufferyuv, width, height, NULL) < 0) {
+                fprintf(stderr, "Error adding watermark\n");
+                return -8;
+            }
         }
     }
 

@@ -230,11 +230,11 @@ printf "done!\n\n"
 
 # home
 # Disabled after 0.3.8
-#pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
+pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # rootfs
 # Disabled after 0.3.8
-#pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
+pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # pack files for release
 pack_files $WORK_DIR $CAMERA_NAME $VERSION_ID

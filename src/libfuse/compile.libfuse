@@ -12,5 +12,5 @@ ninja || exit 1
 
 rsync -av lib/libfuse3.so* ../../_install/lib/ || exit 1
 
-arm-hisiv300-linux-uclibcgnueabi-strip ../../_install/lib/* || exit 1
-
+arm-hisiv300-linux-uclibcgnueabi-strip ../../_install/lib/libfuse3.so.3.4.2 || exit 1
+#arm-hisiv300-linux-uclibcgnueabi-strip ../../_install/lib/libfuse3.so.3.4.2.p/*.o || exit 1

@@ -27,6 +27,8 @@ along with this library; if not, write to the Free Software Foundation, Inc.,
 
 ////////// ByteStreamFifoSource //////////
 
+extern int debug;
+
 ByteStreamFifoSource*
 ByteStreamFifoSource::createNew(UsageEnvironment& env, char const* fileName,
                                 unsigned preferredFrameSize,
@@ -170,7 +172,9 @@ void ByteStreamFifoSource::doReadFromFile() {
         // We don't know a specific play time duration for this data,
         // so just record the current time as being the 'presentation time':
         gettimeofday(&fPresentationTime, NULL);
+        fDurationInMicroseconds = fPlayTimePerFrame;
     }
+    if (debug & 4) fprintf(stderr, "h264 frame - fPresentationTime, sec = %ld, usec = %ld\n", fPresentationTime.tv_sec, fPresentationTime.tv_usec);
 
     // Inform the reader that he has data:
 #ifdef READ_FROM_FILES_SYNCHRONOUSLY

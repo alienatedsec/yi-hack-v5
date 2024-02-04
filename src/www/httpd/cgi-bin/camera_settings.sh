@@ -31,12 +31,6 @@ do
         fi
     elif [ "$CONF" == "sensitivity" ] ; then
         ipc_cmd -s $VAL
-    elif [ "$CONF" == "ai_human_detection" ] ; then
-        if [ "$VAL" == "no" ] ; then
-            ipc_cmd -a off
-        else
-            ipc_cmd -a on
-        fi
     elif [ "$CONF" == "sound_detection" ] ; then
         if [ "$VAL" == "no" ] ; then
             ipc_cmd -b off
@@ -46,6 +40,12 @@ do
     elif [ "$CONF" == "sound_sensitivity" ] ; then
         if [ "$VAL" == "50" ] || [ "$VAL" == "60" ] || [ "$VAL" == "70" ] || [ "$VAL" == "80" ] || [ "$VAL" == "90" ] ; then
             ipc_cmd -n $VAL
+        fi
+    elif [ "$CONF" == "baby_crying_detect" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -B off
+        else
+            ipc_cmd -B on
         fi
     elif [ "$CONF" == "led" ] ; then
         if [ "$VAL" == "no" ] ; then

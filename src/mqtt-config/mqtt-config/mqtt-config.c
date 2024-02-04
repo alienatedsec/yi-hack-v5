@@ -60,6 +60,7 @@ void disconnect_callback(struct mosquitto *mosq, void *obj, int result)
 void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *message)
 {
     char topic_prefix[MAX_LINE_LENGTH], topic[MAX_LINE_LENGTH], file[MAX_KEY_LENGTH], param[MAX_KEY_LENGTH];
+    char conf_file[256];
     char *slash;
     bool match = 0;
     int len;
@@ -145,9 +146,13 @@ void message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_
         // Check if we need to run ipc_cmd
         if (extract_param(ipc_cmd_param, file, param, 8) == 0) {
             if (ipc_cmd_param[0] != '\0') {
-                sprintf(cmd_line, "ipc_cmd %s %s", ipc_cmd_param, (char *) message->payload);
+                sprintf(cmd_line, ipc_cmd_param, (char *) message->payload);
                 if (debug) printf("Running system command \"%s\"\n", cmd_line);
                 system(cmd_line);
+            } else {
+                sprintf(conf_file, "%s/%s.conf", CONF_FILE_PATH, file);
+                if (debug) fprintf(stderr, "Updating file \"%s\", parameter \"%s\" with value \"%s\"\n", file, param, (char *) message->payload);
+                config_replace(conf_file, param, message->payload);
             }
         }
     } else {

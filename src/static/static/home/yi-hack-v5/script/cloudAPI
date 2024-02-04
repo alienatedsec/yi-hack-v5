@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1d
+
 ulimit -s 1024
 export LD_LIBRARY_PATH=/home/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=/tmp/sd/yi-hack-v5/lib:$LD_LIBRARY_PATH
@@ -28,8 +30,11 @@ if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
         cd /home/app
         ./cloudAPI_fake "$@"
 else
-    if [[ $(get_config PROXYCHAINSNG) == "yes" ]] ; then
-        $YI_HACK_V5_PREFIX/bin/proxychains4 ./home/app/cloudAPI_real "$@"
+    if [ "$4" == "https://api.xiaoyi.com/v4/ipc/check_did" ]; then
+        echo '{"allow":true,"code":"20000"}'
+    elif [[ $(get_config PROXYCHAINSNG) == "yes" ]] ; then
+        cd /home/app
+        $YI_HACK_V5_PREFIX/bin/proxychains4 ./cloudAPI_real "$@"
     else
         cd /home/app
         ./cloudAPI_real "$@"

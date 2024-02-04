@@ -17,8 +17,8 @@ DHCP_SCRIPT_DEST="/home/app/script/wifidhcp.sh"
 UDHCP_SCRIPT="$YI_HACK_V5_PREFIX/yi-hack-v5/script/default.script"
 DHCP_SCRIPT="$YI_HACK_V5_PREFIX/yi-hack-v5/script/wifidhcp.sh"
 
-files=`find $YI_PREFIX -maxdepth 1 -name "*.7z"`
-if [ ${#files[@]} -gt 0 ]; then
+files=`find $YI_PREFIX -maxdepth 1 -name "*.7z" | awk 'END { print NR }'`
+if [ $files -gt 0 ]; then
 	/home/base/tools/7za x "$YI_PREFIX/*.7z" -y -o$YI_PREFIX
 	rm $YI_PREFIX/*.7z
 fi

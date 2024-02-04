@@ -1,0 +1,17 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+PREFIX=$(pwd)/sysroot
+cd $SCRIPT_DIR
+
+cp -r openssl-1.1.1w/include/openssl wpa_supplicant-2.10/src/
+cd wpa_supplicant-2.10/wpa_supplicant || exit 1
+
+export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
+
+#cp defconfig .config
+#make CC=arm-hisiv300-linux-gcc CFLAGS=-I$SCRIPT_DIR/sysroot/openssl/include LIBS=-L$SCRIPT_DIR/sysroot/openssl/lib \
+make clean
+make
+make install DESTDIR="$SCRIPT_DIR/_install"
+arm-hisiv300-linux-strip $SCRIPT_DIR/_install/usr/local/sbin/*
