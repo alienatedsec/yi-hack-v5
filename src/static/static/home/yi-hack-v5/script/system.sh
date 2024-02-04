@@ -225,7 +225,8 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-mqttv4 &
+sleep 30 && mqttv4 &
+
 if [[ $(get_config MQTT) == "yes" ]] ; then
     mqtt-config &
     $YI_HACK_PREFIX/script/conf2mqtt.sh &
