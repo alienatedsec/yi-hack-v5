@@ -34,7 +34,7 @@ fi
 files=`find $YI_LIB -maxdepth 1 -name "*.7z" | awk 'END { print NR }'`
 if [ $files -gt 0 ]; then
 	/home/base/tools/7za x "$YI_LIB/*.7z" -y -o$YI_LIB
-	rm $YI_BASE/*.7z
+	rm $YI_LIB/*.7z
 fi
 
 if [ -f $ARCHIVE_FILE ]; then
