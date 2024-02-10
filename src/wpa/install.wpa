@@ -14,4 +14,5 @@ mkdir -p ../../build/home/lib/
 #cp sysroot/lib/libcrypto.so.1.1 ../../build/home/yi-hack-v5/wpa/
 
 rsync -r ./_install/usr/local/sbin/ ../../build/home/base/tools/
-cp sysroot/lib/libcrypto.so.1.1 ../../build/home/lib/
+arm-hisiv300-linux-strip sysroot/lib/libcrypto.so.1.1
+cp sysroot/lib/libcrypto.so* ../../build/home/lib/

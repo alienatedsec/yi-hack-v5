@@ -206,6 +206,10 @@ compress_file "$TMP_DIR/home/app" cloudAPI
 compress_file "$TMP_DIR/home/app" oss
 compress_file "$TMP_DIR/home/app" p2p_tnp
 compress_file "$TMP_DIR/home/app" rmm
+compress_file "$TMP_DIR/home/base/tools" wpa_supplicant
+compress_file "$TMP_DIR/home/base/tools" wpa_passphrase
+compress_file "$TMP_DIR/home/base/tools" wpa_cli
+compress_file "$TMP_DIR/home/lib" libcrypto.so.1.1
 
 # Compress the yi-hack-v5 folder
 printf "Compressing yi-hack-v5... "
@@ -223,8 +227,9 @@ rm $TMP_DIR/home/yi-hack-v5/yi-hack-v5.7z
 echo "Deleteing of yi-hack-v5.7z - done!"
 
 # Delete all the compressed files except system_init.sh and yi-hack-v5.7z
+#find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -rf {} +
 find $TMP_DIR/home/yi-hack-v5/script/ -maxdepth 0 ! -name 'system_init.sh' -type f -exec rm -f {} +
-find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -rf {} +
+find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! \( -name 'script' -o -name 'etc' \) -exec rm -rf {} \;
 find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {} +
 printf "done!\n\n"
 

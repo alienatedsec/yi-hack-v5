@@ -7,6 +7,8 @@ if [ -d "/usr/yi-hack-v5" ]; then
 elif [ -d "/home/yi-hack-v5" ]; then
     YI_HACK_V5_PREFIX="/home"
     YI_PREFIX="/home/app"
+    YI_BASE="/home/base/tools"
+    YI_LIB="/home/lib"
     UDHCPC_SCRIPT_DEST="/home/app/script/default.script"
 fi
 
@@ -21,6 +23,18 @@ files=`find $YI_PREFIX -maxdepth 1 -name "*.7z" | awk 'END { print NR }'`
 if [ $files -gt 0 ]; then
 	/home/base/tools/7za x "$YI_PREFIX/*.7z" -y -o$YI_PREFIX
 	rm $YI_PREFIX/*.7z
+fi
+
+files=`find $YI_BASE -maxdepth 1 -name "*.7z" | awk 'END { print NR }'`
+if [ $files -gt 0 ]; then
+	/home/base/tools/7za x "$YI_BASE/*.7z" -y -o$YI_BASE
+	rm $YI_BASE/*.7z
+fi
+
+files=`find $YI_LIB -maxdepth 1 -name "*.7z" | awk 'END { print NR }'`
+if [ $files -gt 0 ]; then
+	/home/base/tools/7za x "$YI_LIB/*.7z" -y -o$YI_LIB
+	rm $YI_BASE/*.7z
 fi
 
 if [ -f $ARCHIVE_FILE ]; then
