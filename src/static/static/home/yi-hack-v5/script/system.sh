@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1e
+# 0.4.1g
 
 CONF_FILE="etc/system.conf"
 
@@ -27,6 +27,25 @@ export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:
 #if [ ! -L "/var/run/utmp" ]; then
 #  ln -sf /dev/null /var/run/utmp
 #fi
+
+# Upgrade wpa_supplicant modules - after 0.4.1 baseline
+if [ -f $YI_HACK_PREFIX/wpa/wpa_supplicant_upgrade ]; then
+	ifconfig wlan0 up
+    echo "---backing up wpa---"
+    cp /home/base/tools/wpa_supplicant $YI_HACK_PREFIX/wpa/wpa_supplicant_backup
+    cp /home/base/tools/wpa_cli $YI_HACK_PREFIX/wpa/wpa_cli_backup
+    cp /home/base/tools/wpa_passphrase $YI_HACK_PREFIX/wpa/wpa_passphrase_backup
+    killall watch_process
+    killall wpa*
+    mv /tmp/sd/yi-hack-v5/wpa/*.so* /home/lib/
+    mv /tmp/sd/yi-hack-v5/wpa/wpa_supplicant /home/base/tools/
+    mv /tmp/sd/yi-hack-v5/wpa/wpa_cli /home/base/tools/
+    mv /tmp/sd/yi-hack-v5/wpa/wpa_passphrase /home/base/tools/
+    reboot
+    echo "---wpa upgrade done---"
+else
+	echo "---no wpa upgrade---"
+fi
 
 #reversing symlinks
 if [ -L "/var/run/utmp" ]; then
@@ -73,6 +92,11 @@ if [[ "$(grep -m 3 -n '' /home/app/cloudAPI_fake | tail -n 1 | cut -d ':' -f 2 |
   cp -f $YI_HACK_PREFIX/script/cloudAPI_fake /home/app/
 fi
 
+# Update cloudAPI if necessary
+if [[ "$(grep -m 3 -n '' /home/app/cloudAPI | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" != "$(grep -m 3 -n '' $YI_HACK_PREFIX/script/cloudAPI | tail -n 1 | cut -d ':' -f 2 | cut -c 3-)" ]]; then
+  cp -f $YI_HACK_PREFIX/script/cloudAPI /home/app/
+fi
+
 # Manual Wi-Fi config
 if [ -f /tmp/sd/recover/configure_wifi.cfg ]; then
 	mv /tmp/sd/recover/configure_wifi.cfg /tmp/configure_wifi.cfg
@@ -80,6 +104,10 @@ if [ -f /tmp/sd/recover/configure_wifi.cfg ]; then
 	sh $YI_HACK_PREFIX/script/configure_wifi.sh
 fi
 
+if [ -f "/tmp/sd/recover/mtdblock2_recover.bin" ]; then
+	sync
+	sh $YI_HACK_PREFIX/script/configure_wifi.sh
+fi
 $YI_HACK_PREFIX/script/check_conf.sh
 
 hostname -F $YI_HACK_PREFIX/etc/hostname
@@ -246,8 +274,12 @@ if [[ $HTTPD_PORT != "80" ]] ; then
     D_HTTPD_PORT=:$HTTPD_PORT
 fi
 
-if [[ $(get_config ONVIF_WM_SNAPSHOT) == "yes" ]] ; then
-    WATERMARK="&watermark=yes"
+if [[ $(get_config SNAPSHOT) == "no" ]] ; then
+    touch /tmp/snapshot.disabled
+fi
+
+if [[ $(get_config SNAPSHOT_LOW) == "yes" ]] ; then
+    touch /tmp/snapshot.low
 fi
 
 RRTSP_MODEL=$MODEL_SUFFIX
@@ -438,4 +470,3 @@ fi
 $YI_HACK_PREFIX/script/check_update.sh
 
 crond -c $YI_HACK_PREFIX/etc/crontabs
-
