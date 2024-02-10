@@ -3,7 +3,7 @@
 #
 #  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
 #  Copyright (c) 2018-2019 Davide Maggioni - v4 specific
-#  Copyright (c) 2021-2023 alienatedsec - v5 specific
+#  Copyright (c) 2021-2024 alienatedsec - v5 specific
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -232,6 +232,10 @@ find $TMP_DIR/home/yi-hack-v5/script/ -maxdepth 0 ! -name 'system_init.sh' -type
 find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! \( -name 'script' -o -name 'etc' -o -name 'lib' \) -exec rm -rf {} \;
 find $TMP_DIR/home/yi-hack-v5/lib/ -type f ! -name 'ipc_multiplex.so' -exec rm -f {} \;
 find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {} +
+
+# Delete the old wpa_supplicant upgrade file from the image so it wont override the release version
+find $TMP_DIR/home/app/ -type f -name 'wpa_supplicant' -exec rm -f {} \;
+
 printf "done!\n\n"
 
 # home
@@ -253,4 +257,3 @@ printf "done!\n\n"
 echo "------------------------------------------------------------------------"
 echo " Finished!"
 echo "------------------------------------------------------------------------"
-
