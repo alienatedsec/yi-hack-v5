@@ -324,7 +324,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
     rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
     fi
 #Seems to be killing the resource - fixed via #153
-    $YI_HACK_PREFIX/script/wd_rtsp.sh &
+    sleep 30 && $YI_HACK_PREFIX/script/wd_rtsp.sh &
 #The above section (except ONVIF) to be also copied to service.sh
 fi
 
