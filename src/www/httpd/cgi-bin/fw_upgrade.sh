@@ -66,7 +66,12 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "No new firmware available."
             exit
         fi
-
+        elif [ "$BASELINE_VERSION" != "0.4.1" ]; then
+            printf "Content-type: text/html\r\n\r\n"
+            printf "Wrong baseline version"
+            exit
+        fi
+        
         /usr/bin/wget https://github.com/alienatedsec/yi-hack-v5/releases/download/$LATEST_FW/${MODEL_SUFFIX}_${LATEST_FW}.tgz
         
         if [ ! -f ${MODEL_SUFFIX}_${LATEST_FW}.tgz ]; then
@@ -133,7 +138,7 @@ elif [ "$VAL" == "preupgrade" ] ; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."
             exit
-        elif [ "$BASELINE_VERSION" != "0.3.8" ]; then
+        elif [ "$BASELINE_VERSION" != "0.4.1" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Wrong baseline version"
             exit
