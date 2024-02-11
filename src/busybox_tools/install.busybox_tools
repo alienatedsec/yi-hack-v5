@@ -24,7 +24,9 @@ mkdir -p ../../build/home/yi-hack-v5/usr/sbin
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/netstat
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/rmdir
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/tar
-#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/mkswap
+cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/mkswap
+cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/swapon
+cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/hdparm
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/bzip2
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/dirname
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/find
@@ -110,7 +112,7 @@ cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/vi
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/su
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/sulogin
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/vlock
-#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/sendmail
+cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/sendmail
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/crond
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/crontab
 #cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/flashcp
