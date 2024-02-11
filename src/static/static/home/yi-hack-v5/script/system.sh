@@ -259,7 +259,7 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-sleep 30 && mqttv4 &
+mqttv4 &
 
 if [[ $(get_config MQTT) == "yes" ]] ; then
     mqtt-config &
@@ -324,7 +324,7 @@ if [[ $(get_config RTSP) == "yes" ]] ; then
     rRTSPServer -r $RRTSP_RES -a $RRTSP_AUDIO -p $RRTSP_PORT -u $RRTSP_USER -w $RRTSP_PWD &
     fi
 #Seems to be killing the resource - fixed via #153
-    sleep 30 && $YI_HACK_PREFIX/script/wd_rtsp.sh &
+    $YI_HACK_PREFIX/script/wd_rtsp.sh &
 #The above section (except ONVIF) to be also copied to service.sh
 fi
 
