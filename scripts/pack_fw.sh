@@ -3,7 +3,7 @@
 #
 #  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
 #  Copyright (c) 2018-2019 Davide Maggioni - v4 specific
-#  Copyright (c) 2021-2023 alienatedsec - v5 specific
+#  Copyright (c) 2021-2024 alienatedsec - v5 specific
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -206,6 +206,10 @@ compress_file "$TMP_DIR/home/app" cloudAPI
 compress_file "$TMP_DIR/home/app" oss
 compress_file "$TMP_DIR/home/app" p2p_tnp
 compress_file "$TMP_DIR/home/app" rmm
+compress_file "$TMP_DIR/home/base/tools" wpa_supplicant
+compress_file "$TMP_DIR/home/base/tools" wpa_passphrase
+compress_file "$TMP_DIR/home/base/tools" wpa_cli
+compress_file "$TMP_DIR/home/lib" libcrypto.so.1.1
 
 # Compress the yi-hack-v5 folder
 printf "Compressing yi-hack-v5... "
@@ -223,18 +227,24 @@ rm $TMP_DIR/home/yi-hack-v5/yi-hack-v5.7z
 echo "Deleteing of yi-hack-v5.7z - done!"
 
 # Delete all the compressed files except system_init.sh and yi-hack-v5.7z
+#find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -rf {} +
 find $TMP_DIR/home/yi-hack-v5/script/ -maxdepth 0 ! -name 'system_init.sh' -type f -exec rm -f {} +
-find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! -name 'script' -exec rm -rf {} +
+find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type d ! \( -name 'script' -o -name 'etc' -o -name 'lib' \) -exec rm -rf {} \;
+find $TMP_DIR/home/yi-hack-v5/lib/ -type f ! -name 'ipc_multiplex.so' -exec rm -f {} \;
 find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {} +
+
+# Delete the old wpa_supplicant upgrade file from the image so it wont override the release version
+find $TMP_DIR/home/app/ -type f -name 'wpa_supplicant' -exec rm -f {} \;
+
 printf "done!\n\n"
 
 # home
 # Disabled after 0.3.8
-#pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
+pack_image "home" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # rootfs
 # Disabled after 0.3.8
-#pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
+pack_image "rootfs" $CAMERA_ID $TMP_DIR $OUT_DIR
 
 # pack files for release
 pack_files $WORK_DIR $CAMERA_NAME $VERSION_ID
@@ -247,4 +257,3 @@ printf "done!\n\n"
 echo "------------------------------------------------------------------------"
 echo " Finished!"
 echo "------------------------------------------------------------------------"
-

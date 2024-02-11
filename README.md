@@ -15,7 +15,7 @@
 The answer is simple: missing updates, RTSP, and not based on the latest stock firmware (which features improvements and new cool stuff).
 Besides, there were no updates to `yi-hack-v4`, and I am against that RTSP licensing model. I have contributed enough and will continue my work separately.
 
-I am slowly releasing beta versions, and I can see lots of downloads, testing and contributions. A big thank you to the community.
+I am slowly working on pre-release versions, and I can see lots of downloads, testing and contributions. A big thank you to the community.
 
 ## Table of Contents
 
@@ -109,7 +109,7 @@ Alternative way:
 
 </p></details>
 
-3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.3.8
+3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.4.1
 
 | Camera | rootfs partition | home partition | Remarks |
 | --- | --- | --- | --- |
@@ -138,7 +138,7 @@ Depending upon your network setup, accessing the web interface with the hostname
 
 This can be done from the App. Please open the app, and go to the Camera Settings --> Network Info --> IP Address.
 
-Access the web interface by entering the IP address of the camera in a web browser. e.g. `http://192.168.1.5:8080`
+Access the web interface by entering the IP address of the camera in a web browser. e.g. `http://192.168.1.5`
 
 **_IMPORTANT: If you have multiple cameras. It is important to configure each camera with a unique hostname. Otherwise, the web interface will only be accessible by IP address._**
 

@@ -26,7 +26,7 @@ case $(get_config RTSP_PORT) in
     *) RTSP_PORT=$(get_config RTSP_PORT) ;;
 esac
 case $(get_config HTTPD_PORT) in
-    ''|*[!0-9]*) HTTPD_PORT=8080 ;;
+    ''|*[!0-9]*) HTTPD_PORT=80 ;;
     *) HTTPD_PORT=$(get_config HTTPD_PORT) ;;
 esac
 

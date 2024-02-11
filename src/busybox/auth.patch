@@ -1,0 +1,18 @@
+diff -Naur busybox-1.36.1.ori/networking/httpd.c busybox-1.36.1/networking/httpd.c
+--- busybox-1.36.1.ori/networking/httpd.c	2024-01-08 16:52:14.701167800 +0100
++++ busybox-1.36.1/networking/httpd.c	2024-01-08 16:53:21.413344344 +0100
+@@ -2136,8 +2136,12 @@
+ 			goto end_check_passwd;
+ 		}
+  bad_input:
+-		/* Comparing plaintext "user:pass" in one go */
+-		r = strcmp(cur->after_colon, user_and_passwd);
++		/* Check if auth is disabled for this path */
++		r = strcmp(cur->after_colon, ":");
++		if (r != 0) {
++			/* Comparing plaintext "user:pass" in one go */
++			r = strcmp(cur->after_colon, user_and_passwd);
++		}
+  end_check_passwd:
+ 		if (r == 0) {
+ 			remoteuser = xstrndup(user_and_passwd,

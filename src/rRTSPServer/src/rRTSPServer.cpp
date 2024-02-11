@@ -64,10 +64,10 @@ StreamReplicator* startReplicatorStream(const char* inputAudioFileName) {
     FramedSource* source = replicator->createStreamReplica();
 
     // Then create a 'dummy sink' object to receive the replica stream:
-    MediaSink* sink = DummySink::createNew(*env, "dummy");
+//    MediaSink* sink = DummySink::createNew(*env, "dummy");
 
     // Now, start playing, feeding the sink object from the source:
-    sink->startPlaying(*source, NULL, NULL);
+//    sink->startPlaying(*source, NULL, NULL);
 
     return replicator;
 }
@@ -362,7 +362,7 @@ int main(int argc, char** argv)
 
         announceStream(rtspServer, sms_low, streamName, inputFileName, audio);
     }
-/*
+
     // An ADTS  audio elementary stream:
     if (audio != 0)
     {
@@ -379,7 +379,7 @@ int main(int argc, char** argv)
 
         announceStream(rtspServer, sms_audio, streamName, inputAudioFileName, audio);
     }
-*/
+
     // Also, attempt to create a HTTP server for RTSP-over-HTTP tunneling.
     // Try first with the default HTTP port (80), and then with the alternative HTTP
     // port numbers (8000 and 8080).

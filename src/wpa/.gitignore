@@ -1,0 +1,8 @@
+# Ignore the install dir
+_install/
+dbus*
+expat*
+libnl*
+openssl*
+wpa_supplicant*
+sysroot/

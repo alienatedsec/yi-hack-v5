@@ -1,3 +1,6 @@
+#!/bin/sh
+#
+# 0.4.1b
 #
 #  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
 #  Copyright (c) 2021-2023 alienatedsec - v5 specific
@@ -14,55 +17,73 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-# Launch - version 0.3.8
-#
-#!/bin/sh
+
 
 kill_all() {
-  # Kills all running instances of app1 and app2
-  killall wd_rtsp.sh
-  killall rRTSPServer
-  killall h264grabber
+  # Kills all running instances
+  echo Round 1 - Killing using SIGTERM
+  killall -s SIGTERM wd_rtsp.sh
+  killall -s SIGTERM rRTSPServer
+  killall -s SIGTERM h264grabber
+  echo Round 1 - Finished
+  sleep 2
+  echo Round 2 - Killing using SIGKILL
+  killall -s SIGKILL wd_rtsp.sh
+  killall -s SIGKILL rRTSPServer
+  killall -s SIGKILL h264grabber
+  echo Round 2 - Finished
 }
 
 launch_apps() {
-  # Launches app1 and app2 with different commands
+  # Launches apps with different commands
   if [ "$execute_audio" = true ]; then
+    echo Launching - h264grabber -r audio -m "$model" -f &
     h264grabber -r audio -m "$model" -f &
   fi
   
   if [ "$settings" = "high" ]; then
     debug_flag=""
     if [ "$debug_mode" = true ]; then
-      debug_flag="-d 7"
+      debug_flag="-d "$debug_level""
     fi
+    echo Launching - h264grabber -r high -m "$model" -f &
     h264grabber -r high -m "$model" -f &
+    sleep 1
+    echo Launching - rRTSPServer -r high -a "$enable_audio" -p 554 -u -w $debug_flag &
     rRTSPServer -r high -a "$enable_audio" -p 554 -u -w $debug_flag &
   fi
 
   if [ "$settings" = "low" ]; then
     debug_flag=""
     if [ "$debug_mode" = true ]; then
-      debug_flag="-d 7"
+      debug_flag="-d "$debug_level""
     fi
+    echo Launching - h264grabber -r low -m "$model" -f &
     h264grabber -r low -m "$model" -f &
+    sleep 1
+    echo Launching - rRTSPServer -r low -a "$enable_audio" -p 554 -u -w $debug_flag &
     rRTSPServer -r low -a "$enable_audio" -p 554 -u -w $debug_flag &
   fi
   
   if [ "$settings" = "both" ]; then
     debug_flag=""
     if [ "$debug_mode" = true ]; then
-      debug_flag="-d 7"
+      debug_flag="-d "$debug_level""
     fi
+    echo Launching - h264grabber -r low -m "$model" -f &
     h264grabber -r low -m "$model" -f &
+    sleep 1
+    echo Launching - h264grabber -r high -m "$model" -f &
 	h264grabber -r high -m "$model" -f &
+    sleep 1
+    echo Launching - rRTSPServer -r both -a "$enable_audio" -p 554 -u -w $debug_flag &
     rRTSPServer -r both -a "$enable_audio" -p 554 -u -w $debug_flag &
   fi
 
 }
 
 
-# Read model name from file
+# Read model and versions from files
 model=$(cat /home/app/.camver)
 version_cam=$(cat /home/yi-hack-v5/version)
 version_sd=$(cat /tmp/sd/yi-hack-v5/version)
@@ -90,6 +111,11 @@ elif [ "$operation" = "l" ] || [ "$operation" = "L" ]; then
 
   if [ "$debug_choice" = "y" ] || [ "$debug_choice" = "Y" ]; then
     debug_mode=true
+    read -p "Provide debug level (0-15): " debug_level
+    while ! [ "$debug_level" -ge 0 -a "$debug_level" -le 15 ] 2>/dev/null; do
+      echo "Invalid input. Please enter a debug level between 0 and 15."
+      read -p "Provide debug level (0-15): " debug_level
+    done
   else
     debug_mode=false
   fi
