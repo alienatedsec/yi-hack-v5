@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1i
+
 SYSTEM_CONF_FILE="/tmp/sd/yi-hack-v5/etc/system.conf"
 CAMERA_CONF_FILE="/tmp/sd/yi-hack-v5/etc/camera.conf"
 MQTTV4_CONF_FILE="/tmp/sd/yi-hack-v5/etc/mqttv4.conf"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1a
+# 0.4.1i
 
 function print_help {
     echo "configure_wifi.sh"

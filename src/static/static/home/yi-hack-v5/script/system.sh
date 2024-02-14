@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1g
+# 0.4.1i
 
 CONF_FILE="etc/system.conf"
 
@@ -18,7 +18,7 @@ YI_HACK_UPGRADE_PATH="/tmp/sd/$MODEL_SUFFIX"
 get_config()
 {
     key=$1
-    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
+    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib

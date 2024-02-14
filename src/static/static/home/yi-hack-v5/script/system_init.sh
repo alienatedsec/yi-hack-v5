@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1i
+
 if [ -d "/usr/yi-hack-v5" ]; then
     YI_HACK_V5_PREFIX="/usr"
     YI_PREFIX="/home"

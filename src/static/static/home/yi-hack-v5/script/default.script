@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# 0.4.1i
+
 # udhcpc script edited by Tim Riker <Tim@Rikers.org>
 
 RESOLV_CONF="/tmp/resolv.conf"

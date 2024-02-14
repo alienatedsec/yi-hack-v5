@@ -1,3 +1,7 @@
+#!/bin/sh
+
+# 0.4.1i
+
 killall udhcpc
 HN="yi-hack-v5"
 if [ -f /tmp/sd/yi-hack-v5/etc/hostname ]; then

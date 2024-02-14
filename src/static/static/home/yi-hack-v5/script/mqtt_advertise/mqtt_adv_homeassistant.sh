@@ -311,7 +311,7 @@ if [ "$MQTT_ADV_CAMERA_SETTING_ENABLE" == "yes" ]; then
     CONTENT='{"availability_topic":"'$MQTT_PREFIX'/'$TOPIC_BIRTH_WILL'","payload_available":"'$BIRTH_MSG'","payload_not_available":"'$WILL_MSG'","device":{"identifiers":["'$IDENTIFIERS'"],"manufacturer":"'$MANUFACTURER'","model":"'$MODEL'","name":"'$NAME'","sw_version":"'$SW_VERSION'"},'$QOS' '$RETAIN' "icon":"mdi:remote","state_topic":"'$MQTT_PREFIX'/'$MQTT_ADV_CAMERA_SETTING_TOPIC'","command_topic":"'$MQTT_PREFIX'/'$MQTT_ADV_CAMERA_SETTING_TOPIC'/IR/set","name":"'$UNIQUE_NAME'","unique_id":"'$UNIQUE_ID'","value_template":"{{ value_json.IR }}","payload_on":"yes","payload_off":"no", "platform": "mqtt"}'
     $YI_HACK_PREFIX/bin/mosquitto_pub -i $HOSTNAME $HA_QOS $HA_RETAIN -h $HOST -t $TOPIC -m "$CONTENT"
     # Rotate
-    UNIQUE_NAME=" Rotate"
+    UNIQUE_NAME="Rotate"
     UNIQUE_ID=$IDENTIFIERS"-ROTATE"
     TOPIC=$HOMEASSISTANT_MQTT_PREFIX/switch/$IDENTIFIERS/ROTATE/config
     CONTENT='{"availability_topic":"'$MQTT_PREFIX'/'$TOPIC_BIRTH_WILL'","payload_available":"'$BIRTH_MSG'","payload_not_available":"'$WILL_MSG'","device":{"identifiers":["'$IDENTIFIERS'"],"manufacturer":"'$MANUFACTURER'","model":"'$MODEL'","name":"'$NAME'","sw_version":"'$SW_VERSION'"},'$QOS' '$RETAIN' "icon":"mdi:monitor","state_topic":"'$MQTT_PREFIX'/'$MQTT_ADV_CAMERA_SETTING_TOPIC'","command_topic":"'$MQTT_PREFIX'/'$MQTT_ADV_CAMERA_SETTING_TOPIC'/ROTATE/set","name":"'$UNIQUE_NAME'","unique_id":"'$UNIQUE_ID'","value_template":"{{ value_json.ROTATE }}","payload_on":"yes","payload_off":"no", "platform": "mqtt"}'
