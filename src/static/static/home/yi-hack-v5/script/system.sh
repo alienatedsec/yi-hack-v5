@@ -41,6 +41,7 @@ if [ -f $YI_HACK_PREFIX/wpa/wpa_supplicant_upgrade ]; then
     mv /tmp/sd/yi-hack-v5/wpa/wpa_supplicant /home/base/tools/
     mv /tmp/sd/yi-hack-v5/wpa/wpa_cli /home/base/tools/
     mv /tmp/sd/yi-hack-v5/wpa/wpa_passphrase /home/base/tools/
+    rm $YI_HACK_PREFIX/wpa/wpa_supplicant_upgrade
     reboot
     echo "---wpa upgrade done---"
 else
