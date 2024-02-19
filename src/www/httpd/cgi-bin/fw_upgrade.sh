@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 MODEL_SUFFIX=`cat /home/app/.camver`
 FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`

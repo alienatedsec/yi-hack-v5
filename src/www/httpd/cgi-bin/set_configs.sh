@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# 0.4.1j
+
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 
 sedencode(){

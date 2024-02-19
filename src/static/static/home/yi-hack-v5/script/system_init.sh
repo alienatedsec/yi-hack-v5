@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1i
+# 0.4.1j
 
 if [ -d "/usr/yi-hack-v5" ]; then
     YI_HACK_V5_PREFIX="/usr"

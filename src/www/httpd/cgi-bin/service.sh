@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 CONF_FILE="etc/system.conf"
 
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"

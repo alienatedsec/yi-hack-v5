@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 # Use. Available variables:
 # "oldness" variable. Defines which video to retrieve. 
 # - "0" (default) or "1" means latest already available.

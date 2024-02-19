@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 printf "Content-type: application/octet-stream\r\n\r\n"
 
 TMP_DIR="/tmp/yi-temp-save"

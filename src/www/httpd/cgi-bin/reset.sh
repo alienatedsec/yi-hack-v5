@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 cd /tmp/sd/yi-hack-v5/etc
 
 rm hostname

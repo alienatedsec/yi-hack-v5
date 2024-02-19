@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1i
+# 0.4.1j
 
 ulimit -s 1024
 export LD_LIBRARY_PATH=/home/lib:$LD_LIBRARY_PATH

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 PTZ_CONF_FILE=$YI_HACK_PREFIX/etc/ptz_presets.conf
 PTZ_SCRIPT=$YI_HACK_PREFIX/script/ptz_presets.sh

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1i
+# 0.4.1j
 
 killall udhcpc
 HN="yi-hack-v5"

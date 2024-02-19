@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 DIR="none"
 TIME="0.3"
 

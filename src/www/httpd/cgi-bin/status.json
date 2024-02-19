@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 printf "Content-type: application/json\r\n\r\n"
 
 NAME="yi-hack-v5"
