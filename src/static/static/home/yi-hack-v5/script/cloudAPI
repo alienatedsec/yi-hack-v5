@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1d
+# 0.4.1j
 
 ulimit -s 1024
 export LD_LIBRARY_PATH=/home/lib:$LD_LIBRARY_PATH
@@ -22,8 +22,8 @@ fi
 
 get_config()
 {
-	key=$1
-	grep $1 $YI_HACK_V5_PREFIX/$CONF_FILE | cut -d "=" -f2
+    key=$1
+    grep -w $1 $YI_HACK_V5_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
 if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then

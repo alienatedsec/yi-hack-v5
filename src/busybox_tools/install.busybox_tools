@@ -1,0 +1,166 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+mkdir -p ../../build/home/yi-hack-v5/bin
+mkdir -p ../../build/home/yi-hack-v5/sbin
+mkdir -p ../../build/home/yi-hack-v5/usr/bin
+mkdir -p ../../build/home/yi-hack-v5/usr/sbin
+mkdir -p ../../build/home/yi-hack-v5/busybox
+
+find _install/ -type f -exec sed -i 's|#!/bin/busybox|#!/tmp/sd/yi-hack-v5/busybox/busybox|g' {} +
+cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/busybox/busybox
+cp -f ./_install/sbin/mkswap ../../build/home/yi-hack-v5/sbin/mkswap
+cp -f ./_install/sbin/swapon ../../build/home/yi-hack-v5/sbin/swapon
+cp -f ./_install/sbin/hdparm ../../build/home/yi-hack-v5/sbin/hdparm
+cp -f ./_install/bin/vi ../../build/home/yi-hack-v5/bin/vi
+cp -f ./_install/usr/sbin/sendmail ../../build/home/yi-hack-v5/usr/sbin/sendmail
+cp -f ./_install/usr/bin/wget ../../build/home/yi-hack-v5/usr/bin/wget
+
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/base64
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/gzip
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/hostname
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/netstat
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/rmdir
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/tar
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/bzip2
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/dirname
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/find
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/free
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/ftpget
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/ftpput
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/mkpasswd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/nc
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/sort
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/tail
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/xargs
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/wget
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/crond
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/httpd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/ntpd
+
+# busybox
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/unlzma
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/lzma
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/tar
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/cat
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/chgrp
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/chmod
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/chown
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/cp
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/cut
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/date
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/dd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/df
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/dirname
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/du
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/echo
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/env
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/fsync
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/ln
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/logname
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/ls
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/md5sum
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/sha1sum
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/mkdir
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/mknod
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/mv
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/nohup
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/od
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/printenv
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/pwd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/rm
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/rmdir
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/sleep
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/sync
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/tail
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/test
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/[
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/[[
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/touch
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/tr
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/arch
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/usleep
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/base64
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/awk
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/sed
+
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/find
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/grep
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/xargs
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/bootchartd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/reboot
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/init
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/linuxrc
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/resume
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/addgroup
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/add-shell
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/remove-shell
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/adduser
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/chpasswd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/cryptpw
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/mkpasswd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/deluser
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/delgroup
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/getty
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/login
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/passwd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/su
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/sulogin
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/vlock
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/crond
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/crontab
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/flashcp
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/flash_eraseall
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/hexedit
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/setfattr
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/depmod
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/insmod
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/lsmod
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/modinfo
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/modprobe
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/rmmod
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/arp
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/arping
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/ftpd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/ftpget
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/ftpput
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/hostname
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/httpd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/ifconfig
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/inetd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/nc
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/netstat
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/ntpd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/ping
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/route
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/tc
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/tcpsvd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/telnetd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/free
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/iostat
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/kill
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/killall
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/sbin/killall5
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/lsof
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/mpstat
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/ps
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/sysctl
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/top
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/uptime
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/svok
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/ash
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/sh
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/cttyhack
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/fdisk
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/flock
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/hexdump
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/hd
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/lsusb
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/usr/bin/mesg
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/more
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/mount
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/setpriv
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/bin/umount
+#cp -f ./_install/bin/busybox ../../build/home/yi-hack-v5/sbin/udhcpc

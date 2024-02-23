@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 CONF_FILE="etc/system.conf"
 
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
@@ -15,7 +17,7 @@ fi
 get_config()
 {
     key=$1
-    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
+    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
 init_config()

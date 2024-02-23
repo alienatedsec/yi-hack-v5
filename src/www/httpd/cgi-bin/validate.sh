@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 validateFile()
 {
     case $1 in

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 YI_HACK_V5_PREFIX="/tmp/sd/yi-hack-v5"
 CAMERA_CONF_FILE="$YI_HACK_V5_PREFIX/etc/camera.conf"
 MQTT_CONF_FILE="$YI_HACK_V5_PREFIX/etc/mqttv4.conf"

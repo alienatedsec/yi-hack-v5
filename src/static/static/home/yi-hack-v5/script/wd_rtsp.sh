@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.0d
+# 0.4.1j
 
 script_name=$(basename -- "$0")
 
@@ -20,7 +20,7 @@ LOG_FILE="/tmp/sd/wd_rtsp.log"
 get_config()
 {
     key=$1
-    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
+    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
 COUNTER=0

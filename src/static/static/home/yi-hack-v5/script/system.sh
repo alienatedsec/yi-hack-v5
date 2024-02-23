@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1g
+# 0.4.1j
 
 CONF_FILE="etc/system.conf"
 
@@ -18,7 +18,7 @@ YI_HACK_UPGRADE_PATH="/tmp/sd/$MODEL_SUFFIX"
 get_config()
 {
     key=$1
-    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2
+    grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib
@@ -41,6 +41,7 @@ if [ -f $YI_HACK_PREFIX/wpa/wpa_supplicant_upgrade ]; then
     mv /tmp/sd/yi-hack-v5/wpa/wpa_supplicant /home/base/tools/
     mv /tmp/sd/yi-hack-v5/wpa/wpa_cli /home/base/tools/
     mv /tmp/sd/yi-hack-v5/wpa/wpa_passphrase /home/base/tools/
+    rm $YI_HACK_PREFIX/wpa/wpa_supplicant_upgrade
     reboot
     echo "---wpa upgrade done---"
 else
@@ -259,7 +260,7 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-sleep 30 && mqttv4 &
+mqttv4 &
 
 if [[ $(get_config MQTT) == "yes" ]] ; then
     mqtt-config &

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 ACTION="none"
 
@@ -18,19 +20,23 @@ fi
 
 if [ $ACTION == "scan" ]; then
 
-    printf "Content-type: application/json\r\n\r\n"
-    printf "{\"wifi\":[\n"
+# Set content type header
+printf "Content-type: application/json\r\n\r\n"
 
-    LIST=`iwlist wlan0 scan | grep "ESSID:" | cut -d : -f 2,3,4,5,6,7,8 | grep -v -e '^$'`
+# Start JSON response
+printf "{\"wifi\":["
 
-    IFS="\""
-    for l in $LIST; do
-        if [ ! -z $(echo $l | tr -d ' ') ]; then
-            printf "\"$l\", \n"
-        fi
-    done
+# Scan for WiFi networks and extract ESSIDs
+iwlist wlan0 scan | grep "ESSID:" | cut -d '"' -f 2 | while read -r ESSID; do
+    # Check if ESSID is not empty
+    if [ -n "$ESSID" ]; then
+        # Print ESSID in JSON format
+        printf "\"$ESSID\","
+    fi
+done
 
-    printf "\"\"]}\n"
+# Complete JSON response and remove trailing comma
+printf "\"\"]}\n"
 
 elif [ $ACTION == "save" ]; then
 

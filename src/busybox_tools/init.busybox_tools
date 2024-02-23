@@ -1,0 +1,18 @@
+#!/bin/bash
+
+SCRIPT_DIR=$(cd `dirname $0` && pwd)
+cd $SCRIPT_DIR
+
+source config.busybox_tools
+
+rm -rf ./_install
+
+if [ ! -f "${ARCHIVE}" ]; then
+    wget "${MAIN_URL}"
+fi
+
+tar xvf "${ARCHIVE}"
+
+cd "${BUILD_FOLDER}"
+
+cp ../.config ./ || exit 1

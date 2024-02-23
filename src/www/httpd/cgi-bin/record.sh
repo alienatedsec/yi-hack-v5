@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 validateNumber()
 {
     RES=$(echo ${1} | sed -E 's/^[0-9]*$//g')

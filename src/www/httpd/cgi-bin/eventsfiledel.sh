@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# 0.4.1j
+
 validateFile()
 {
     if [ "Y${1:4:1}" != "YY" ] ; then

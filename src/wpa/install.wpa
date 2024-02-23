@@ -15,4 +15,4 @@ mkdir -p ../../build/home/lib/
 
 rsync -r ./_install/usr/local/sbin/ ../../build/home/base/tools/
 arm-hisiv300-linux-strip sysroot/lib/libcrypto.so.1.1
-cp sysroot/lib/libcrypto.so* ../../build/home/lib/
+cp -a sysroot/lib/libcrypto.so* ../../build/home/lib/

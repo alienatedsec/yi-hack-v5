@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.0c
+# 0.4.1j
 
 CONF_FILE="etc/system.conf"
 if [ -d "/tmp/sd/yi-hack-v5" ]; then
@@ -12,7 +12,7 @@ fi
 get_config()
 {
     key=$1
-    grep -w $1 $YI_HACK_V5_PREFIX/$CONF_FILE | cut -d "=" -f2
+    grep -w $1 $YI_HACK_V5_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
 while test $# -gt 0

@@ -236,6 +236,9 @@ find $TMP_DIR/home/yi-hack-v5/* -maxdepth 0 -type f ! -name 'version' -exec rm {
 # Delete the old wpa_supplicant upgrade file from the image so it wont override the release version
 find $TMP_DIR/home/app/ -type f -name 'wpa_supplicant' -exec rm -f {} \;
 
+# Delete symlink to vi
+find $TMP_DIR/rootfs/bin/ -type l -name 'vi' -exec rm -f {} \;
+
 printf "done!\n\n"
 
 # home
