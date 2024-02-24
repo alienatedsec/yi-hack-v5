@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1j
+# 0.4.1
 
 printf "Content-type: text/javascript\r\n\r\n"
 

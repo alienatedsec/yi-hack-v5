@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1j
+# 0.4.1
 
 cd /tmp/sd/yi-hack-v5/etc
 

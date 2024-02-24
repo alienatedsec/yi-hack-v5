@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1j
+# 0.4.1
 
 SYSTEM_CONF_FILE="/tmp/sd/yi-hack-v5/etc/system.conf"
 CAMERA_CONF_FILE="/tmp/sd/yi-hack-v5/etc/camera.conf"

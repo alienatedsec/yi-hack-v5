@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1j
+# 0.4.1
 
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 CONF_FILE="$YI_HACK_PREFIX/etc/camera.conf"

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# 0.4.1j
+# 0.4.1
 #
 #  This file is part of yi-hack-v5 (https://github.com/alienatedsec/yi-hack-v5).
 #  Copyright (c) 2021-2023 alienatedsec - v5 specific
