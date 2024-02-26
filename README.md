@@ -62,6 +62,7 @@ Currently, this project supports the following cameras:
 - Yi 1080p Dome - confirmed; however, I have no device to test
 - Yi 1080p Cloud Dome - confirmed; however, I have no device to test
 - Yi 1080p Outdoor - confirmed; however, I have no device to test
+- Yi Dome Camera 1080p 15US - tested with yi_dome_1080p_0.4.1j by @Andurilll
 
 ## Getting Started
 1. Check that you have a correct Xiaomi Yi camera. (see the section above)
@@ -109,7 +110,7 @@ Alternative way:
 
 </p></details>
 
-3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.4.1
+3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases
 
 | Camera | rootfs partition | home partition | Remarks |
 | --- | --- | --- | --- |
