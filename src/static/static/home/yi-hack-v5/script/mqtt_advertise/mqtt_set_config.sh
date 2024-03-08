@@ -38,9 +38,9 @@ MQTT_PREFIX=$(get_config MQTT_PREFIX)
 MQTT_ADV_CAMERA_SETTING_TOPIC=$(get_mqtt_advertise_config MQTT_ADV_CAMERA_SETTING_TOPIC)
 
 while :; do
-    TOPIC=$MQTT_PREFIX'/'$MQTT_ADV_CAMERA_SETTING_TOPIC'/+/set'
+    TOPIC=$MQTT_PREFIX'/command/'$MQTT_ADV_CAMERA_SETTING_TOPIC'/#'
     SUBSCRIBED=$($YI_HACK_PREFIX/bin/mosquitto_sub -i $HOSTNAME -v -C 1 -h $HOST -t $TOPIC)
-    CONF_UPPER=$(echo $SUBSCRIBED | awk '{print $1}' | awk -F / '{ print $(NF-1)}')
+    CONF_UPPER=$(echo $SUBSCRIBED | awk '{print $1}' | awk -F / '{ print $(NF)}')
     CONF=$(echo $CONF_UPPER | awk '{ print tolower($0) }')
     VAL=$(echo $SUBSCRIBED | awk '{print $2}')
 
