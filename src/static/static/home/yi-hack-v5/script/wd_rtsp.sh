@@ -25,6 +25,8 @@ get_config()
 
 COUNTER=0
 COUNTER_LIMIT=10
+COUNTER_STREAM=0
+COUNTER_STREAM_LIMIT=3
 INTERVAL=10
 
 if [[ "$(get_config USERNAME)" != "" ]] ; then
@@ -95,6 +97,7 @@ check_rtsp()
         sleep 1
         restart_rtsp
         COUNTER=0
+        COUNTER_STREAM=0
     fi
     if [ $SOCKET -gt 0 ]; then
         if [ "$CPU" == "0.0" ]; then
@@ -106,10 +109,52 @@ check_rtsp()
                 sleep 1
                 restart_rtsp
                 COUNTER=0
+                COUNTER_STREAM=0
            fi
         else
             COUNTER=0
         fi
+    fi
+}
+
+check_rtsp_stream()
+{
+    # Verify the RTSP data pipeline is healthy by checking that h264grabber
+    # has the FIFO open for writing.  rRTSPServer opens the FIFO lazily (only
+    # when a client connects), so we only check h264grabber here.
+    #
+    # This catches cases where h264grabber is alive but lost the FIFO fd
+    # (e.g. after a shared-memory glitch from rmm).  We use "ls -la" + grep
+    # because busybox on this device has no "readlink" applet.
+
+    FIFO_NAME="h264_high_fifo"
+    if [[ $(get_config RTSP_STREAM) == "low" ]]; then
+        FIFO_NAME="h264_low_fifo"
+    fi
+
+    GRAB_PID=$(pidof h264grabber)
+
+    # If h264grabber is not running, check_grabber() handles restart.
+    if [ -z "$GRAB_PID" ]; then
+        return
+    fi
+
+    GRAB_HAS_FIFO=$(ls -la /proc/$GRAB_PID/fd/ 2>/dev/null | grep -c "$FIFO_NAME")
+
+    if [ "$GRAB_HAS_FIFO" -eq 0 ] 2>/dev/null; then
+        COUNTER_STREAM=$((COUNTER_STREAM+1))
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - h264grabber missing FIFO fd ($COUNTER_STREAM/$COUNTER_STREAM_LIMIT)" >> $LOG_FILE
+        if [ $COUNTER_STREAM -ge $COUNTER_STREAM_LIMIT ]; then
+            echo "$(date +'%Y-%m-%d %H:%M:%S') - h264grabber FIFO broken for $COUNTER_STREAM_LIMIT checks, restarting RTSP stack ..." >> $LOG_FILE
+            killall -q rRTSPServer
+            killall -q h264grabber
+            sleep 2
+            restart_grabber
+            COUNTER_STREAM=0
+            COUNTER=0
+        fi
+    else
+        COUNTER_STREAM=0
     fi
 }
 
@@ -172,6 +217,7 @@ while true
 do
     check_grabber
     check_rtsp
+    check_rtsp_stream
     check_rmm
     check_cloud
     if [[ $(get_config MQTT) == "yes" ]] ; then
