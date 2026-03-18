@@ -136,6 +136,12 @@ if [[ $(get_config SWAP_FILE) == "yes" ]] || [[ $MODEL_SUFFIX == "yi_dome" ]] ||
     fi
 fi
 
+# Increase network buffers for RTSP streaming stability
+sysctl -w net.core.rmem_max=524288 > /dev/null 2>&1
+sysctl -w net.core.wmem_max=524288 > /dev/null 2>&1
+sysctl -w net.core.rmem_default=524288 > /dev/null 2>&1
+sysctl -w net.core.wmem_default=524288 > /dev/null 2>&1
+
 if [[ x$(get_config USERNAME) != "x" ]] ; then
     USERNAME=$(get_config USERNAME)
     PASSWORD=$(get_config PASSWORD)
