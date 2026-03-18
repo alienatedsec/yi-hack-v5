@@ -83,7 +83,7 @@ elif [ "$c" = "136" ]; then
         NTP_SERVER="pool.ntp.org"
     fi
     #$YI_HACK_V5_PREFIX/usr/sbin/ntpd -p $NTP_SERVER -n -q <<< ntpd part of busybox in v5
-    ntpd -p $NTP_SERVER -n -q
+    timeout 10 ntpd -p $NTP_SERVER -n -q 2>/dev/null
     echo '{"code":"20000","time":'$(date +%s)'000}'
 elif [ "$c" = "141" ]; then
     #CMD_do_tnp_on_line
