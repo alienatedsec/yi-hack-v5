@@ -174,7 +174,9 @@ do
     check_rtsp
     check_rmm
     check_cloud
-    check_mqttv4
+    if [[ $(get_config MQTT) == "yes" ]] ; then
+        check_mqttv4
+    fi
     if [ $COUNTER -eq 0 ]; then
         sleep $INTERVAL
     fi
