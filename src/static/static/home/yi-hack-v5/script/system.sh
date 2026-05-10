@@ -111,6 +111,17 @@ if [ -f "/tmp/sd/recover/mtdblock2_recover.bin" ]; then
 fi
 $YI_HACK_PREFIX/script/check_conf.sh
 
+# Multi-WiFi support: replace stock single-network wpa_supplicant
+# with a multi-network wpa_supplicant.conf from the SD card
+if [[ $(get_config WIFI_MULTI) == "yes" ]] ; then
+    if [ -f "$YI_HACK_PREFIX/etc/wpa_supplicant.conf" ]; then
+        echo "---multi-WiFi enabled, starting wifi_connect.sh---"
+        sh $YI_HACK_PREFIX/script/wifi_connect.sh
+    else
+        echo "---WIFI_MULTI=yes but wpa_supplicant.conf not found on SD card---"
+    fi
+fi
+
 hostname -F $YI_HACK_PREFIX/etc/hostname
 
 export TZ=$(get_config TIMEZONE)

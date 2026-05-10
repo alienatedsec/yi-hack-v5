@@ -206,9 +206,47 @@ check_mqttv4()
     fi
 }
 
+check_wifi()
+{
+    if [[ $(get_config WIFI_MULTI) != "yes" ]] ; then
+        return
+    fi
+
+    # Check if wlan0 has an IP address
+    IP_ADDR=$(ifconfig wlan0 2>/dev/null | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}')
+
+    if [ -z "$IP_ADDR" ]; then
+        WIFI_FAIL_COUNT=$((WIFI_FAIL_COUNT + 1))
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - WiFi has no IP address (fail count: $WIFI_FAIL_COUNT)" >> $LOG_FILE
+
+        if [ $WIFI_FAIL_COUNT -ge 3 ]; then
+            echo "$(date +'%Y-%m-%d %H:%M:%S') - WiFi connection lost, triggering wpa_supplicant reassociate..." >> $LOG_FILE
+
+            # Check if wpa_supplicant is still running
+            WPA_PS=$(ps | grep wpa_supplicant | grep -v grep | grep -c ^)
+            if [ $WPA_PS -eq 0 ]; then
+                echo "$(date +'%Y-%m-%d %H:%M:%S') - wpa_supplicant not running, restarting multi-WiFi..." >> $LOG_FILE
+                sh $YI_HACK_PREFIX/script/wifi_connect.sh
+            else
+                # wpa_supplicant is running, tell it to reassociate (scan + reconnect)
+                WPA_CLI="/home/base/tools/wpa_cli"
+                if [ -f "$WPA_CLI" ]; then
+                    $WPA_CLI -i wlan0 reassociate 2>/dev/null
+                    echo "$(date +'%Y-%m-%d %H:%M:%S') - Sent reassociate command to wpa_supplicant" >> $LOG_FILE
+                fi
+            fi
+            WIFI_FAIL_COUNT=0
+        fi
+    else
+        WIFI_FAIL_COUNT=0
+    fi
+}
+
 if [[ $(get_config RTSP) == "no" ]] ; then
     exit
 fi
+
+WIFI_FAIL_COUNT=0
 
 # Re-enabled when its starting
 echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
@@ -223,6 +261,7 @@ do
     if [[ $(get_config MQTT) == "yes" ]] ; then
         check_mqttv4
     fi
+    check_wifi
     if [ $COUNTER -eq 0 ]; then
         sleep $INTERVAL
     fi
