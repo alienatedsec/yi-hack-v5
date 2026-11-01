@@ -86,7 +86,7 @@ restart_mqttv4()
 
 check_rtsp()
 {
-    SOCKET=`/bin/netstat -an 2>&1 | grep ":$RTSP_PORT " | grep LISTEN | grep -c ^`
+    SOCKET=`/bin/netstat -an 2>&1 | grep ":$RRTSP_PORT " | grep ESTABLISHED | grep -c ^`
     CPU=`top -b -n 1 | grep rRTSPServer | grep -v grep | tail -n 1 | awk '{print $8}'`
 
     if [ "$CPU" == "" ]; then
