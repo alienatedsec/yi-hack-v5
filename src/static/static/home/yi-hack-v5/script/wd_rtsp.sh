@@ -43,6 +43,16 @@ if [ ! -z $PASSWORD ]; then
     RRTSP_PWD="-w $PASSWORD"
 fi
 
+# h264grabber processes restart_grabber() starts for this config
+case $RRTSP_RES in
+    both) GRABBER_COUNT=2 ;;
+    low|high) GRABBER_COUNT=1 ;;
+    *) GRABBER_COUNT=0 ;;
+esac
+if [[ "$RRTSP_AUDIO" == "yes" ]]; then
+    GRABBER_COUNT=$((GRABBER_COUNT+1))
+fi
+
 restart_rtsp()
 {
     killall -q rRTSPServer
@@ -141,8 +151,8 @@ check_grabber()
 {
     PS=`ps | grep h264grabber | grep -v grep | grep -c ^`
 
-    if [ $PS -eq 0 ]; then
-        echo "$(date +'%Y-%m-%d %H:%M:%S') - No running processes, restarting h264grabber ..." >> $LOG_FILE
+    if [ $PS -lt $GRABBER_COUNT ]; then
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - $PS of $GRABBER_COUNT h264grabber processes running, restarting h264grabber ..." >> $LOG_FILE
         killall -q h264grabber
         sleep 1
         restart_grabber
