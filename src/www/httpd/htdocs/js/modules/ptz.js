@@ -40,6 +40,15 @@ APP.ptz = (function ($) {
         $(document).on("click", '#button-goto', function (e) {
             gotoPreset('#button-goto', '#select-goto');
         });
+        $(document).on("click", '#button-add', function (e) {
+            addPreset('#button-add');
+        });
+        $(document).on("click", '#button-del', function (e) {
+            delPreset('#button-del', '#select-del');
+        });
+        $(document).on("click", '#button-del-all', function (e) {
+            delAllPreset('#button-del-all');
+        });
     }
 
     function move(button, dir) {
