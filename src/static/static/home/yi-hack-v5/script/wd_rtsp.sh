@@ -25,6 +25,8 @@ get_config()
 
 COUNTER=0
 COUNTER_LIMIT=10
+COUNTER_STREAM=0
+COUNTER_STREAM_LIMIT=3
 INTERVAL=10
 
 if [[ "$(get_config USERNAME)" != "" ]] ; then
@@ -105,6 +107,7 @@ check_rtsp()
         sleep 1
         restart_rtsp
         COUNTER=0
+        COUNTER_STREAM=0
     fi
     if [ $SOCKET -gt 0 ]; then
         if [ "$CPU" == "0.0" ]; then
@@ -116,10 +119,52 @@ check_rtsp()
                 sleep 1
                 restart_rtsp
                 COUNTER=0
+                COUNTER_STREAM=0
            fi
         else
             COUNTER=0
         fi
+    fi
+}
+
+check_rtsp_stream()
+{
+    # Verify the RTSP data pipeline is healthy by checking that h264grabber
+    # has the FIFO open for writing.  rRTSPServer opens the FIFO lazily (only
+    # when a client connects), so we only check h264grabber here.
+    #
+    # This catches cases where h264grabber is alive but lost the FIFO fd
+    # (e.g. after a shared-memory glitch from rmm).  We use "ls -la" + grep
+    # because busybox on this device has no "readlink" applet.
+
+    FIFO_NAME="h264_high_fifo"
+    if [[ $(get_config RTSP_STREAM) == "low" ]]; then
+        FIFO_NAME="h264_low_fifo"
+    fi
+
+    GRAB_PID=$(pidof h264grabber)
+
+    # If h264grabber is not running, check_grabber() handles restart.
+    if [ -z "$GRAB_PID" ]; then
+        return
+    fi
+
+    GRAB_HAS_FIFO=$(ls -la /proc/$GRAB_PID/fd/ 2>/dev/null | grep -c "$FIFO_NAME")
+
+    if [ "$GRAB_HAS_FIFO" -eq 0 ] 2>/dev/null; then
+        COUNTER_STREAM=$((COUNTER_STREAM+1))
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - h264grabber missing FIFO fd ($COUNTER_STREAM/$COUNTER_STREAM_LIMIT)" >> $LOG_FILE
+        if [ $COUNTER_STREAM -ge $COUNTER_STREAM_LIMIT ]; then
+            echo "$(date +'%Y-%m-%d %H:%M:%S') - h264grabber FIFO broken for $COUNTER_STREAM_LIMIT checks, restarting RTSP stack ..." >> $LOG_FILE
+            killall -q rRTSPServer
+            killall -q h264grabber
+            sleep 2
+            restart_grabber
+            COUNTER_STREAM=0
+            COUNTER=0
+        fi
+    else
+        COUNTER_STREAM=0
     fi
 }
 
@@ -171,9 +216,47 @@ check_mqttv4()
     fi
 }
 
+check_wifi()
+{
+    if [[ $(get_config WIFI_MULTI) != "yes" ]] ; then
+        return
+    fi
+
+    # Check if wlan0 has an IP address
+    IP_ADDR=$(ifconfig wlan0 2>/dev/null | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}')
+
+    if [ -z "$IP_ADDR" ]; then
+        WIFI_FAIL_COUNT=$((WIFI_FAIL_COUNT + 1))
+        echo "$(date +'%Y-%m-%d %H:%M:%S') - WiFi has no IP address (fail count: $WIFI_FAIL_COUNT)" >> $LOG_FILE
+
+        if [ $WIFI_FAIL_COUNT -ge 3 ]; then
+            echo "$(date +'%Y-%m-%d %H:%M:%S') - WiFi connection lost, triggering wpa_supplicant reassociate..." >> $LOG_FILE
+
+            # Check if wpa_supplicant is still running
+            WPA_PS=$(ps | grep wpa_supplicant | grep -v grep | grep -c ^)
+            if [ $WPA_PS -eq 0 ]; then
+                echo "$(date +'%Y-%m-%d %H:%M:%S') - wpa_supplicant not running, restarting multi-WiFi..." >> $LOG_FILE
+                sh $YI_HACK_PREFIX/script/wifi_connect.sh
+            else
+                # wpa_supplicant is running, tell it to reassociate (scan + reconnect)
+                WPA_CLI="/home/base/tools/wpa_cli"
+                if [ -f "$WPA_CLI" ]; then
+                    $WPA_CLI -i wlan0 reassociate 2>/dev/null
+                    echo "$(date +'%Y-%m-%d %H:%M:%S') - Sent reassociate command to wpa_supplicant" >> $LOG_FILE
+                fi
+            fi
+            WIFI_FAIL_COUNT=0
+        fi
+    else
+        WIFI_FAIL_COUNT=0
+    fi
+}
+
 if [[ $(get_config RTSP) == "no" ]] ; then
     exit
 fi
+
+WIFI_FAIL_COUNT=0
 
 # Re-enabled when its starting
 echo "$(date +'%Y-%m-%d %H:%M:%S') - Starting RTSP watchdog..." >> $LOG_FILE
@@ -182,9 +265,13 @@ while true
 do
     check_grabber
     check_rtsp
+    check_rtsp_stream
     check_rmm
     check_cloud
-    check_mqttv4
+    if [[ $(get_config MQTT) == "yes" ]] ; then
+        check_mqttv4
+    fi
+    check_wifi
     if [ $COUNTER -eq 0 ]; then
         sleep $INTERVAL
     fi

@@ -111,6 +111,17 @@ if [ -f "/tmp/sd/recover/mtdblock2_recover.bin" ]; then
 fi
 $YI_HACK_PREFIX/script/check_conf.sh
 
+# Multi-WiFi support: replace stock single-network wpa_supplicant
+# with a multi-network wpa_supplicant.conf from the SD card
+if [[ $(get_config WIFI_MULTI) == "yes" ]] ; then
+    if [ -f "$YI_HACK_PREFIX/etc/wpa_supplicant.conf" ]; then
+        echo "---multi-WiFi enabled, starting wifi_connect.sh---"
+        sh $YI_HACK_PREFIX/script/wifi_connect.sh
+    else
+        echo "---WIFI_MULTI=yes but wpa_supplicant.conf not found on SD card---"
+    fi
+fi
+
 hostname -F $YI_HACK_PREFIX/etc/hostname
 
 export TZ=$(get_config TIMEZONE)
@@ -135,6 +146,12 @@ if [[ $(get_config SWAP_FILE) == "yes" ]] || [[ $MODEL_SUFFIX == "yi_dome" ]] ||
         sysctl -w vm.laptop_mode=5
     fi
 fi
+
+# Increase network buffers for RTSP streaming stability
+sysctl -w net.core.rmem_max=524288 > /dev/null 2>&1
+sysctl -w net.core.wmem_max=524288 > /dev/null 2>&1
+sysctl -w net.core.rmem_default=524288 > /dev/null 2>&1
+sysctl -w net.core.wmem_default=524288 > /dev/null 2>&1
 
 if [[ x$(get_config USERNAME) != "x" ]] ; then
     USERNAME=$(get_config USERNAME)
@@ -260,9 +277,8 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-mqttv4 &
-
 if [[ $(get_config MQTT) == "yes" ]] ; then
+    mqttv4 &
     mqtt-config &
     $YI_HACK_PREFIX/script/conf2mqtt.sh &
 fi
