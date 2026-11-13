@@ -191,6 +191,15 @@ if [[ $(get_config NTPD) == "yes" ]] ; then
     sleep 5 && ntpd -p $(get_config NTP_SERVER) &
 fi
 
+# Speaker audio control (must run before the camera app is started)
+if [[ $(get_config SPEAKER_AUDIO) == "no" ]] ; then
+    if [ -f /home/app/audio_file/alarm_ring.aac ]; then
+        touch /tmp/alarm_ring.aac
+        mount -o bind /tmp/alarm_ring.aac /home/app/audio_file/alarm_ring.aac
+        echo "---speaker audio muted (alarm_ring.aac)---"
+    fi
+fi
+
 if [[ $(get_config DISABLE_CLOUD) == "no" ]] ; then
     (
         cd /home/app

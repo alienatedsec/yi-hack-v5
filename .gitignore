@@ -19,6 +19,7 @@ REQUIRED_PACKAGES
 INIT_SUBMODULES.md
 
 *.DS_Store
+.idea/
 
 # Added for easier management
 src/dropbear/dropbear
