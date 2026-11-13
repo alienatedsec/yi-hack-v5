@@ -316,7 +316,8 @@ int main(int argc, char** argv)
     char const* descriptionString = "Session streamed by \"rRTSPServer\"";
 
     // First, make sure that the RTPSinks' buffers will be large enough to handle the huge size of DV frames (as big as 288000).
-    OutPacketBuffer::maxSize = 262144;
+    // 1080p key frames can be larger than 256 KB in daylight; a smaller buffer cuts their end.
+    OutPacketBuffer::maxSize = 524288;
 
     // Set up each of the possible streams that can be served by the
     // RTSP server.  Each such stream is implemented using a

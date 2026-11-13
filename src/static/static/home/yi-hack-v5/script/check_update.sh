@@ -32,7 +32,7 @@ if [[ $(get_config CHECK_UPDATES) == "yes" ]] ; then
             # The camera might be connecting to the wifi
             # Keep checking every 5 seconds and increment retry number
             sleep 5
-            ((N_RETRY++))
+            N_RETRY=$((N_RETRY+1))
         fi
         
         [ ! -f $REMOTE_RELEASE_FILE ] && [ $N_RETRY -le $MAX_RETRY ] || break
