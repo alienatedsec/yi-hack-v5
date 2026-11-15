@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1
+# 0.4.2
 
 CONF_FILE="etc/system.conf"
 
@@ -436,14 +436,24 @@ fi
 framefinder $MODEL_SUFFIX &
 
 # Add crontab
+# Build both entries in one write: the crontab file lives on persistent storage, so the
+# previous second rewrite clobbered a user-supplied CRONTAB with the FREE_SPACE entry
 CRONTAB=$(get_config CRONTAB)
 FREE_SPACE=$(get_config FREE_SPACE)
-mkdir -p /var/spool/cron/crontabs/
+CRONTAB_CONTENT=""
 if [ ! -z "$CRONTAB" ]; then
-    echo "$CRONTAB" > /var/spool/cron/crontabs/root
+    CRONTAB_CONTENT="$CRONTAB
+"
 fi
 if [ "$FREE_SPACE" != "0" ]; then
-    echo "0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE" > /var/spool/cron/crontabs/root
+    CRONTAB_CONTENT="${CRONTAB_CONTENT}0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE
+"
+fi
+mkdir -p /var/spool/cron/crontabs/
+if [ -n "$CRONTAB_CONTENT" ]; then
+    printf '%s' "$CRONTAB_CONTENT" > /var/spool/cron/crontabs/root
+else
+    rm -f /var/spool/cron/crontabs/root
 fi
 
 /usr/sbin/crond -c /var/spool/cron/crontabs/
