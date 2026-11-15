@@ -22,6 +22,7 @@ cd $SCRIPT_DIR
 
 rm -rf ./_install
 rm -rf ./live
+rm -rf ./live.ori
 
 # live555
 if [ ! -f $ARCHIVE ]; then
@@ -29,8 +30,12 @@ if [ ! -f $ARCHIVE ]; then
 fi
 tar zxvf $ARCHIVE
 
-patch -p0 < rRTSPServer.patch
-patch -p0 < rtp-tcp-drop-packet.patch
+# The patches below reference a pristine "live.ori" tree, but the upstream tarball
+# only ships "live" — create it, and fail loudly if a patch does not apply
+cp -a ./live ./live.ori
+
+patch -p0 < rRTSPServer.patch || exit 1
+patch -p0 < rtp-tcp-drop-packet.patch || exit 1
 #patch -p0 < rRTSPServer2.patch
 
 cd live || exit 1
