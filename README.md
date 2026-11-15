@@ -36,7 +36,7 @@ This firmware will add the following features:
   - WebServer - user-friendly stats and configurations.
   - SSH server -  _Enabled by default._
   - Telnet server -  _Disabled by default._
-  - FTP server -  _Enabled by default._
+  - FTP server -  _Disabled by default._
   - Web server -  _Enabled by default._
   - The possibility to change some camera settings (copied from the official app):
     - camera on/off
@@ -110,7 +110,7 @@ Alternative way:
 
 </p></details>
 
-3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.4.1
+3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.4.2
 
 4. Save both files `rootfs_xx` and `home_xx`, and the `yi-hack-v5` folder on the root path of the microSD card.
 
