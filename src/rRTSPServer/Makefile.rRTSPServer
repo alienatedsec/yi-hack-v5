@@ -5,7 +5,8 @@ C_COMPILER =		$(CC)
 C_FLAGS =		$(COMPILE_OPTS) $(CPPFLAGS) $(CFLAGS)
 CPP =			cpp
 CPLUSPLUS_COMPILER =	$(CXX)
-CPLUSPLUS_FLAGS =	$(COMPILE_OPTS) -Wall -DBSD=1 $(CPPFLAGS) $(CXXFLAGS)
+# live502 >= 2024.06.26 requires C++11 (std::atomic_flag in BasicUsageEnvironment)
+CPLUSPLUS_FLAGS = $(COMPILE_OPTS) -Wall -DBSD=1 -std=c++11 $(CPPFLAGS) $(CXXFLAGS)
 OBJ =			o
 LINK =			$(CXX) -o
 LINK_OPTS =		-Wl,--gc-sections -L. $(LDFLAGS)

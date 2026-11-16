@@ -8,7 +8,7 @@ diff -Naur live.ori/config.linux-cross live/config.linux-cross
 +C_FLAGS =		$(COMPILE_OPTS) $(CPPFLAGS) $(CFLAGS)
 +CPP =			cpp
 +CPLUSPLUS_COMPILER =	$(CXX)
-+CPLUSPLUS_FLAGS =	$(COMPILE_OPTS) -Wall -DBSD=1 $(CPPFLAGS) $(CXXFLAGS)
++CPLUSPLUS_FLAGS =	$(COMPILE_OPTS) -Wall -DBSD=1 -std=c++11 $(CPPFLAGS) $(CXXFLAGS)
 +OBJ =			o
 +LINK =			$(CXX) -o
 +LINK_OPTS =		-Wl,--gc-sections -L. $(LDFLAGS)
