@@ -1,6 +1,8 @@
 #!/bin/bash
 
-ARCHIVE=live.2023.01.19.tar.gz
+ARCHIVE=live.2024.06.26.tar.gz
+# Cross-checked 2026-11-16 against download.videolan.org and mirror.sobukus.de
+ARCHIVE_SHA256=97e9fa015fc6559808955ec7a0c90fe4000b868f04c58794ff627f8a562d2f1c
 
 export PATH=${PATH}:/opt/arm-hisiv300-linux/bin
 
@@ -28,6 +30,9 @@ rm -rf ./live.ori
 if [ ! -f $ARCHIVE ]; then
     wget https://download.videolan.org/pub/contrib/live555/$ARCHIVE
 fi
+# verify even if the archive is already present, so a stale or corrupted
+# download from a previous version cannot be reused silently
+echo "$ARCHIVE_SHA256  $ARCHIVE" | sha256sum -c - || exit 1
 tar zxvf $ARCHIVE
 
 # The patches below reference a pristine "live.ori" tree, but the upstream tarball
