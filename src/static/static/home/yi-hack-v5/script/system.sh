@@ -27,12 +27,17 @@ export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:
 # The stock ld-uClibc only searches /lib by default (there is no /usr/lib on
 # this board), and dropbear/cron sessions do not inherit LD_LIBRARY_PATH, so
 # ipc_cmd/ipc_read fail with "can't load library 'libpthread.so.0'" unless a
-# parent exported the env. Symlink the uClibc libs from the SD install tree
-# into /lib (persistent jffs2) so the ipc tools resolve from any context.
-# /home/lib is no longer populated by the build. Verified on yi_dome.
-[ -e /lib/libpthread.so.0 ] || [ -f "$YI_HACK_PREFIX/lib/libpthread-0.9.33.2.so" ] && ln -sf "$YI_HACK_PREFIX/lib/libpthread-0.9.33.2.so" /lib/libpthread.so.0
-[ -e /lib/librt.so.0 ]      || [ -f "$YI_HACK_PREFIX/lib/librt-0.9.33.2.so" ]      && ln -sf "$YI_HACK_PREFIX/lib/librt-0.9.33.2.so" /lib/librt.so.0
-[ -e /lib/libdl.so.0 ]      || [ -f "$YI_HACK_PREFIX/lib/libdl-0.9.33.2.so" ]      && ln -sf "$YI_HACK_PREFIX/lib/libdl-0.9.33.2.so" /lib/libdl.so.0
+# parent exported the env. /lib must keep resolving even when the SD card is
+# absent (the SD tree then does not exist), so prefer the persistent /home/lib
+# copy and fall back to the SD install tree. Re-asserted every boot so a stale
+# link (e.g. pointing at a since-removed SD path) is repaired.
+for _l in libpthread librt libdl; do
+    if [ -f "/home/lib/${_l}-0.9.33.2.so" ]; then
+        ln -sf "/home/lib/${_l}-0.9.33.2.so" "/lib/${_l}.so.0"
+    elif [ -f "$YI_HACK_PREFIX/lib/${_l}-0.9.33.2.so" ]; then
+        ln -sf "$YI_HACK_PREFIX/lib/${_l}-0.9.33.2.so" "/lib/${_l}.so.0"
+    fi
+done
 
 #if [ ! -L "/var/run/utmp" ]; then
 #  ln -sf /dev/null /var/run/utmp
