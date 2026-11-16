@@ -41,6 +41,7 @@ cp -a ./live ./live.ori
 
 patch -p0 < rRTSPServer.patch || exit 1
 patch -p0 < rtp-tcp-drop-packet.patch || exit 1
+patch -p0 < tcp-send-failure-recovery.patch || exit 1
 #patch -p0 < rRTSPServer2.patch
 
 cd live || exit 1
