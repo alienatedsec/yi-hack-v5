@@ -64,7 +64,7 @@
                             </div>
                         </td>
                     </tr>
-                   <!-- <tr class="row">
+                    <tr class="row">
                         <td>AI Human Detection</td>
                         <td>
                             <label class="switch small">
@@ -76,7 +76,7 @@
                                 Enable/disable AI Human Detection.
                             </span>
                         </td>
-                    </tr> -->
+                    </tr>
                     <tr class="row">
                         <td>Sound Detection (if supported by your cam)</td>
                         <td>
@@ -154,6 +154,97 @@
                             <span class="switch-description">
                                 Enable image rotation for ceiling mount.
                             </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>AI Vehicle Detection</td>
+                        <td>
+                            <label class="switch small">
+                                <input type="checkbox" data-key="AI_VEHICLE_DETECTION"/>
+                                <span class="slider round"></span>
+                                <span class="switch-text"></span>
+                            </label>
+                            <span class="switch-description">
+                                Enable/disable AI Vehicle Detection.
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>AI Animal Detection</td>
+                        <td>
+                            <label class="switch small">
+                                <input type="checkbox" data-key="AI_ANIMAL_DETECTION"/>
+                                <span class="slider round"></span>
+                                <span class="switch-text"></span>
+                            </label>
+                            <span class="switch-description">
+                                Enable/disable AI Animal Detection.
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>AI Motion Detection</td>
+                        <td>
+                            <label class="switch small">
+                                <input type="checkbox" data-key="MOTION_DETECTION"/>
+                                <span class="slider round"></span>
+                                <span class="switch-text"></span>
+                            </label>
+                            <span class="switch-description">
+                                Enable/disable generic AI Motion Detection.
+                                (Enabling it disables all other AI detections)
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>Face Detection</td>
+                        <td>
+                            <label class="switch small">
+                                <input type="checkbox" data-key="FACE_DETECTION"/>
+                                <span class="slider round"></span>
+                                <span class="switch-text"></span>
+                            </label>
+                            <span class="switch-description">
+                                Enable/disable Face Detection.
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>Motion Tracking (PTZ)</td>
+                        <td>
+                            <label class="switch small">
+                                <input type="checkbox" data-key="MOTION_TRACKING"/>
+                                <span class="slider round"></span>
+                                <span class="switch-text"></span>
+                            </label>
+                            <span class="switch-description">
+                                Enable/disable the PTZ tracking of a moving target.
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>Microphone</td>
+                        <td>
+                            <label class="switch small">
+                                <input type="checkbox" data-key="MIC"/>
+                                <span class="slider round"></span>
+                                <span class="switch-text"></span>
+                            </label>
+                            <span class="switch-description">
+                                Enable/disable the microphone.
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="row">
+                        <td>Cruise</td>
+                        <td>
+                            <div class="standard-select">
+                                <select data-key="CRUISE" id="CRUISE">
+                                    <option value="no">Off</option>
+                                    <option value="presets">Preset tour</option>
+                                    <option value="360">360&#176; tour</option>
+                                </select>
+                            </div>
                         </td>
                     </tr>
                     </tbody>

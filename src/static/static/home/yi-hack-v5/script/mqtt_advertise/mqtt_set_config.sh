@@ -65,6 +65,48 @@ while :; do
         else
             ipc_cmd -a on
         fi
+    elif [ "$CONF" == "ai_vehicle_detection" ]; then
+        if [ "$VAL" == "no" ]; then
+            ipc_cmd -E off
+        else
+            ipc_cmd -E on
+        fi
+    elif [ "$CONF" == "ai_animal_detection" ]; then
+        if [ "$VAL" == "no" ]; then
+            ipc_cmd -N off
+        else
+            ipc_cmd -N on
+        fi
+    elif [ "$CONF" == "motion_detection" ]; then
+        if [ "$VAL" == "no" ]; then
+            ipc_cmd -O off
+        else
+            ipc_cmd -O on
+        fi
+    elif [ "$CONF" == "face_detection" ]; then
+        if [ "$VAL" == "no" ]; then
+            ipc_cmd -c off
+        else
+            ipc_cmd -c on
+        fi
+    elif [ "$CONF" == "mic" ]; then
+        if [ "$VAL" == "no" ]; then
+            ipc_cmd -I off
+        else
+            ipc_cmd -I on
+        fi
+    elif [ "$CONF" == "motion_tracking" ]; then
+        if [ "$VAL" == "no" ]; then
+            ipc_cmd -o off
+        else
+            ipc_cmd -o on
+        fi
+    elif [ "$CONF" == "cruise" ]; then
+        if [ "$VAL" == "no" ] || [ "$VAL" == "off" ]; then
+            ipc_cmd -C off
+        elif [ "$VAL" == "presets" ] || [ "$VAL" == "360" ]; then
+            ipc_cmd -C $VAL
+        fi
     elif [ "$CONF" == "sound_detection" ]; then
         if [ "$VAL" == "no" ]; then
             ipc_cmd -b off

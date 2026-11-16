@@ -58,7 +58,7 @@ void ipc_stop()
 
 void print_usage(char *progname)
 {
-    fprintf(stderr, "\nUsage: %s [t ON/OFF] [-s SENS] [-l LED] [-v WHEN] [-i IR] [-r ROTATE] [-1] [-a AIHUMANDETECTION] [-E AIVEHICLEDETECTION] [-N AIANIMALDETECTION] [-O AIMOTIONDETECTION] [-c FACEDETECTION] [-o MOTIONTRACKING] [-I MIC] [-b SOUNDDETECTION] [-B BABYCRYING] [-n SOUNDSENSITIVITY] [-m MOVE] [-g] [-j ABS_POSITION] [-J REL_POSITION] [-p NUM] [-P NAME] [-R NUM] [-C MODE] [-f FILE] [-S TIME] [-T] [-d]\n\n", progname);
+    fprintf(stderr, "\nUsage: %s [t ON/OFF] [-s SENS] [-l LED] [-v WHEN] [-i IR] [-r ROTATE] [-1] [-a AIHUMANDETECTION] [-E AIVEHICLEDETECTION] [-N AIANIMALDETECTION] [-O AIMOTIONDETECTION] [-c FACEDETECTION] [-o MOTIONTRACKING] [-I MIC] [-b SOUNDDETECTION] [-B BABYCRYING] [-n SOUNDSENSITIVITY] [-m MOVE] [-g] [-u] [-j ABS_POSITION] [-J REL_POSITION] [-p NUM] [-P NAME] [-R NUM] [-C MODE] [-f FILE] [-S TIME] [-T] [-d]\n\n", progname);
     fprintf(stderr, "\t-t ON/OFF, --switch ON/OFF\n");
     fprintf(stderr, "\t\tswitch ON or OFF the cam\n");
     fprintf(stderr, "\t-s SENS, --sensitivity SENS\n");
@@ -97,6 +97,8 @@ void print_usage(char *progname)
     fprintf(stderr, "\t\tsend PTZ command: RIGHT, LEFT, DOWN, UP or STOP\n");
     fprintf(stderr, "\t-g, --get-ptz\n");
     fprintf(stderr, "\t\tget PTZ position\n");
+    fprintf(stderr, "\t-u, --is_moving\n");
+    fprintf(stderr, "\t\tget PTZ moving state (0/1)\n");
     fprintf(stderr, "\t-j ABS_POSITION, --jump-abs ABS_POSITION\n");
     fprintf(stderr, "\t\tmove PTZ to ABS_POSITION (x,y) in degrees (example -j 500,500)\n");
     fprintf(stderr, "\t-J REL_POSITION, --jump-rel REL_POSITION\n");
@@ -148,6 +150,7 @@ int main(int argc, char ** argv)
     int soundsensitivity = NONE;
     int move = NONE;
     int get_pos = NONE;
+    int is_moving = NONE;
     int jump_abs = NONE;
     int jump_rel = NONE;
     char jump_msg[24];
@@ -193,6 +196,7 @@ int main(int argc, char ** argv)
             {"move",  required_argument, 0, 'm'},
             {"move-reverse",  required_argument, 0, 'M'},
             {"get-pos", no_argument, 0, 'g'},
+            {"is_moving", no_argument, 0, 'u'},
             {"jump-abs", required_argument, 0, 'j'},
             {"jump-rel", required_argument, 0, 'J'},
             {"preset",  required_argument, 0, 'p'},
@@ -448,6 +452,10 @@ int main(int argc, char ** argv)
 
         case 'g':
             get_pos = 1;
+            break;
+
+        case 'u':
+            is_moving = 1;
             break;
 
         case 'j':
@@ -758,7 +766,7 @@ int main(int argc, char ** argv)
 
     if (jump_abs != NONE) {
         double fx, fy;
-        int cur_x, cur_y;
+        int cur_x, cur_y, cur_i;
         int fin_x, fin_y;
         char model_suffix[16];
         int is_ptz_value;
@@ -771,7 +779,7 @@ int main(int argc, char ** argv)
             y = 180.0 - y;
         }
 
-        if (read_ptz(&cur_x, &cur_y) != 0) {
+        if (read_ptz(&cur_x, &cur_y, &cur_i) != 0) {
             fprintf(stderr, "Error reading current ptz position\n");
             return -1;
         }
@@ -794,7 +802,7 @@ int main(int argc, char ** argv)
 
     if (jump_rel != NONE) {
         double fx, fy;
-        int cur_x, cur_y;
+        int cur_x, cur_y, cur_i;
         int fin_x, fin_y;
         char model_suffix[16];
         int is_ptz_value;
@@ -807,7 +815,7 @@ int main(int argc, char ** argv)
             y = -1.0 * y;
         }
 
-        if (read_ptz(&cur_x, &cur_y) != 0) {
+        if (read_ptz(&cur_x, &cur_y, &cur_i) != 0) {
             fprintf(stderr, "Error reading current ptz position\n");
             return -1;
         }
@@ -841,7 +849,7 @@ int main(int argc, char ** argv)
 
     if (get_pos != NONE) {
         double fx, fy;
-        int cur_x, cur_y;
+        int cur_x, cur_y, cur_i;
         char model_suffix[16];
         int is_ptz_value;
 
@@ -849,7 +857,7 @@ int main(int argc, char ** argv)
         get_model_suffix(model_suffix, sizeof(model_suffix));
         is_ptz_value = is_ptz(model_suffix);
 
-        if (read_ptz(&cur_x, &cur_y) != 0) {
+        if (read_ptz(&cur_x, &cur_y, &cur_i) != 0) {
             fprintf(stderr, "Error reading current ptz position\n");
             return -1;
         }
@@ -862,6 +870,17 @@ int main(int argc, char ** argv)
 
         fprintf(stderr, "Degrees x  = %.1f, y  = %.1f\n", fx, fy);
         fprintf(stdout, "%.1f,%.1f\n", fx, fy);
+    }
+
+    if (is_moving != NONE) {
+        int cur_x, cur_y, cur_i;
+
+        if (read_ptz(&cur_x, &cur_y, &cur_i) != 0) {
+            fprintf(stderr, "Error reading ptz moving state\n");
+            return -1;
+        }
+
+        fprintf(stdout, "%d\n", cur_i);
     }
 
     if (set_home_position != NONE) {

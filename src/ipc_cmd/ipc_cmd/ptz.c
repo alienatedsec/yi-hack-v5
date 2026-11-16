@@ -106,6 +106,7 @@ int read_ptz(int *px, int *py)
 
     *px = *((int *) (&pos[0]));
     *py = *((int *) (&pos[4]));
+    *pi = *((int *) (&pos[20]));
 
     return 0;
 }
