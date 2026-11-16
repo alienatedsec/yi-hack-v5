@@ -7,7 +7,7 @@ CONF_FILE="$YI_HACK_PREFIX/etc/camera.conf"
 
 CONF_LAST="CONF_LAST"
 
-for I in 1 2 3 4 5 6 7 8 9
+for I in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17
 do
     CONF="$(echo $QUERY_STRING | cut -d'&' -f$I | cut -d'=' -f1)"
     VAL="$(echo $QUERY_STRING | cut -d'&' -f$I | cut -d'=' -f2)"
@@ -66,6 +66,54 @@ do
             ipc_cmd -r off
         else
             ipc_cmd -r on
+        fi
+    elif [ "$CONF" == "ai_human_detection" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -a off
+        else
+            ipc_cmd -a on
+        fi
+    elif [ "$CONF" == "ai_vehicle_detection" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -E off
+        else
+            ipc_cmd -E on
+        fi
+    elif [ "$CONF" == "ai_animal_detection" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -N off
+        else
+            ipc_cmd -N on
+        fi
+    elif [ "$CONF" == "motion_detection" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -O off
+        else
+            ipc_cmd -O on
+        fi
+    elif [ "$CONF" == "face_detection" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -c off
+        else
+            ipc_cmd -c on
+        fi
+    elif [ "$CONF" == "mic" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -I off
+        else
+            ipc_cmd -I on
+        fi
+    elif [ "$CONF" == "motion_tracking" ] ; then
+        if [ "$VAL" == "no" ] ; then
+            ipc_cmd -o off
+        else
+            ipc_cmd -o on
+        fi
+    elif [ "$CONF" == "cruise" ] ; then
+        if [ "$VAL" == "no" ] || [ "$VAL" == "off" ] ; then
+            ipc_cmd -C off
+        elif [ "$VAL" == "presets" ] || [ "$VAL" == "360" ] ; then
+            ipc_cmd -C $VAL
         fi
     fi
     sleep 1

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.1
+# 0.4.2
 
 CONF_FILE="etc/system.conf"
 
@@ -23,6 +23,21 @@ get_config()
 
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin:/home/yi-hack-v5/sbin
+
+# The stock ld-uClibc only searches /lib by default (there is no /usr/lib on
+# this board), and dropbear/cron sessions do not inherit LD_LIBRARY_PATH, so
+# ipc_cmd/ipc_read fail with "can't load library 'libpthread.so.0'" unless a
+# parent exported the env. /lib must keep resolving even when the SD card is
+# absent (the SD tree then does not exist), so prefer the persistent /home/lib
+# copy and fall back to the SD install tree. Re-asserted every boot so a stale
+# link (e.g. pointing at a since-removed SD path) is repaired.
+for _l in libpthread librt libdl; do
+    if [ -f "/home/lib/${_l}-0.9.33.2.so" ]; then
+        ln -sf "/home/lib/${_l}-0.9.33.2.so" "/lib/${_l}.so.0"
+    elif [ -f "$YI_HACK_PREFIX/lib/${_l}-0.9.33.2.so" ]; then
+        ln -sf "$YI_HACK_PREFIX/lib/${_l}-0.9.33.2.so" "/lib/${_l}.so.0"
+    fi
+done
 
 #if [ ! -L "/var/run/utmp" ]; then
 #  ln -sf /dev/null /var/run/utmp
@@ -260,9 +275,8 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
     dropbear -R -B
 fi
 
-mqttv4 &
-
 if [[ $(get_config MQTT) == "yes" ]] ; then
+    mqttv4 &
     mqtt-config &
     $YI_HACK_PREFIX/script/conf2mqtt.sh &
 fi
@@ -429,21 +443,31 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
     onvif_notify_server --conf_file $ONVIF_SRVD_CONF
 
     if [[ $(get_config ONVIF_WSDD) == "yes" ]] ; then
-        wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m yi_hack -n Yi
+        wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m `hostname` -n Yi
     fi
 fi
 
 framefinder $MODEL_SUFFIX &
 
 # Add crontab
+# Build both entries in one write: the crontab file lives on persistent storage, so the
+# previous second rewrite clobbered a user-supplied CRONTAB with the FREE_SPACE entry
 CRONTAB=$(get_config CRONTAB)
 FREE_SPACE=$(get_config FREE_SPACE)
-mkdir -p /var/spool/cron/crontabs/
+CRONTAB_CONTENT=""
 if [ ! -z "$CRONTAB" ]; then
-    echo "$CRONTAB" > /var/spool/cron/crontabs/root
+    CRONTAB_CONTENT="$CRONTAB
+"
 fi
 if [ "$FREE_SPACE" != "0" ]; then
-    echo "0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE" > /var/spool/cron/crontabs/root
+    CRONTAB_CONTENT="${CRONTAB_CONTENT}0 * * * * /tmp/sd/yi-hack-v5/script/clean_records.sh $FREE_SPACE
+"
+fi
+mkdir -p /var/spool/cron/crontabs/
+if [ -n "$CRONTAB_CONTENT" ]; then
+    printf '%s' "$CRONTAB_CONTENT" > /var/spool/cron/crontabs/root
+else
+    rm -f /var/spool/cron/crontabs/root
 fi
 
 /usr/sbin/crond -c /var/spool/cron/crontabs/

@@ -62,6 +62,7 @@ char *config_params[PARAM_NUM][PARAM_OPTIONS] = {
     { "camera", "LED", "bool", "", "", "" , "", "", "ipc_cmd -l %s" },
     { "camera", "ROTATE", "bool", "", "", "" , "", "", "ipc_cmd -r %s" },
     { "camera", "IR", "bool", "", "", "", "", "", "ipc_cmd -i %s" },
+    { "camera", "MIC", "bool", "", "", "", "", "", "ipc_cmd -I %s" },
     { "camera", "SOUND_DETECTION", "bool", "", "", "", "", "", "ipc_cmd -b %s" },
     { "camera", "SOUND_SENSITIVITY", "int", "30", "90", "", "", "", "ipc_cmd -n %s" },
     { "camera", "MOTION_TRACKING", "bool", "", "", "", "", "", "ipc_cmd -o %s" },

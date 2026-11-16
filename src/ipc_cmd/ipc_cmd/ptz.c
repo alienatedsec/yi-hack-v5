@@ -81,7 +81,7 @@ int ssp_init()
     return fd;
 }
 
-int read_ptz(int *px, int *py)
+int read_ptz(int *px, int *py, int *pi)
 {
     int fd_ssp;
     fd_ssp = ssp_init();
@@ -106,6 +106,7 @@ int read_ptz(int *px, int *py)
 
     *px = *((int *) (&pos[0]));
     *py = *((int *) (&pos[4]));
+    *pi = *((int *) (&pos[20]));
 
     return 0;
 }
