@@ -24,6 +24,15 @@ get_config()
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/app/locallib:/home/hisiko/hisilib:/tmp/sd/yi-hack-v5/lib:/home/yi-hack-v5/lib
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/yi-hack-v5/bin:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin:/home/yi-hack-v5/sbin
 
+# The stock ld-uClibc only searches /lib by default (there is no /usr/lib on
+# this board), and dropbear/cron sessions do not inherit LD_LIBRARY_PATH, so
+# ipc_cmd/ipc_read fail with "can't load library 'libpthread.so.0'" unless a
+# parent exported the env. Symlink the uClibc libs into /lib (persistent
+# jffs2) so the ipc tools resolve from any context. Verified on yi_dome.
+[ -e /lib/libpthread.so.0 ] || ln -sf /home/lib/libpthread-0.9.33.2.so /lib/libpthread.so.0
+[ -e /lib/librt.so.0 ]      || ln -sf /home/lib/librt-0.9.33.2.so /lib/librt.so.0
+[ -e /lib/libdl.so.0 ]      || ln -sf /home/lib/libdl-0.9.33.2.so /lib/libdl.so.0
+
 #if [ ! -L "/var/run/utmp" ]; then
 #  ln -sf /dev/null /var/run/utmp
 #fi
