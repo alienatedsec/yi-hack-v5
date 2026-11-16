@@ -1,12 +1,14 @@
 ##### Change the following for your environment:
-COMPILE_OPTS =		$(INCLUDES) -I. -I./include -O1 -ffunction-sections -fdata-sections -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DNO_OPENSSL=1 -DRTP_PAYLOAD_MAX_SIZE=1352 -DNEWLOCALE_NOT_USED
+COMPILE_OPTS =		$(INCLUDES) -I. -I./include -O1 -ffunction-sections -fdata-sections -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DNO_OPENSSL=1 -DRTP_PAYLOAD_MAX_SIZE=1352 -DNEWLOCALE_NOT_USED -DNO_STD_LIB
 C =			c
 C_COMPILER =		$(CC)
 C_FLAGS =		$(COMPILE_OPTS) $(CPPFLAGS) $(CFLAGS)
 CPP =			cpp
 CPLUSPLUS_COMPILER =	$(CXX)
-# live502 >= 2024.06.26 requires C++11 (std::atomic_flag in BasicUsageEnvironment)
-CPLUSPLUS_FLAGS = $(COMPILE_OPTS) -Wall -DBSD=1 -std=c++11 $(CPPFLAGS) $(CXXFLAGS)
+# live502 >= 2023.06 uses std::atomic_flag when NO_STD_LIB is undefined;
+# the HiSilicon gcc 4.8.3 toolchain cannot build it, so use upstream's
+# NO_STD_LIB fallback (volatile trigger flags, correct on this single-CPU target)
+CPLUSPLUS_FLAGS = $(COMPILE_OPTS) -Wall -DBSD=1 $(CPPFLAGS) $(CXXFLAGS)
 OBJ =			o
 LINK =			$(CXX) -o
 LINK_OPTS =		-Wl,--gc-sections -L. $(LDFLAGS)
