@@ -161,6 +161,10 @@ check_grabber()
 
 check_mqttv4()
 {
+    if [[ $(get_config MQTT) != "yes" ]] ; then
+        return
+    fi
+
     PS=`ps | grep mqttv4 | grep -v grep | grep -c ^`
 
     if [ $PS -eq 0 ]; then
