@@ -81,7 +81,7 @@ int ssp_init()
     return fd;
 }
 
-int read_ptz(int *px, int *py)
+int read_ptz(int *px, int *py, int *pi)
 {
     int fd_ssp;
     fd_ssp = ssp_init();
