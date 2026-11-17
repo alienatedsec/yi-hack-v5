@@ -244,7 +244,8 @@ check_grabber()
 
 check_mqttv4()
 {
-    if [[ $(get_config MQTT) != "yes" ]] ; then
+    read_conf MQTT
+    if [[ "$CONF_VAL" != "yes" ]] ; then
         return
     fi
 
