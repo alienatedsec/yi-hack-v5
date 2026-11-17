@@ -276,7 +276,7 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
 fi
 
 if [[ $(get_config MQTT) == "yes" ]] ; then
-    mqttv4 &
+    mqttv4 -t local &
     mqtt-config &
     $YI_HACK_PREFIX/script/conf2mqtt.sh &
 fi

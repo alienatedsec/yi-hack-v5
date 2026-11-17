@@ -93,7 +93,7 @@ restart_cloud()
 
 restart_mqttv4()
 {
-    mqttv4 &
+    mqttv4 -t local &
 }
 
 # The checks below run every 10 s, so they read /proc with shell builtins

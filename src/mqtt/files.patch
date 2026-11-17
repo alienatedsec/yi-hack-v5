@@ -1,0 +1,23 @@
+--- mqttv4/src/files.c
++++ mqttv4/src/files.c
+@@ -100,13 +100,14 @@
+         timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_hour);
+     sprintf(sFile, "%02dM", timeinfo->tm_min);
+ 
+-    while (findFile(sFilename, sDir, sFile) == 0) {
+-        fileFound = 1;
+-        sprintf(output + strlen(output), "\"%s/%s\", ", sDir, sFilename);
+-
+-        num++;
+-        if (num >= limit) break;
++    for (;;) {
++        if (findFile(sFilename, sDir, sFile) == 0) {
++            fileFound = 1;
++            sprintf(output + strlen(output), "\"%s/%s\", ", sDir, sFilename);
+ 
++            num++;
++            if (num >= limit) break;
++        }
+ 
+         if (gmt == 1) {
+             rawtime=timegm(timeinfo);
