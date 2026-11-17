@@ -357,6 +357,12 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
     else
         ONVIF_NETIF="eth0"
     fi
+    # Stable device UID for ONVIF/WS-Discovery (#107): user-configurable,
+    # falls back to the camera serial number so it never changes between boots.
+    ONVIF_UID=$(get_config ONVIF_UID)
+    if [ -z "$ONVIF_UID" ]; then
+        ONVIF_UID="$SERIAL_NUMBER"
+    fi
 
     ONVIF_SRVD_CONF="/tmp/onvif_simple_server.conf"
 
@@ -443,7 +449,7 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
     onvif_notify_server --conf_file $ONVIF_SRVD_CONF
 
     if [[ $(get_config ONVIF_WSDD) == "yes" ]] ; then
-        wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m `hostname` -n Yi
+        wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m $(hostname) -n Yi --uid $ONVIF_UID
     fi
 fi
 

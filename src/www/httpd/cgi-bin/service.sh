@@ -20,6 +20,13 @@ get_config()
     grep -w $1 $YI_HACK_PREFIX/$CONF_FILE | cut -d "=" -f2 | awk 'NR==1 {print; exit}'
 }
 
+# Stable device UID for ONVIF/WS-Discovery (#107): user-configurable,
+# falls back to the camera serial number so it never changes between boots.
+ONVIF_UID=$(get_config ONVIF_UID)
+if [ -z "$ONVIF_UID" ]; then
+    ONVIF_UID="$SERIAL_NUMBER"
+fi
+
 init_config()
 {
     if [[ x$(get_config USERNAME) != "x" ]] ; then
@@ -201,7 +208,7 @@ stop_onvif()
 
 start_wsdd()
 {
-    wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m `hostname` -n Yi
+    wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m `hostname` -n Yi --uid $ONVIF_UID
 }
 
 stop_wsdd()
