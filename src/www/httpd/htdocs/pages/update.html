@@ -73,5 +73,35 @@
                 <input class="button-primary" type="button" id="button-upload" value="Upload"/>
             </div>
         </div>
+        <div id="fwpkg-section">
+            <h4 class="no-margin">Firmware Package</h4>
+            <hr class="tiny-margin"/>
+            <div class="row">
+                <div class="twelve columns configs-switch">
+                    <table class="u-full-width padded-table config-table">
+                        <tbody id="fwpkg-tbody">
+                        <tr class="row">
+                            <td>Package (.tgz)</td>
+                            <td>
+                                <input class="u-full-width" id="file-fwpkg" type="file" />
+                                <span class="switch-description">Upload a yi-hack tgz package (e.g. yi_dome_0.4.3.tgz). After the upload completes, press Install: the camera backs up its configuration, installs the package and reboots. Only the yi-hack tree is installed; baseline rootfs/home flashes are not performed.</span>
+                            </td>
+                        </tr>
+                        <tr class="row">
+                            <td>Status</td>
+                            <td>
+                                <span id="fwpkg-status"></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br/>
+            <div class="float-right">
+                <input class="button-primary padded-right" type="button" id="button-fwpkg-install" value="Install" disabled=""/>
+                <input class="button-primary" type="button" id="button-fwpkg-upload" value="Upload"/>
+            </div>
+        </div>
     </div>
 </div>

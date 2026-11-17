@@ -103,6 +103,53 @@ elif [ "$VAL" == "upgrade" ] ; then
     sleep 1
     reboot
 
+elif [ "$VAL" == "tgz" ] ; then
+    # Manual install of an uploaded .tgz package.
+    # The package is uploaded via upload.sh (stored as fw_upload.tgz
+    # in the hack prefix) or placed on the SD root.
+    TGAZ_FILE="$YI_HACK_PREFIX/fw_upload.tgz"
+    if [ ! -f "$TGAZ_FILE" ]; then
+        TGAZ_FILE="/tmp/sd/fw_upload.tgz"
+    fi
+    if [ ! -f "$TGAZ_FILE" ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "No firmware package found. Upload it first."
+        exit
+    fi
+
+    FREE_SD=$(df /tmp/sd/ | grep mmc | awk '{print $4}')
+    if [ -z "$FREE_SD" ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "No SD detected."
+        exit
+    fi
+
+    if [ $FREE_SD -lt 100000 ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "No space left on SD."
+        exit
+    fi
+
+    # Validate: must be a readable tgz containing this camera's hack tree.
+    # (busybox tar here has no -z; tf - lists bare names, no -v)
+    if ! gzip -dc "$TGAZ_FILE" 2>/dev/null | tar tf - 2>/dev/null | grep -q "^${MODEL_SUFFIX}/yi-hack-v5/version$"; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Invalid firmware package (missing ${MODEL_SUFFIX}/yi-hack-v5 tree)."
+        rm -f "$TGAZ_FILE"
+        exit
+    fi
+
+    # Hand over to the standard local-package path.
+    # Move it where the local-package branch expects it, then run that
+    # branch detached so the install survives the HTTP client disconnecting
+    # (extraction + reboot takes a few minutes).
+    mv "$TGAZ_FILE" "/tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz"
+    rm -f "$YI_HACK_PREFIX/fw_upload.tgz" /tmp/sd/fw_upload.tgz
+    printf "Content-type: text/html\r\n\r\n"
+    printf "Install started. The camera will reboot in a few seconds."
+    nohup sh -c "env QUERY_STRING=get=upgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh > /dev/null 2>&1" &
+    exit
+
 elif [ "$VAL" == "preupgrade" ] ; then
     FREE_SD=$(df /tmp/sd/ | grep mmc | awk '{print $4}')
     if [ -z "$FREE_SD" ]; then

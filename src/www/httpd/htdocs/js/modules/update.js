@@ -7,6 +7,11 @@ APP.update = (function ($) {
     var uploadSection;
     var uploadButton;
     
+    var fwpkgUploadButton;
+    var fwpkgInstallButton;
+    var fwpkgStatus;
+    var fwpkgUploaded=false;
+
     var filesToUpload;
 
     function init() {
@@ -17,11 +22,21 @@ APP.update = (function ($) {
         
         uploadSection=$("#upload-section");
         //uploadSection.hide();
+
+        fwpkgUploadButton=$("#button-fwpkg-upload");
+        fwpkgInstallButton=$("#button-fwpkg-install");
+        fwpkgStatus=$("#fwpkg-status");
     }
 
     function registerEventHandler() {
         $(document).on("click", '#button-upload', function (e) {
             uploadFiles();
+        });
+        $(document).on("click", '#button-fwpkg-upload', function (e) {
+            uploadFwPackage();
+        });
+        $(document).on("click", '#button-fwpkg-install', function (e) {
+            installFwPackage();
         });
     }
 
@@ -132,6 +147,89 @@ APP.update = (function ($) {
         });
     }
     
+    function updateFwPkgStatus(text)
+    {
+        if(fwpkgStatus)
+            fwpkgStatus.text(text);
+    }
+    
+    function uploadFwPackage()
+    {
+        if(configs["IS_SD_PRESENT"]=="NO")
+        {
+            alert("An SD card must be present in the camera to install a firmware package.");
+            return;
+        }
+        
+        var fileInput=document.getElementById("file-fwpkg");
+        if(!fileInput || !fileInput.files || fileInput.files.length==0)
+        {
+            alert("Choose a .tgz package file first.");
+            return;
+        }
+        
+        var fname=fileInput.files[0].name;
+        if(!fname.toLowerCase().endsWith(".tgz"))
+        {
+            alert("Only .tgz packages are supported.");
+            return;
+        }
+        
+        fwpkgUploadButton.prop('value', 'Uploading...');
+        updateFwPkgStatus("Uploading " + fname + " ... this can take a while.");
+        
+        var fd = new FormData();
+        fd.append('file', fileInput.files[0]);
+        $.ajax({
+            url: "cgi-bin/upload.sh?file=fw_upload.tgz",
+            type: 'POST',
+            data: fd,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(data){
+                fwpkgUploadButton.prop('value', 'Upload');
+                fwpkgUploaded=true;
+                fwpkgInstallButton.prop('disabled', false);
+                updateFwPkgStatus("Package uploaded. Ready to install.");
+            },
+            error: function(){
+                fwpkgUploadButton.prop('value', 'Upload');
+                updateFwPkgStatus("Upload failed.");
+            }
+        });
+    }
+    
+    function installFwPackage()
+    {
+        if(!fwpkgUploaded)
+        {
+            alert("Upload a package first.");
+            return;
+        }
+        
+        if(!confirm("Install the uploaded package?\nThe camera will reboot and take a couple of minutes."))
+            return;
+        
+        fwpkgInstallButton.prop('value', 'Installing...');
+        updateFwPkgStatus("Installing. The camera will reboot in a few seconds.");
+        
+        $.ajax({
+            url: "cgi-bin/fw_upgrade.sh?get=tgz",
+            type: "GET",
+            timeout: 30000,
+            success: function(data){
+                if(String(data).indexOf("Download completed") >= 0)
+                    updateFwPkgStatus(data + " The camera will reboot shortly.");
+                else
+                    updateFwPkgStatus(data);
+            },
+            error: function(){
+                updateFwPkgStatus("Install started. The camera will reboot shortly.");
+            }
+        });
+    }
+    
     function updateChecks()
     {
         var verStatusElem=$("#version-status");
@@ -142,6 +240,9 @@ APP.update = (function ($) {
         {
             var elem=$("#upload-tbody");
             elem.text("An SD card must be present in the camera to flash a new image.")
+            var fwpkgElem=$("#fwpkg-tbody");
+            fwpkgElem.text("An SD card must be present in the camera to install a firmware package.")
+            fwpkgInstallButton.prop('disabled', true);
         }
         
         if(needsUpdate=="yes")
