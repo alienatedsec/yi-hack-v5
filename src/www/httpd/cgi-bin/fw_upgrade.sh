@@ -7,6 +7,13 @@ MODEL_SUFFIX=`cat /home/app/.camver`
 FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
 BASELINE_VERSION=`cat /home/yi-hack-v5/version`
 
+# Flashed baseline (rootfs and home partitions) must be 0.4.1 or newer
+BASELINE_MAJOR=$(echo $BASELINE_VERSION | cut -d'.' -f1)
+BASELINE_MINOR=$(echo $BASELINE_VERSION | cut -d'.' -f2)
+BASELINE_PATCH=$(echo $BASELINE_VERSION | cut -d'.' -f3)
+BASELINE_NUM=$(printf "%03d%03d%03d" $BASELINE_MAJOR $BASELINE_MINOR $BASELINE_PATCH)
+MIN_BASELINE_NUM=$(printf "%03d%03d%03d" 0 4 1)
+
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/qigan/lib:/home/app/locallib:/tmp/sd:/tmp/sd/gdb:/tmp/sd/yi-hack-v5/lib
 
@@ -67,7 +74,7 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."
             exit
-        elif [ "$BASELINE_VERSION" != "0.4.1" ]; then
+        elif [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Wrong baseline version"
             exit
@@ -186,7 +193,7 @@ elif [ "$VAL" == "preupgrade" ] ; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."
             exit
-        elif [ "$BASELINE_VERSION" != "0.4.1" ]; then
+        elif [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Wrong baseline version"
             exit

@@ -189,10 +189,16 @@ if [ ! -d "/home/yi-hack-v5/lib" ]; then
         cp -a /tmp/sd/yi-hack-v5/lib/. /home/yi-hack-v5/lib/
 fi
 
-# Version Firmware Check
+# Version Firmware Check - the flashed baseline (rootfs and home partitions)
+# must be 0.4.1 or newer; older flashes lack the modifications the hack needs.
 if [ -f "/home/yi-hack-v5/version" ]; then
   version=$(cat /home/yi-hack-v5/version)
-  if [[ "$version" != "0.4.1" ]]; then
+  B_MAJOR=$(echo $version | cut -d'.' -f1)
+  B_MINOR=$(echo $version | cut -d'.' -f2)
+  B_PATCH=$(echo $version | cut -d'.' -f3)
+  BASELINE_NUM=$(printf "%03d%03d%03d" $B_MAJOR $B_MINOR $B_PATCH)
+  MIN_BASELINE_NUM=$(printf "%03d%03d%03d" 0 4 1)
+  if [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
     echo "Your baseline $version (rootfs and home partitions) is incorrect. Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267"
     echo "Your baseline $version (rootfs and home partitions) is incorrect, Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267" > "/tmp/sd/hackerror.txt"
   fi
