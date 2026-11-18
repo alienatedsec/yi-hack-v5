@@ -152,7 +152,7 @@ the settings will be lost.
 Please follow this [guide](https://github.com/alienatedsec/yi-hack-v5/discussions/248#discussion-5090628) if you want to test new features and improvements
 
 ## Updating from the web interface
-The **Update** page in the web interface can install a new version without a microSD card: upload the release `.tgz` package for your camera model, then press **Install**. The package is validated before use, your configuration is preserved, and the camera reboots twice to complete the upgrade.
+The **Update** page in the web interface can install a new version without manually copying the package to the microSD card: upload the release `.tgz` package for your camera model, then press **Install**. The package is validated before use, your configuration is preserved, and the camera reboots twice to complete the upgrade. The microSD card must still be installed — the hack runs from the `yi-hack-v5` folder on it.
 
 ## Acknowledgments
 Special thanks to the following people and projects, without them `yi-hack-v5` wouldn't be possible.
