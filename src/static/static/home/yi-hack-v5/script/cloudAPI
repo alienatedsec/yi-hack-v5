@@ -28,7 +28,7 @@ get_config()
 
 if [[ $(get_config DISABLE_CLOUD) == "yes" ]] ; then
         cd /home/app
-        ./cloudAPI_fake "$@"
+        exec ./cloudAPI_fake "$@"
 else
     if [ "$4" == "https://api.xiaoyi.com/v4/ipc/check_did" ]; then
         echo '{"allow":true,"code":"20000"}'
