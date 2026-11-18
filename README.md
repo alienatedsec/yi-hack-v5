@@ -110,7 +110,7 @@ Alternative way:
 
 </p></details>
 
-3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.4.2
+3. Get the correct firmware files for your camera from the latest baseline release link: https://github.com/alienatedsec/yi-hack-v5/releases/tag/0.4.3
 
 4. Save both files `rootfs_xx` and `home_xx`, and the `yi-hack-v5` folder on the root path of the microSD card.
 

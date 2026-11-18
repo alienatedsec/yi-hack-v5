@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.2
+# 0.4.3
 
 CONF_FILE="etc/system.conf"
 
