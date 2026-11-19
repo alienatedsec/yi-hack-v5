@@ -26,12 +26,47 @@ if [ "$NAME" != "get" ] ; then
 fi
 
 if [ "$VAL" == "info" ] ; then
-    printf "Content-type: application/json\r\n\r\n"
+    # The GitHub API allows 60 requests/hour per IP (shared with the
+    # rest of the LAN on the same WAN IP), so the status page is served
+    # from a 10-minute local cache. Only cache when the API actually
+    # answered (LATEST_FW non-empty) so a rate-limited response is not
+    # pinned for the whole TTL.
+    CACHE_FILE="/tmp/fwup_info_cache"
+    CACHE_TTL=600
+    NOW=$(date +%s)
+    if [ -f "$CACHE_FILE" ] ; then
+        read C_TS C_FW C_LATEST C_PRE < "$CACHE_FILE"
+        if [ -n "$C_TS" ] && [ $((NOW - C_TS)) -lt $CACHE_TTL ] ; then
+            printf "Content-type: application/json\r\n\r\n"
+            printf "{\n"
+            printf "\"%s\":\"%s\",\n" "fw_version"       "$C_FW"
+            printf "\"%s\":\"%s\",\n" "latest_fw"       "$C_LATEST"
+            printf "\"%s\":\"%s\"\n" "prerelease_fw"       "$C_PRE"
+            printf "}"
+            exit
+        fi
+    fi
 
     FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
     LATEST_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest 2>&1 | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
-    PRERELEASE_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null | jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty'`
-	
+    # Fetch the release list to a temp file: piping the ~460 KB body from
+    # `wget -O -` into jq intermittently truncates the stream on the camera
+    # (jq: "Unfinished string at EOF"), which reports no pre-release.
+    # Retry up to 3 times before giving up.
+    PRERELEASE_FW=""
+    i=0
+    while [ $i -lt 3 ]; do
+        wget -O /tmp/fwup_releases.json https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null
+        PRERELEASE_FW=`jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty' /tmp/fwup_releases.json 2>/dev/null`
+        [ -n "$PRERELEASE_FW" ] && break
+        i=$((i+1))
+    done
+    rm -f /tmp/fwup_releases.json
+
+    if [ -n "$LATEST_FW" ] ; then
+        printf "%s %s %s %s" "$NOW" "$FW_VERSION" "$LATEST_FW" "$PRERELEASE_FW" > "$CACHE_FILE"
+    fi
+    printf "Content-type: application/json\r\n\r\n"
     printf "{\n"
     printf "\"%s\":\"%s\",\n" "fw_version"       "$FW_VERSION"
     printf "\"%s\":\"%s\",\n" "latest_fw"       "$LATEST_FW"
@@ -188,7 +223,17 @@ elif [ "$VAL" == "preupgrade" ] ; then
 #        mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/${MODEL_SUFFIX}/${MODEL_SUFFIX}_x.x.x.tgz
         PRERELEASE_FW="x.x.x"
     else
-        PRERELEASE_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null | jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty'`
+        # File-based fetch with retries: see the info action above for why
+        # the stdout-pipe variant truncates on the camera.
+        PRERELEASE_FW=""
+        i=0
+        while [ $i -lt 3 ]; do
+            wget -O /tmp/fwup_releases.json https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null
+            PRERELEASE_FW=`jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty' /tmp/fwup_releases.json 2>/dev/null`
+            [ -n "$PRERELEASE_FW" ] && break
+            i=$((i+1))
+        done
+        rm -f /tmp/fwup_releases.json
         if [ -z "$PRERELEASE_FW" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No pre-release available."
