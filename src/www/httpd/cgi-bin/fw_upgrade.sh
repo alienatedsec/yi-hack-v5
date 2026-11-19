@@ -30,7 +30,7 @@ if [ "$VAL" == "info" ] ; then
 
     FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
     LATEST_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest 2>&1 | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
-    PRERELEASE_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>&1 | grep -B 4 '"prerelease": true' | awk -F '"' '{print $4; exit}'`
+    PRERELEASE_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null | jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty'`
 	
     printf "{\n"
     printf "\"%s\":\"%s\",\n" "fw_version"       "$FW_VERSION"
@@ -188,7 +188,12 @@ elif [ "$VAL" == "preupgrade" ] ; then
 #        mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/${MODEL_SUFFIX}/${MODEL_SUFFIX}_x.x.x.tgz
         PRERELEASE_FW="x.x.x"
     else
-        PRERELEASE_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>&1 | grep -B 4 '"prerelease": true' | awk -F '"' '{print $4; exit}'`
+        PRERELEASE_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null | jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty'`
+        if [ -z "$PRERELEASE_FW" ]; then
+            printf "Content-type: text/html\r\n\r\n"
+            printf "No pre-release available."
+            exit
+        fi
         if [ "$FW_VERSION" == "$PRERELEASE_FW" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."

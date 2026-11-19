@@ -236,7 +236,7 @@ APP.maintenance = (function($) {
             },
             success: function(data) {
                 setPreFwStatus("Installed: " + data.fw_version + " - Available: " + data.prerelease_fw);
-                if (data.fw_version == data.prelease_fw) {
+                if (data.fw_version == data.prerelease_fw) {
                     $('#button-preupgrade').attr("disabled", true);
                 }
             }
