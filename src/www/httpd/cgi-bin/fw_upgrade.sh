@@ -62,49 +62,78 @@ if [ "$VAL" == "info" ] ; then
     # from a 10-minute local cache. Only cache when the API actually
     # answered (LATEST_FW non-empty) so a rate-limited response is not
     # pinned for the whole TTL.
+    #
+    # This action must NEVER block: the status page fires it twice per
+    # load, and the camera's httpd is single-threaded - a blocked info
+    # request freezes every other request, including a firmware upload
+    # (the browser then aborts the stalled transfer and a partial
+    # fw_upload.tgz is left behind). So a stale or missing cache kicks
+    # a detached refresher (get=refresh) and answers immediately with
+    # the last known values, flagged "checking" so the page re-polls.
     CACHE_FILE="/tmp/fwup_info_cache"
     CACHE_TTL=600
+    CHECK_FILE="/tmp/fwup_info_checking"
     NOW=$(date +%s)
+    C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
+    CHECKING="false"
+
     if [ -f "$CACHE_FILE" ] ; then
         read C_TS C_FW C_LATEST C_PRE < "$CACHE_FILE"
-        if [ -n "$C_TS" ] && [ $((NOW - C_TS)) -lt $CACHE_TTL ] ; then
-            printf "Content-type: application/json\r\n\r\n"
-            printf "{\n"
-            printf "\"%s\":\"%s\",\n" "fw_version"       "$C_FW"
-            printf "\"%s\":\"%s\",\n" "latest_fw"       "$C_LATEST"
-            printf "\"%s\":\"%s\"\n" "prerelease_fw"       "$C_PRE"
-            printf "}"
-            exit
+    fi
+
+    if [ -n "$C_TS" ] && [ $((NOW - C_TS)) -lt $CACHE_TTL ] ; then
+        # Fresh cache - served as is.
+        :
+    else
+        CHECKING="true"
+        if [ ! -f "$CHECK_FILE" ] ; then
+            echo "$$" > "$CHECK_FILE"
+            # NB: the redirections must be OUTSIDE the sh -c string. The
+            # httpd only finishes the CGI response when the CGI's stdout
+            # pipe gets EOF, i.e. when every process holding it exits -
+            # a nohup that inherits the pipe (redirections inside the
+            # string apply to its child, not to it) would hold the
+            # response hostage for the whole duration of the fetch.
+            nohup sh -c "env QUERY_STRING=get=refresh sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
         fi
     fi
 
-    FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
-    # Fetch the release list to a temp file and read both fields from it
-    # with jq (one API call instead of two): piping the ~460 KB body from
-    # `wget -O -` into grep/jq intermittently truncates the stream on the
-    # camera, and the old parsing of the "latest" field broke when GitHub
-    # changed its response layout. Retry up to 3 times.
+    printf "Content-type: application/json\r\n\r\n"
+    printf "{\n"
+    printf "\"%s\":\"%s\",\n" "fw_version"       "${C_FW:-$FW_VERSION}"
+    printf "\"%s\":\"%s\",\n" "latest_fw"       "$C_LATEST"
+    printf "\"%s\":\"%s\",\n" "prerelease_fw"   "$C_PRE"
+    printf "\"%s\":%s\n" "checking" "$CHECKING"
+    printf "}"
+
+elif [ "$VAL" == "refresh" ] ; then
+    # Detached cache refresher, re-invoked by get=info above through
+    # nohup - it must never hold the httpd, that is the whole point of
+    # the split. Runs 3 bounded attempts, writes the cache only on
+    # success, and always clears the in-flight marker on exit.
+    CHECK_FILE="/tmp/fwup_info_checking"
+    trap 'rm -f "$CHECK_FILE"' EXIT
+    CACHE_FILE="/tmp/fwup_info_cache"
     LATEST_FW=""
     PRERELEASE_FW=""
     i=0
     while [ $i -lt 3 ]; do
-        wget -O /tmp/fwup_releases.json https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null
+        # -T 30 aborts a dead/stalled WAN connection (a bare wget hangs
+        # in the kernel TCP timeout for ~2 minutes per attempt); see
+        # download_pkg above for why the stdout-pipe variant is avoided.
+        wget -T 30 -q -O /tmp/fwup_releases.json https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null
         LATEST_FW=`jq -r 'map(select(.prerelease == false)) | first | .tag_name // empty' /tmp/fwup_releases.json 2>/dev/null`
         PRERELEASE_FW=`jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty' /tmp/fwup_releases.json 2>/dev/null`
         [ -n "$LATEST_FW" ] && break
+        rm -f /tmp/fwup_releases.json
         i=$((i+1))
+        [ $i -lt 3 ] && sleep 2
     done
     rm -f /tmp/fwup_releases.json
-
     if [ -n "$LATEST_FW" ] ; then
-        printf "%s %s %s %s" "$NOW" "$FW_VERSION" "$LATEST_FW" "$PRERELEASE_FW" > "$CACHE_FILE"
+        printf "%s %s %s %s" "$(date +%s)" "$FW_VERSION" "$LATEST_FW" "$PRERELEASE_FW" > "$CACHE_FILE"
     fi
-    printf "Content-type: application/json\r\n\r\n"
-    printf "{\n"
-    printf "\"%s\":\"%s\",\n" "fw_version"       "$FW_VERSION"
-    printf "\"%s\":\"%s\",\n" "latest_fw"       "$LATEST_FW"
-    printf "\"%s\":\"%s\"\n" "prerelease_fw"       "$PRERELEASE_FW"
-    printf "}"
+    exit 0
 
 elif [ "$VAL" == "upgrade" ] ; then
     FREE_SD=$(df /tmp/sd/ | grep mmc | awk '{print $4}')

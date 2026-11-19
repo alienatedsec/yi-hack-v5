@@ -230,6 +230,13 @@ APP.maintenance = (function($) {
                 setFwStatus("Error getting fw info");
             },
             success: function(data) {
+                if (data.checking) {
+                    // The camera is checking GitHub in the background -
+                    // re-poll until the check lands in the cache.
+                    setFwStatus("Installed: " + data.fw_version + " - checking for updates...");
+                    setTimeout(getFwStatus, 5000);
+                    return;
+                }
                 setFwStatus("Installed: " + data.fw_version + " - Available: " + data.latest_fw);
                 if (data.fw_version == data.latest_fw) {
                     $('#button-upgrade').attr("disabled", true);
@@ -248,6 +255,11 @@ APP.maintenance = (function($) {
                 setPreFwStatus("Error getting fw info");
             },
             success: function(data) {
+                if (data.checking) {
+                    setPreFwStatus("Installed: " + data.fw_version + " - checking for pre-releases...");
+                    setTimeout(getPreFwStatus, 5000);
+                    return;
+                }
                 setPreFwStatus("Installed: " + data.fw_version + " - Available: " + data.prerelease_fw);
                 if (data.fw_version == data.prerelease_fw) {
                     $('#button-preupgrade').attr("disabled", true);
@@ -319,15 +331,38 @@ APP.maintenance = (function($) {
             cache: false,
             contentType: false,
             processData: false,
+            // The camera's Wi-Fi link is slow (~1 MB in 7 s), so show
+            // the transfer percentage - a frozen "Uploading..." makes
+            // users think the upload is dead and abort it.
+            xhr: function() {
+                var x = new XMLHttpRequest();
+                x.upload.addEventListener("progress", function(e) {
+                    if (e.lengthComputable) {
+                        updateFwPkgStatus("Uploading " + fname + " ... " + Math.round(e.loaded / e.total * 100) + "%");
+                    }
+                });
+                return x;
+            },
             success: function(data){
                 fwpkgUploadButton.prop('value', 'Upload');
+                if (data && String(data.error) === "true") {
+                    // The CGI verified the transfer and found it short.
+                    updateFwPkgStatus((data.message || "Upload failed.") + " Please retry.");
+                    return;
+                }
                 fwpkgUploaded=true;
                 fwpkgInstallButton.prop('disabled', false);
                 updateFwPkgStatus("Package uploaded. Ready to install.");
             },
-            error: function(){
+            error: function(xhr){
                 fwpkgUploadButton.prop('value', 'Upload');
-                updateFwPkgStatus("Upload failed.");
+                if (xhr && xhr.status === 0) {
+                    // Network-level failure: the connection dropped
+                    // before the transfer finished.
+                    updateFwPkgStatus("Upload failed - the connection dropped before the transfer finished. Please retry.");
+                } else {
+                    updateFwPkgStatus("Upload failed (HTTP " + (xhr ? xhr.status : "unknown") + "). Please retry.");
+                }
             }
         });
     }
