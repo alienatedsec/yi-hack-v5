@@ -127,6 +127,16 @@ elif [ "$VAL" == "upgrade" ] ; then
     rm -rf /tmp/sd/newhome
     rm /tmp/sd/rootfs*
     rm /tmp/sd/home*
+    # Remove stale package files left behind by interrupted installs
+    # (a partial run's tgz + tar can be 30 MB+ and fills the SD over
+    # repeated failed upgrades). The manual x.x.x package is kept - it
+    # is what this run installs if present.
+    for f in /tmp/sd/${MODEL_SUFFIX}_*.tgz /tmp/sd/${MODEL_SUFFIX}_*.tar; do
+        [ -f "$f" ] || continue
+        case "$f" in *_x.x.x.*) continue;; esac
+        rm -f "$f"
+    done
+    rm -f "$YI_HACK_PREFIX/fw_upload.tgz"
 
     mkdir -p /tmp/sd/${MODEL_SUFFIX}
     mkdir -p /tmp/sd/${MODEL_SUFFIX}.conf
@@ -275,6 +285,16 @@ elif [ "$VAL" == "preupgrade" ] ; then
     rm -rf /tmp/sd/newhome
     rm /tmp/sd/rootfs*
     rm /tmp/sd/home*
+    # Remove stale package files left behind by interrupted installs
+    # (a partial run's tgz + tar can be 30 MB+ and fills the SD over
+    # repeated failed upgrades). The manual x.x.x package is kept - it
+    # is what this run installs if present.
+    for f in /tmp/sd/${MODEL_SUFFIX}_*.tgz /tmp/sd/${MODEL_SUFFIX}_*.tar; do
+        [ -f "$f" ] || continue
+        case "$f" in *_x.x.x.*) continue;; esac
+        rm -f "$f"
+    done
+    rm -f "$YI_HACK_PREFIX/fw_upload.tgz"
 
     mkdir -p /tmp/sd/${MODEL_SUFFIX}
     mkdir -p /tmp/sd/${MODEL_SUFFIX}.conf
