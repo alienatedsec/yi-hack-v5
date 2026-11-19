@@ -24,6 +24,34 @@ export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/qigan/lib:/home/app/localli
 NAME="$(echo $QUERY_STRING | cut -d'=' -f1)"
 VAL="$(echo $QUERY_STRING | cut -d'=' -f2)"
 
+# Download a firmware package with resume, a read timeout and retries,
+# then verify the result by fully decompressing it: gzip -dc validates
+# the whole stream and its CRC, so a truncated or corrupt download is
+# caught here, before any install is attempted. A failed attempt is
+# deleted and retried; after the final failure the caller reports the
+# error and the user can simply try again (a clean start every time).
+# $1 = URL, $2 = output file. Returns 0 on success, 1 on failure.
+download_pkg()
+{
+    local URL=$1 FILE=$2
+    local i=0
+    while [ $i -lt 3 ]; do
+        # -c resumes a partial file left by an earlier interrupted
+        # download (e.g. the camera rebooted mid-fetch); -T 60 aborts a
+        # dead/stalled connection after 60 s of silence (the old bare
+        # wget hung forever on a dropped link); -q keeps wget's progress
+        # out of the HTTP response.
+        wget -c -q -T 60 -O "$FILE" "$URL" 2>/dev/null
+        if [ -s "$FILE" ] && gzip -dc "$FILE" > /dev/null 2>&1; then
+            return 0
+        fi
+        rm -f "$FILE"
+        i=$((i+1))
+        [ $i -lt 3 ] && sleep 2
+    done
+    return 1
+}
+
 if [ "$NAME" != "get" ] ; then
     exit
 fi
@@ -51,17 +79,19 @@ if [ "$VAL" == "info" ] ; then
     fi
 
     FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
-    LATEST_FW=`wget -O - https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest 2>&1 | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
-    # Fetch the release list to a temp file: piping the ~460 KB body from
-    # `wget -O -` into jq intermittently truncates the stream on the camera
-    # (jq: "Unfinished string at EOF"), which reports no pre-release.
-    # Retry up to 3 times before giving up.
+    # Fetch the release list to a temp file and read both fields from it
+    # with jq (one API call instead of two): piping the ~460 KB body from
+    # `wget -O -` into grep/jq intermittently truncates the stream on the
+    # camera, and the old parsing of the "latest" field broke when GitHub
+    # changed its response layout. Retry up to 3 times.
+    LATEST_FW=""
     PRERELEASE_FW=""
     i=0
     while [ $i -lt 3 ]; do
         wget -O /tmp/fwup_releases.json https://api.github.com/repos/alienatedsec/yi-hack-v5/releases 2>/dev/null
+        LATEST_FW=`jq -r 'map(select(.prerelease == false)) | first | .tag_name // empty' /tmp/fwup_releases.json 2>/dev/null`
         PRERELEASE_FW=`jq -r '[.[] | select(.prerelease == true)] | first | .tag_name // empty' /tmp/fwup_releases.json 2>/dev/null`
-        [ -n "$PRERELEASE_FW" ] && break
+        [ -n "$LATEST_FW" ] && break
         i=$((i+1))
     done
     rm -f /tmp/fwup_releases.json
@@ -107,7 +137,23 @@ elif [ "$VAL" == "upgrade" ] ; then
 #        mv /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz /tmp/sd/${MODEL_SUFFIX}/${MODEL_SUFFIX}_x.x.x.tgz
         LATEST_FW="x.x.x"
     else
-        LATEST_FW=`wget -O -  https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest 2>&1 | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'`
+        # File-based fetch with jq, like the preupgrade path: the stdout
+        # pipe variant truncates on the camera and broke when GitHub
+        # changed its response layout.
+        LATEST_FW=""
+        i=0
+        while [ $i -lt 3 ]; do
+            wget -O /tmp/fwup_latest.json https://api.github.com/repos/alienatedsec/yi-hack-v5/releases/latest 2>/dev/null
+            LATEST_FW=`jq -r '.tag_name // empty' /tmp/fwup_latest.json 2>/dev/null`
+            [ -n "$LATEST_FW" ] && break
+            i=$((i+1))
+        done
+        rm -f /tmp/fwup_latest.json
+        if [ -z "$LATEST_FW" ]; then
+            printf "Content-type: text/html\r\n\r\n"
+            printf "Unable to contact the firmware repository."
+            exit
+        fi
         if [ "$FW_VERSION" == "$LATEST_FW" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."
@@ -117,10 +163,9 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "Wrong baseline version"
             exit
         fi
-        
-        wget https://github.com/alienatedsec/yi-hack-v5/releases/download/$LATEST_FW/${MODEL_SUFFIX}_${LATEST_FW}.tgz
-        
-        if [ ! -f ${MODEL_SUFFIX}_${LATEST_FW}.tgz ]; then
+
+        download_pkg "https://github.com/alienatedsec/yi-hack-v5/releases/download/$LATEST_FW/${MODEL_SUFFIX}_${LATEST_FW}.tgz" "/tmp/sd/${MODEL_SUFFIX}_${LATEST_FW}.tgz"
+        if [ $? -ne 0 ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Unable to download firmware file."
             exit
@@ -266,9 +311,8 @@ elif [ "$VAL" == "preupgrade" ] ; then
             exit
         fi
 
-        wget https://github.com/alienatedsec/yi-hack-v5/releases/download/$PRERELEASE_FW/${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz
-        
-        if [ ! -f ${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz ]; then
+        download_pkg "https://github.com/alienatedsec/yi-hack-v5/releases/download/$PRERELEASE_FW/${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz" "/tmp/sd/${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz"
+        if [ $? -ne 0 ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Unable to download firmware file."
             exit
