@@ -133,7 +133,17 @@ elif [ "$VAL" == "upgrade" ] ; then
 
     # Prepare new hack
     gzip -d ${MODEL_SUFFIX}_${LATEST_FW}.tgz
+    if [ $? -ne 0 ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Package is corrupt (decompression failed). Remove it from /tmp/sd and retry."
+        exit
+    fi
     tar xvf ${MODEL_SUFFIX}_${LATEST_FW}.tar
+    if [ $? -ne 0 ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Package is corrupt (extraction failed). Remove it from /tmp/sd and retry."
+        exit
+    fi
     rm ${MODEL_SUFFIX}_${LATEST_FW}.tar
     # Consume the manual x.x.x package (if this install used one), otherwise
     # the next upgrade click re-installs the stale file instead of checking
@@ -271,7 +281,17 @@ elif [ "$VAL" == "preupgrade" ] ; then
 
     # Prepare new hack
     gzip -d ${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz
+    if [ $? -ne 0 ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Package is corrupt (decompression failed). Remove it from /tmp/sd and retry."
+        exit
+    fi
     tar xvf ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
+    if [ $? -ne 0 ]; then
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Package is corrupt (extraction failed). Remove it from /tmp/sd and retry."
+        exit
+    fi
     rm ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
     # Consume the manual x.x.x package (if this install used one), otherwise
     # the next upgrade click re-installs the stale file instead of checking
