@@ -135,6 +135,10 @@ elif [ "$VAL" == "upgrade" ] ; then
     gzip -d ${MODEL_SUFFIX}_${LATEST_FW}.tgz
     tar xvf ${MODEL_SUFFIX}_${LATEST_FW}.tar
     rm ${MODEL_SUFFIX}_${LATEST_FW}.tar
+    # Consume the manual x.x.x package (if this install used one), otherwise
+    # the next upgrade click re-installs the stale file instead of checking
+    # GitHub.
+    rm -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz
     mkdir -p /tmp/sd/${MODEL_SUFFIX}/yi-hack-v5/etc
     cp -rf /tmp/sd/${MODEL_SUFFIX}.conf/* /tmp/sd/${MODEL_SUFFIX}/yi-hack-v5/etc/
 
@@ -269,6 +273,10 @@ elif [ "$VAL" == "preupgrade" ] ; then
     gzip -d ${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz
     tar xvf ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
     rm ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
+    # Consume the manual x.x.x package (if this install used one), otherwise
+    # the next upgrade click re-installs the stale file instead of checking
+    # GitHub.
+    rm -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz
     mkdir -p /tmp/sd/${MODEL_SUFFIX}/yi-hack-v5/etc
     cp -rf /tmp/sd/${MODEL_SUFFIX}.conf/* /tmp/sd/${MODEL_SUFFIX}/yi-hack-v5/etc/
 
