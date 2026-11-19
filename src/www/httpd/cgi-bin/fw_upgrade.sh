@@ -17,6 +17,29 @@ BASELINE_PATCH=$(echo $BASELINE_VERSION | cut -d'.' -f3)
 BASELINE_NUM=$(printf "%03d%03d%03d" $BASELINE_MAJOR $BASELINE_MINOR $BASELINE_PATCH)
 MIN_BASELINE_NUM=$(printf "%03d%03d%03d" 0 4 1)
 
+# ver_gt A B: returns 0 when A is a newer version than B.
+# Letter suffixes are later iterations of the same numeric version in
+# this project (0.4.3e > 0.4.3d > 0.4.3), so a numeric tie falls
+# through to the suffixes: no suffix is the oldest, then a, b, c, ...
+ver_gt()
+{
+    A_NUM=$(printf "%03d%03d%03d" $(echo "$1" | sed 's/[^0-9.]//g' | cut -d'.' -f1) $(echo "$1" | sed 's/[^0-9.]//g' | cut -d'.' -f2) $(echo "$1" | sed 's/[^0-9.]//g' | cut -d'.' -f3))
+    B_NUM=$(printf "%03d%03d%03d" $(echo "$2" | sed 's/[^0-9.]//g' | cut -d'.' -f1) $(echo "$2" | sed 's/[^0-9.]//g' | cut -d'.' -f2) $(echo "$2" | sed 's/[^0-9.]//g' | cut -d'.' -f3))
+    if [ "$A_NUM" != "$B_NUM" ]; then
+        [ "$A_NUM" -gt "$B_NUM" ]
+        return
+    fi
+    A_SUF=$(echo "$1" | sed 's/^[0-9.]*//')
+    B_SUF=$(echo "$2" | sed 's/^[0-9.]*//')
+    if [ -z "$A_SUF" ]; then
+        return 1
+    fi
+    if [ -z "$B_SUF" ]; then
+        return 0
+    fi
+    [ "$A_SUF" \> "$B_SUF" ]
+}
+
 export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/home/base/tools:/home/app/localbin:/home/base:/tmp/sd/yi-hack-v5/bin:/tmp/sd/yi-hack-v5/sbin:/tmp/sd/yi-hack-v5/usr/bin:/tmp/sd/yi-hack-v5/usr/sbin
 export LD_LIBRARY_PATH=/lib:/usr/lib:/home/lib:/home/qigan/lib:/home/app/locallib:/tmp/sd:/tmp/sd/gdb:/tmp/sd/yi-hack-v5/lib
 
@@ -159,6 +182,10 @@ elif [ "$VAL" == "upgrade" ] ; then
     # tgz branch's proven pattern) with stdout on /dev/null and
     # answers immediately; the real work happens out of reach of the
     # browser.
+    # NB: the pre-check below only applies to a genuine GitHub fetch -
+    # a local x.x.x package (manual upload) always wins and is never
+    # version-gated, and the detached child re-checks GitHub itself.
+
     if [ -z "$YI_FW_DETACHED" ] ; then
         UP_MARK="/tmp/fwup_upgrading"
         if [ -f "$UP_MARK" ] ; then
@@ -168,6 +195,25 @@ elif [ "$VAL" == "upgrade" ] ; then
                 printf "Content-type: text/html\r\n\r\n"
                 printf "An upgrade is already in progress. The camera will reboot when it finishes."
                 exit
+            fi
+        fi
+        # Pre-check against the info cache (the status page keeps it
+        # fresh with its own polling): when a fresh cache shows no
+        # newer version, answer that immediately instead of dispatching
+        # an install that would only fail - the detached child's error
+        # output goes to /dev/null, so without this the UI would report
+        # "Install started" and then nothing would happen. A stale or
+        # missing cache falls through: the detached install re-checks
+        # GitHub itself.
+        if [ ! -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ] ; then
+            if [ -f /tmp/fwup_info_cache ] ; then
+                C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
+                read C_TS C_FW C_LATEST C_PRE < /tmp/fwup_info_cache
+                if [ -n "$C_TS" ] && [ $(( $(date +%s) - C_TS )) -lt 600 ] && [ -n "$C_LATEST" ] && ! ver_gt "$C_LATEST" "$FW_VERSION"; then
+                    printf "Content-type: text/html\r\n\r\n"
+                    printf "No new firmware available (current: $FW_VERSION, latest: $C_LATEST)."
+                    exit
+                fi
             fi
         fi
         nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=upgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
@@ -228,17 +274,12 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "Unable to contact the firmware repository."
             exit
         fi
-        # Numeric newness check (letter suffix stripped, same trick as
-        # the baseline check at the top) so this never installs a
-        # version equal to or older than the one running - e.g. a
-        # 0.4.3d camera must not be offered the 0.4.2 "latest".
-        LATEST_FW_CLEAN=$(echo $LATEST_FW | sed 's/[^0-9.]//g')
-        LATEST_FW_NUM=$(printf "%03d%03d%03d" $(echo $LATEST_FW_CLEAN | cut -d'.' -f1) $(echo $LATEST_FW_CLEAN | cut -d'.' -f2) $(echo $LATEST_FW_CLEAN | cut -d'.' -f3))
-        FW_VERSION_CLEAN=$(echo $FW_VERSION | sed 's/[^0-9.]//g')
-        FW_VERSION_NUM=$(printf "%03d%03d%03d" $(echo $FW_VERSION_CLEAN | cut -d'.' -f1) $(echo $FW_VERSION_CLEAN | cut -d'.' -f2) $(echo $FW_VERSION_CLEAN | cut -d'.' -f3))
-        if [ -z "$LATEST_FW_NUM" ] || [ -z "$FW_VERSION_NUM" ] || [ "$LATEST_FW_NUM" -le "$FW_VERSION_NUM" ]; then
+        # Newness check (suffix-aware, see ver_gt): an upgrade never
+        # installs a version equal to or older than the one running -
+        # e.g. a 0.4.3d camera must not be offered the 0.4.2 "latest".
+        if ! ver_gt "$LATEST_FW" "$FW_VERSION"; then
             printf "Content-type: text/html\r\n\r\n"
-            printf "No new firmware available."
+            printf "No new firmware available (current: $FW_VERSION, latest: $LATEST_FW)."
             exit
         elif [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
@@ -282,6 +323,10 @@ elif [ "$VAL" == "upgrade" ] ; then
         exit
     fi
     rm ${MODEL_SUFFIX}_${LATEST_FW}.tar
+    # Consume the package itself too: a 13 MB leftover on a small FAT32
+    # SD eats into the next install's staging space and can trip the
+    # free-space check.
+    rm -f ${MODEL_SUFFIX}_${LATEST_FW}.tgz
     # Consume the manual x.x.x package (if this install used one), otherwise
     # the next upgrade click re-installs the stale file instead of checking
     # GitHub.
@@ -378,6 +423,19 @@ elif [ "$VAL" == "preupgrade" ] ; then
                 exit
             fi
         fi
+        # Same cache pre-check as the upgrade branch, against the
+        # pre-release field.
+        if [ ! -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ] ; then
+            if [ -f /tmp/fwup_info_cache ] ; then
+                C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
+                read C_TS C_FW C_LATEST C_PRE < /tmp/fwup_info_cache
+                if [ -n "$C_TS" ] && [ $(( $(date +%s) - C_TS )) -lt 600 ] && [ -n "$C_PRE" ] && ! ver_gt "$C_PRE" "$FW_VERSION"; then
+                    printf "Content-type: text/html\r\n\r\n"
+                    printf "No new firmware available (current: $FW_VERSION, pre-release: $C_PRE)."
+                    exit
+                fi
+            fi
+        fi
         nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=preupgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
         printf "Content-type: text/html\r\n\r\n"
         printf "Install started. The camera will reboot in a few seconds."
@@ -430,16 +488,11 @@ elif [ "$VAL" == "preupgrade" ] ; then
             printf "No pre-release available."
             exit
         fi
-        # Numeric newness check (letter suffix stripped, same trick as
-        # the baseline check at the top) so this never installs a
-        # version equal to or older than the one running.
-        PRERELEASE_FW_CLEAN=$(echo $PRERELEASE_FW | sed 's/[^0-9.]//g')
-        PRERELEASE_FW_NUM=$(printf "%03d%03d%03d" $(echo $PRERELEASE_FW_CLEAN | cut -d'.' -f1) $(echo $PRERELEASE_FW_CLEAN | cut -d'.' -f2) $(echo $PRERELEASE_FW_CLEAN | cut -d'.' -f3))
-        FW_VERSION_CLEAN=$(echo $FW_VERSION | sed 's/[^0-9.]//g')
-        FW_VERSION_NUM=$(printf "%03d%03d%03d" $(echo $FW_VERSION_CLEAN | cut -d'.' -f1) $(echo $FW_VERSION_CLEAN | cut -d'.' -f2) $(echo $FW_VERSION_CLEAN | cut -d'.' -f3))
-        if [ -z "$PRERELEASE_FW_NUM" ] || [ -z "$FW_VERSION_NUM" ] || [ "$PRERELEASE_FW_NUM" -le "$FW_VERSION_NUM" ]; then
+        # Newness check (suffix-aware, see ver_gt): an upgrade never
+        # installs a version equal to or older than the one running.
+        if ! ver_gt "$PRERELEASE_FW" "$FW_VERSION"; then
             printf "Content-type: text/html\r\n\r\n"
-            printf "No new firmware available."
+            printf "No new firmware available (current: $FW_VERSION, pre-release: $PRERELEASE_FW)."
             exit
         elif [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
@@ -483,6 +536,10 @@ elif [ "$VAL" == "preupgrade" ] ; then
         exit
     fi
     rm ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
+    # Consume the package itself too: a 13 MB leftover on a small FAT32
+    # SD eats into the next install's staging space and can trip the
+    # free-space check.
+    rm -f ${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz
     # Consume the manual x.x.x package (if this install used one), otherwise
     # the next upgrade click re-installs the stale file instead of checking
     # GitHub.
