@@ -5,7 +5,10 @@
 YI_HACK_PREFIX="/tmp/sd/yi-hack-v5"
 MODEL_SUFFIX=`cat /home/app/.camver`
 FW_VERSION=`cat /tmp/sd/yi-hack-v5/version`
-BASELINE_VERSION=`cat /home/yi-hack-v5/version`
+# Strip any pre-release letter suffix (e.g. 0.4.3b -> 0.4.3): a non-numeric
+# patch field makes busybox printf emit 0 for it, so a 0.4.x pre-release
+# baseline would be misread as 0.4.0 and fail the check below.
+BASELINE_VERSION=$(echo `cat /home/yi-hack-v5/version 2>/dev/null` | sed 's/[^0-9.]//g')
 
 # Flashed baseline (rootfs and home partitions) must be 0.4.1 or newer
 BASELINE_MAJOR=$(echo $BASELINE_VERSION | cut -d'.' -f1)

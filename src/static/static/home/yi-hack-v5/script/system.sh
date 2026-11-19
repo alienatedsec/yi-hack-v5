@@ -193,9 +193,12 @@ fi
 # must be 0.4.1 or newer; older flashes lack the modifications the hack needs.
 if [ -f "/home/yi-hack-v5/version" ]; then
   version=$(cat /home/yi-hack-v5/version)
-  B_MAJOR=$(echo $version | cut -d'.' -f1)
-  B_MINOR=$(echo $version | cut -d'.' -f2)
-  B_PATCH=$(echo $version | cut -d'.' -f3)
+  # Strip a pre-release letter suffix (0.4.3b -> 0.4.3) before the numeric
+  # parse: busybox printf reads a non-numeric patch field as 0.
+  B_VERSION=$(echo $version | sed 's/[^0-9.]//g')
+  B_MAJOR=$(echo $B_VERSION | cut -d'.' -f1)
+  B_MINOR=$(echo $B_VERSION | cut -d'.' -f2)
+  B_PATCH=$(echo $B_VERSION | cut -d'.' -f3)
   BASELINE_NUM=$(printf "%03d%03d%03d" $B_MAJOR $B_MINOR $B_PATCH)
   MIN_BASELINE_NUM=$(printf "%03d%03d%03d" 0 4 1)
   if [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
