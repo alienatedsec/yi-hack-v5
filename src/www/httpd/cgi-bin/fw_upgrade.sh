@@ -149,6 +149,41 @@ elif [ "$VAL" == "upgrade" ] ; then
         exit
     fi
 
+    # The fetch + download + extraction + reboot takes several minutes.
+    # Running it inside this browser request freezes the single-
+    # threaded httpd the whole time, and the open connection is a live
+    # wire: any page refresh closes it, the httpd dies, and the verbose
+    # tar gets SIGPIPE mid-extraction - leaving a partial staging tree
+    # (rootfs written, home missing) and no reboot. So a request that
+    # is not already the detached install only re-dispatches it (the
+    # tgz branch's proven pattern) with stdout on /dev/null and
+    # answers immediately; the real work happens out of reach of the
+    # browser.
+    if [ -z "$YI_FW_DETACHED" ] ; then
+        UP_MARK="/tmp/fwup_upgrading"
+        if [ -f "$UP_MARK" ] ; then
+            UP_TS=$(cat "$UP_MARK" 2>/dev/null)
+            NOW=$(date +%s)
+            if [ -n "$UP_TS" ] && [ $((NOW - UP_TS)) -lt 900 ] ; then
+                printf "Content-type: text/html\r\n\r\n"
+                printf "An upgrade is already in progress. The camera will reboot when it finishes."
+                exit
+            fi
+        fi
+        nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=upgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Install started. The camera will reboot in a few seconds."
+        exit
+    fi
+    # The detached install owns an in-progress marker until it exits:
+    # on failure the trap removes it (so a retry works right away), on
+    # success the reboot wipes /tmp. It is re-stamped after the
+    # download so a slow WAN fetch cannot age it out of the 900 s
+    # window.
+    UP_MARK="/tmp/fwup_upgrading"
+    printf "%s" "$(date +%s)" > "$UP_MARK"
+    trap 'rm -f "$UP_MARK"' EXIT
+
     # Clean old upgrades
     rm -rf /tmp/sd/${MODEL_SUFFIX}
     rm -rf /tmp/sd/${MODEL_SUFFIX}.conf
@@ -193,7 +228,15 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "Unable to contact the firmware repository."
             exit
         fi
-        if [ "$FW_VERSION" == "$LATEST_FW" ]; then
+        # Numeric newness check (letter suffix stripped, same trick as
+        # the baseline check at the top) so this never installs a
+        # version equal to or older than the one running - e.g. a
+        # 0.4.3d camera must not be offered the 0.4.2 "latest".
+        LATEST_FW_CLEAN=$(echo $LATEST_FW | sed 's/[^0-9.]//g')
+        LATEST_FW_NUM=$(printf "%03d%03d%03d" $(echo $LATEST_FW_CLEAN | cut -d'.' -f1) $(echo $LATEST_FW_CLEAN | cut -d'.' -f2) $(echo $LATEST_FW_CLEAN | cut -d'.' -f3))
+        FW_VERSION_CLEAN=$(echo $FW_VERSION | sed 's/[^0-9.]//g')
+        FW_VERSION_NUM=$(printf "%03d%03d%03d" $(echo $FW_VERSION_CLEAN | cut -d'.' -f1) $(echo $FW_VERSION_CLEAN | cut -d'.' -f2) $(echo $FW_VERSION_CLEAN | cut -d'.' -f3))
+        if [ -z "$LATEST_FW_NUM" ] || [ -z "$FW_VERSION_NUM" ] || [ "$LATEST_FW_NUM" -le "$FW_VERSION_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."
             exit
@@ -209,20 +252,30 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "Unable to download firmware file."
             exit
         fi
+        # The download is the slowest phase; re-stamp the in-progress
+        # marker so it cannot age out while the extraction runs.
+        printf "%s" "$(date +%s)" > "$UP_MARK"
     fi
 
     # Backup configuration
     cp -rf $YI_HACK_PREFIX/etc/* /tmp/sd/${MODEL_SUFFIX}.conf/
     rm /tmp/sd/${MODEL_SUFFIX}.conf/*.tar.gz
 
-    # Prepare new hack
-    gzip -d ${MODEL_SUFFIX}_${LATEST_FW}.tgz
+    # Prepare new hack. -dc + explicit redirect: the output name is
+    # this script's, not the gzip applet's (plain -d names its output
+    # after the input's suffix and that differs between busybox builds,
+    # which is how an install can fail at "tar: no such file").
+    gzip -dc ${MODEL_SUFFIX}_${LATEST_FW}.tgz > ${MODEL_SUFFIX}_${LATEST_FW}.tar
     if [ $? -ne 0 ]; then
         printf "Content-type: text/html\r\n\r\n"
         printf "Package is corrupt (decompression failed). Remove it from /tmp/sd and retry."
         exit
     fi
-    tar xvf ${MODEL_SUFFIX}_${LATEST_FW}.tar
+    # No -v: the verbose listing is written to stdout, which the httpd
+    # routes through a pipe the browser can close at any moment - a
+    # SIGPIPE there kills the extraction mid-run and leaves a partial
+    # staging tree (rootfs written, home missing, no reboot).
+    tar xf ${MODEL_SUFFIX}_${LATEST_FW}.tar
     if [ $? -ne 0 ]; then
         printf "Content-type: text/html\r\n\r\n"
         printf "Package is corrupt (extraction failed). Remove it from /tmp/sd and retry."
@@ -285,12 +338,16 @@ elif [ "$VAL" == "tgz" ] ; then
     # Hand over to the standard local-package path.
     # Move it where the local-package branch expects it, then run that
     # branch detached so the install survives the HTTP client disconnecting
-    # (extraction + reboot takes a few minutes).
+    # (extraction + reboot takes a few minutes). YI_FW_DETACHED marks the
+    # manual path as already detached (no re-dispatch), and the
+    # redirections sit OUTSIDE the sh -c string - inside them they apply
+    # to the child only, and this nohup would hold the response hostage
+    # until the install finished.
     mv "$TGAZ_FILE" "/tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz"
     rm -f "$YI_HACK_PREFIX/fw_upload.tgz" /tmp/sd/fw_upload.tgz
     printf "Content-type: text/html\r\n\r\n"
     printf "Install started. The camera will reboot in a few seconds."
-    nohup sh -c "env QUERY_STRING=get=upgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh > /dev/null 2>&1" &
+    nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=upgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
     exit
 
 elif [ "$VAL" == "preupgrade" ] ; then
@@ -306,6 +363,29 @@ elif [ "$VAL" == "preupgrade" ] ; then
         printf "No space left on SD."
         exit
     fi
+
+    # Same detach as the upgrade branch: the install runs out of reach
+    # of the browser connection, so a page refresh mid-install cannot
+    # kill it.
+    if [ -z "$YI_FW_DETACHED" ] ; then
+        UP_MARK="/tmp/fwup_upgrading"
+        if [ -f "$UP_MARK" ] ; then
+            UP_TS=$(cat "$UP_MARK" 2>/dev/null)
+            NOW=$(date +%s)
+            if [ -n "$UP_TS" ] && [ $((NOW - UP_TS)) -lt 900 ] ; then
+                printf "Content-type: text/html\r\n\r\n"
+                printf "An upgrade is already in progress. The camera will reboot when it finishes."
+                exit
+            fi
+        fi
+        nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=preupgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
+        printf "Content-type: text/html\r\n\r\n"
+        printf "Install started. The camera will reboot in a few seconds."
+        exit
+    fi
+    UP_MARK="/tmp/fwup_upgrading"
+    printf "%s" "$(date +%s)" > "$UP_MARK"
+    trap 'rm -f "$UP_MARK"' EXIT
 
     # Clean old upgrades
     rm -rf /tmp/sd/${MODEL_SUFFIX}
@@ -350,7 +430,14 @@ elif [ "$VAL" == "preupgrade" ] ; then
             printf "No pre-release available."
             exit
         fi
-        if [ "$FW_VERSION" == "$PRERELEASE_FW" ]; then
+        # Numeric newness check (letter suffix stripped, same trick as
+        # the baseline check at the top) so this never installs a
+        # version equal to or older than the one running.
+        PRERELEASE_FW_CLEAN=$(echo $PRERELEASE_FW | sed 's/[^0-9.]//g')
+        PRERELEASE_FW_NUM=$(printf "%03d%03d%03d" $(echo $PRERELEASE_FW_CLEAN | cut -d'.' -f1) $(echo $PRERELEASE_FW_CLEAN | cut -d'.' -f2) $(echo $PRERELEASE_FW_CLEAN | cut -d'.' -f3))
+        FW_VERSION_CLEAN=$(echo $FW_VERSION | sed 's/[^0-9.]//g')
+        FW_VERSION_NUM=$(printf "%03d%03d%03d" $(echo $FW_VERSION_CLEAN | cut -d'.' -f1) $(echo $FW_VERSION_CLEAN | cut -d'.' -f2) $(echo $FW_VERSION_CLEAN | cut -d'.' -f3))
+        if [ -z "$PRERELEASE_FW_NUM" ] || [ -z "$FW_VERSION_NUM" ] || [ "$PRERELEASE_FW_NUM" -le "$FW_VERSION_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "No new firmware available."
             exit
@@ -366,20 +453,30 @@ elif [ "$VAL" == "preupgrade" ] ; then
             printf "Unable to download firmware file."
             exit
         fi
+        # The download is the slowest phase; re-stamp the in-progress
+        # marker so it cannot age out while the extraction runs.
+        printf "%s" "$(date +%s)" > "$UP_MARK"
     fi
 
     # Backup configuration
     cp -rf $YI_HACK_PREFIX/etc/* /tmp/sd/${MODEL_SUFFIX}.conf/
     rm /tmp/sd/${MODEL_SUFFIX}.conf/*.tar.gz
 
-    # Prepare new hack
-    gzip -d ${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz
+    # Prepare new hack. -dc + explicit redirect: the output name is
+    # this script's, not the gzip applet's (plain -d names its output
+    # after the input's suffix and that differs between busybox builds,
+    # which is how an install can fail at "tar: no such file").
+    gzip -dc ${MODEL_SUFFIX}_${PRERELEASE_FW}.tgz > ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
     if [ $? -ne 0 ]; then
         printf "Content-type: text/html\r\n\r\n"
         printf "Package is corrupt (decompression failed). Remove it from /tmp/sd and retry."
         exit
     fi
-    tar xvf ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
+    # No -v: the verbose listing is written to stdout, which the httpd
+    # routes through a pipe the browser can close at any moment - a
+    # SIGPIPE there kills the extraction mid-run and leaves a partial
+    # staging tree (rootfs written, home missing, no reboot).
+    tar xf ${MODEL_SUFFIX}_${PRERELEASE_FW}.tar
     if [ $? -ne 0 ]; then
         printf "Content-type: text/html\r\n\r\n"
         printf "Package is corrupt (extraction failed). Remove it from /tmp/sd and retry."
