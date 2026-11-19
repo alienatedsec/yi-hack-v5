@@ -182,9 +182,11 @@ elif [ "$VAL" == "upgrade" ] ; then
     # tgz branch's proven pattern) with stdout on /dev/null and
     # answers immediately; the real work happens out of reach of the
     # browser.
-    # NB: the pre-check below only applies to a genuine GitHub fetch -
-    # a local x.x.x package (manual upload) always wins and is never
-    # version-gated, and the detached child re-checks GitHub itself.
+    # NB: the direction check below only applies to a genuine GitHub
+    # fetch - a local x.x.x package (manual upload) always wins. There
+    # is deliberately NO newness gate: the button is a pin to whatever
+    # GitHub reports, and downgrading (e.g. back to the stable line)
+    # is a deliberate operation the user may want.
 
     if [ -z "$YI_FW_DETACHED" ] ; then
         UP_MARK="/tmp/fwup_upgrading"
@@ -197,28 +199,22 @@ elif [ "$VAL" == "upgrade" ] ; then
                 exit
             fi
         fi
-        # Pre-check against the info cache (the status page keeps it
-        # fresh with its own polling): when a fresh cache shows no
-        # newer version, answer that immediately instead of dispatching
-        # an install that would only fail - the detached child's error
-        # output goes to /dev/null, so without this the UI would report
-        # "Install started" and then nothing would happen. A stale or
-        # missing cache falls through: the detached install re-checks
-        # GitHub itself.
-        if [ ! -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ] ; then
-            if [ -f /tmp/fwup_info_cache ] ; then
-                C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
-                read C_TS C_FW C_LATEST C_PRE < /tmp/fwup_info_cache
-                if [ -n "$C_TS" ] && [ $(( $(date +%s) - C_TS )) -lt 600 ] && [ -n "$C_LATEST" ] && ! ver_gt "$C_LATEST" "$FW_VERSION"; then
-                    printf "Content-type: text/html\r\n\r\n"
-                    printf "No new firmware available (current: $FW_VERSION, latest: $C_LATEST)."
-                    exit
-                fi
+        # No newness gate on this button: the user may deliberately
+        # downgrade (e.g. moving a camera off the pre-release train
+        # back to the stable line), so it installs whatever GitHub
+        # reports as latest. A fresh info cache tells us the direction,
+        # so a downgrade announces itself instead of running silently.
+        UP_MSG="Install started. The camera will reboot in a few seconds."
+        if [ ! -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ] && [ -f /tmp/fwup_info_cache ] ; then
+            C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
+            read C_TS C_FW C_LATEST C_PRE < /tmp/fwup_info_cache
+            if [ -n "$C_TS" ] && [ $(( $(date +%s) - C_TS )) -lt 600 ] && [ -n "$C_LATEST" ] && ! ver_gt "$C_LATEST" "$FW_VERSION" ; then
+                UP_MSG="Downgrade to $C_LATEST started (current: $FW_VERSION). The camera will reboot in a few seconds."
             fi
         fi
         nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=upgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
         printf "Content-type: text/html\r\n\r\n"
-        printf "Install started. The camera will reboot in a few seconds."
+        printf "%s" "$UP_MSG"
         exit
     fi
     # The detached install owns an in-progress marker until it exits:
@@ -274,14 +270,12 @@ elif [ "$VAL" == "upgrade" ] ; then
             printf "Unable to contact the firmware repository."
             exit
         fi
-        # Newness check (suffix-aware, see ver_gt): an upgrade never
-        # installs a version equal to or older than the one running -
-        # e.g. a 0.4.3d camera must not be offered the 0.4.2 "latest".
-        if ! ver_gt "$LATEST_FW" "$FW_VERSION"; then
-            printf "Content-type: text/html\r\n\r\n"
-            printf "No new firmware available (current: $FW_VERSION, latest: $LATEST_FW)."
-            exit
-        elif [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
+        # No newness gate here: the button is a pin to the stable
+        # latest, and downgrading is deliberate (a camera on the
+        # 0.4.3 pre-release train can be moved back to the 0.4.2
+        # stable by clicking it). Whatever GitHub reports is what the
+        # camera ends up with. The baseline gate below still applies.
+        if [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Wrong baseline version"
             exit
@@ -423,22 +417,20 @@ elif [ "$VAL" == "preupgrade" ] ; then
                 exit
             fi
         fi
-        # Same cache pre-check as the upgrade branch, against the
-        # pre-release field.
-        if [ ! -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ] ; then
-            if [ -f /tmp/fwup_info_cache ] ; then
-                C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
-                read C_TS C_FW C_LATEST C_PRE < /tmp/fwup_info_cache
-                if [ -n "$C_TS" ] && [ $(( $(date +%s) - C_TS )) -lt 600 ] && [ -n "$C_PRE" ] && ! ver_gt "$C_PRE" "$FW_VERSION"; then
-                    printf "Content-type: text/html\r\n\r\n"
-                    printf "No new firmware available (current: $FW_VERSION, pre-release: $C_PRE)."
-                    exit
-                fi
+        # Same as the upgrade branch: the button is a pin to the
+        # newest pre-release, and downgrading is deliberate, so a
+        # fresh cache only steers the message, never blocks.
+        UP_MSG="Install started. The camera will reboot in a few seconds."
+        if [ ! -f /tmp/sd/${MODEL_SUFFIX}_x.x.x.tgz ] && [ -f /tmp/fwup_info_cache ] ; then
+            C_TS=""; C_FW=""; C_LATEST=""; C_PRE=""
+            read C_TS C_FW C_LATEST C_PRE < /tmp/fwup_info_cache
+            if [ -n "$C_TS" ] && [ $(( $(date +%s) - C_TS )) -lt 600 ] && [ -n "$C_PRE" ] && ! ver_gt "$C_PRE" "$FW_VERSION" ; then
+                UP_MSG="Downgrade to $C_PRE started (current: $FW_VERSION). The camera will reboot in a few seconds."
             fi
         fi
         nohup sh -c "env YI_FW_DETACHED=1 QUERY_STRING=get=preupgrade sh $YI_HACK_PREFIX/www/cgi-bin/fw_upgrade.sh" > /dev/null 2>&1 &
         printf "Content-type: text/html\r\n\r\n"
-        printf "Install started. The camera will reboot in a few seconds."
+        printf "%s" "$UP_MSG"
         exit
     fi
     UP_MARK="/tmp/fwup_upgrading"
@@ -488,13 +480,11 @@ elif [ "$VAL" == "preupgrade" ] ; then
             printf "No pre-release available."
             exit
         fi
-        # Newness check (suffix-aware, see ver_gt): an upgrade never
-        # installs a version equal to or older than the one running.
-        if ! ver_gt "$PRERELEASE_FW" "$FW_VERSION"; then
-            printf "Content-type: text/html\r\n\r\n"
-            printf "No new firmware available (current: $FW_VERSION, pre-release: $PRERELEASE_FW)."
-            exit
-        elif [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
+        # No newness gate: same pin semantics as the upgrade branch -
+        # the newest pre-release is what gets installed, even when it
+        # is older than the one running (moving a camera back to an
+        # earlier pre-release). The baseline gate below still applies.
+        if [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
             printf "Content-type: text/html\r\n\r\n"
             printf "Wrong baseline version"
             exit
