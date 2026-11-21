@@ -18,3 +18,4 @@ cd onvif_simple_server
 git reset --hard
 
 patch -p1 < ../path.patch
+patch -p1 < ../uid.patch

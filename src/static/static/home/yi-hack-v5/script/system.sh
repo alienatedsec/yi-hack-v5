@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 0.4.2
+# 0.4.3
 
 CONF_FILE="etc/system.conf"
 
@@ -189,10 +189,19 @@ if [ ! -d "/home/yi-hack-v5/lib" ]; then
         cp -a /tmp/sd/yi-hack-v5/lib/. /home/yi-hack-v5/lib/
 fi
 
-# Version Firmware Check
+# Version Firmware Check - the flashed baseline (rootfs and home partitions)
+# must be 0.4.1 or newer; older flashes lack the modifications the hack needs.
 if [ -f "/home/yi-hack-v5/version" ]; then
   version=$(cat /home/yi-hack-v5/version)
-  if [[ "$version" != "0.4.1" ]]; then
+  # Strip a pre-release letter suffix (0.4.3b -> 0.4.3) before the numeric
+  # parse: busybox printf reads a non-numeric patch field as 0.
+  B_VERSION=$(echo $version | sed 's/[^0-9.]//g')
+  B_MAJOR=$(echo $B_VERSION | cut -d'.' -f1)
+  B_MINOR=$(echo $B_VERSION | cut -d'.' -f2)
+  B_PATCH=$(echo $B_VERSION | cut -d'.' -f3)
+  BASELINE_NUM=$(printf "%03d%03d%03d" $B_MAJOR $B_MINOR $B_PATCH)
+  MIN_BASELINE_NUM=$(printf "%03d%03d%03d" 0 4 1)
+  if [ "$BASELINE_NUM" -lt "$MIN_BASELINE_NUM" ]; then
     echo "Your baseline $version (rootfs and home partitions) is incorrect. Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267"
     echo "Your baseline $version (rootfs and home partitions) is incorrect, Ignore if you are using a pre-release version. Please refer to https://github.com/alienatedsec/yi-hack-v5/discussions/267" > "/tmp/sd/hackerror.txt"
   fi
@@ -276,7 +285,7 @@ mkdir -p $YI_HACK_PREFIX/etc/dropbear
 fi
 
 if [[ $(get_config MQTT) == "yes" ]] ; then
-    mqttv4 &
+    mqttv4 -t local &
     mqtt-config &
     $YI_HACK_PREFIX/script/conf2mqtt.sh &
 fi
@@ -356,6 +365,12 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
         ONVIF_NETIF="wlan0"
     else
         ONVIF_NETIF="eth0"
+    fi
+    # Stable device UID for ONVIF/WS-Discovery (#107): user-configurable,
+    # falls back to the camera serial number so it never changes between boots.
+    ONVIF_UID=$(get_config ONVIF_UID)
+    if [ -z "$ONVIF_UID" ]; then
+        ONVIF_UID="$SERIAL_NUMBER"
     fi
 
     ONVIF_SRVD_CONF="/tmp/onvif_simple_server.conf"
@@ -443,7 +458,7 @@ if [[ $(get_config ONVIF) == "yes" ]] ; then
     onvif_notify_server --conf_file $ONVIF_SRVD_CONF
 
     if [[ $(get_config ONVIF_WSDD) == "yes" ]] ; then
-        wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m `hostname` -n Yi
+        wsd_simple_server --pid_file /var/run/wsd_simple_server.pid --if_name $ONVIF_NETIF --xaddr "http://%s$D_HTTPD_PORT/onvif/device_service" -m $(hostname) -n Yi --uid $ONVIF_UID
     fi
 fi
 

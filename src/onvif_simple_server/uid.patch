@@ -1,0 +1,54 @@
+diff --git a/wsd_simple_server.c b/wsd_simple_server.c
+index 686bcd4..6a7e4a2 100644
+--- a/wsd_simple_server.c
++++ b/wsd_simple_server.c
+@@ -67,6 +67,7 @@ int exit_main;
+ int msg_number;
+ char uuid[UUID_LEN + 1];
+ char msg_uuid[UUID_LEN + 1];
++char uid[UUID_LEN + 1];
+ 
+ char model[64];
+ char hardware[64];
+@@ -269,6 +270,7 @@ int main(int argc, char **argv)  {
+             {"if_name",  required_argument, 0, 'i'},
+             {"pid_file",  required_argument, 0, 'p'},
+             {"xaddr",  required_argument, 0, 'x'},
++            {"uid",  required_argument, 0, 'u'},
+             {"model",  required_argument, 0, 'm'},
+             {"hardware",  required_argument, 0, 'n'},
+             {"foreground",  no_argument, 0, 'f'},
+@@ -279,7 +281,7 @@ int main(int argc, char **argv)  {
+         /* getopt_long stores the option index here. */
+         int option_index = 0;
+ 
+-        c = getopt_long (argc, argv, "i:p:x:m:n:fd:h",
++        c = getopt_long (argc, argv, "i:p:x:u:m:n:fd:h",
+                          long_options, &option_index);
+ 
+         /* Detect the end of the options. */
+@@ -295,6 +297,15 @@ int main(int argc, char **argv)  {
+             xaddr_s = optarg;
+             break;
+ 
++        case 'u':
++            if (strlen(optarg) < sizeof(uid)) {
++                strcpy(uid, optarg);
++            } else {
++                print_usage(argv[0]);
++                exit(EXIT_FAILURE);
++            }
++            break;
++
+         case 'm':
+             if (strlen(optarg) < sizeof(model)) {
+                 strcpy(model, optarg);
+@@ -461,6 +472,8 @@ int main(int argc, char **argv)  {
+     sprintf(s_tmp, "%d", msg_number);
+     gen_uuid(uuid);
+     gen_uuid(msg_uuid);
++    if (uid[0] != '\0')
++        strcpy(uuid, uid);
+ 
+     sprintf(xaddr, xaddr_s, address);
+ 

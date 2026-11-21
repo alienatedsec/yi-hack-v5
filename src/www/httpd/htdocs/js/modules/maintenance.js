@@ -4,11 +4,18 @@ APP.maintenance = (function($) {
 
     var timeoutVar;
 
+    var fwpkgUploadButton;
+    var fwpkgInstallButton;
+    var fwpkgStatus;
+    var fwpkgUploaded=false;
+    var configs={};
+
     function init() {
         registerEventHandler();
         setRebootStatus("Camera is online.");
         getFwStatus();
         getPreFwStatus();
+        initFwPackage();
     }
 
     function registerEventHandler() {
@@ -29,6 +36,12 @@ APP.maintenance = (function($) {
         });
         $(document).on("click", '#button-preupgrade', function(e) {
             preupgradeFirmware();
+        });
+        $(document).on("click", '#button-fwpkg-upload', function(e) {
+            uploadFwPackage();
+        });
+        $(document).on("click", '#button-fwpkg-install', function(e) {
+            installFwPackage();
         });
     }
 
@@ -217,6 +230,13 @@ APP.maintenance = (function($) {
                 setFwStatus("Error getting fw info");
             },
             success: function(data) {
+                if (data.checking) {
+                    // The camera is checking GitHub in the background -
+                    // re-poll until the check lands in the cache.
+                    setFwStatus("Installed: " + data.fw_version + " - checking for updates...");
+                    setTimeout(getFwStatus, 5000);
+                    return;
+                }
                 setFwStatus("Installed: " + data.fw_version + " - Available: " + data.latest_fw);
                 if (data.fw_version == data.latest_fw) {
                     $('#button-upgrade').attr("disabled", true);
@@ -235,14 +255,148 @@ APP.maintenance = (function($) {
                 setPreFwStatus("Error getting fw info");
             },
             success: function(data) {
+                if (data.checking) {
+                    setPreFwStatus("Installed: " + data.fw_version + " - checking for pre-releases...");
+                    setTimeout(getPreFwStatus, 5000);
+                    return;
+                }
                 setPreFwStatus("Installed: " + data.fw_version + " - Available: " + data.prerelease_fw);
-                if (data.fw_version == data.prelease_fw) {
+                if (data.fw_version == data.prerelease_fw) {
                     $('#button-preupgrade').attr("disabled", true);
                 }
             }
         });
     }
     
+    function initFwPackage() {
+        fwpkgUploadButton=$("#button-fwpkg-upload");
+        fwpkgInstallButton=$("#button-fwpkg-install");
+        fwpkgStatus=$("#fwpkg-status");
+        $.ajax({
+            type: "GET",
+            url: 'cgi-bin/update_backend.sh',
+            dataType: "json",
+            success: function(response) {
+                $.each(response, function (key, state) {
+                    configs[key]=state;
+                });
+                if(response["IS_SD_PRESENT"]=="NO") {
+                    $("#fwpkg-tbody").text("An SD card must be present in the camera to install a firmware package.");
+                    fwpkgInstallButton.prop('disabled', true);
+                }
+            },
+            error: function(response) {
+                console.log('error', response);
+            }
+        });
+    }
+
+    function updateFwPkgStatus(text)
+    {
+        if(fwpkgStatus)
+            fwpkgStatus.text(text);
+    }
+
+    function uploadFwPackage()
+    {
+        if(configs["IS_SD_PRESENT"]=="NO")
+        {
+            alert("An SD card must be present in the camera to install a firmware package.");
+            return;
+        }
+
+        var fileInput=document.getElementById("file-fwpkg");
+        if(!fileInput || !fileInput.files || fileInput.files.length==0)
+        {
+            alert("Choose a .tgz package file first.");
+            return;
+        }
+
+        var fname=fileInput.files[0].name;
+        if(!fname.toLowerCase().endsWith(".tgz"))
+        {
+            alert("Only .tgz packages are supported.");
+            return;
+        }
+
+        fwpkgUploadButton.prop('value', 'Uploading...');
+        updateFwPkgStatus("Uploading " + fname + " ... this can take a while.");
+
+        var fd = new FormData();
+        fd.append('file', fileInput.files[0]);
+        $.ajax({
+            url: "cgi-bin/upload.sh?file=fw_upload.tgz",
+            type: 'POST',
+            data: fd,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // The camera's Wi-Fi link is slow (~1 MB in 7 s), so show
+            // the transfer percentage - a frozen "Uploading..." makes
+            // users think the upload is dead and abort it.
+            xhr: function() {
+                var x = new XMLHttpRequest();
+                x.upload.addEventListener("progress", function(e) {
+                    if (e.lengthComputable) {
+                        updateFwPkgStatus("Uploading " + fname + " ... " + Math.round(e.loaded / e.total * 100) + "%");
+                    }
+                });
+                return x;
+            },
+            success: function(data){
+                fwpkgUploadButton.prop('value', 'Upload');
+                if (data && String(data.error) === "true") {
+                    // The CGI verified the transfer and found it short.
+                    updateFwPkgStatus((data.message || "Upload failed.") + " Please retry.");
+                    return;
+                }
+                fwpkgUploaded=true;
+                fwpkgInstallButton.prop('disabled', false);
+                updateFwPkgStatus("Package uploaded. Ready to install.");
+            },
+            error: function(xhr){
+                fwpkgUploadButton.prop('value', 'Upload');
+                if (xhr && xhr.status === 0) {
+                    // Network-level failure: the connection dropped
+                    // before the transfer finished.
+                    updateFwPkgStatus("Upload failed - the connection dropped before the transfer finished. Please retry.");
+                } else {
+                    updateFwPkgStatus("Upload failed (HTTP " + (xhr ? xhr.status : "unknown") + "). Please retry.");
+                }
+            }
+        });
+    }
+
+    function installFwPackage()
+    {
+        if(!fwpkgUploaded)
+        {
+            alert("Upload a package first.");
+            return;
+        }
+
+        if(!confirm("Install the uploaded package?\nThe camera will reboot and take a couple of minutes."))
+            return;
+
+        fwpkgInstallButton.prop('value', 'Installing...');
+        updateFwPkgStatus("Installing. The camera will reboot in a few seconds.");
+
+        $.ajax({
+            url: "cgi-bin/fw_upgrade.sh?get=tgz",
+            type: "GET",
+            timeout: 30000,
+            success: function(data){
+                if(String(data).indexOf("Download completed") >= 0)
+                    updateFwPkgStatus(data + " The camera will reboot shortly.");
+                else
+                    updateFwPkgStatus(data);
+            },
+            error: function(){
+                updateFwPkgStatus("Install started. The camera will reboot shortly.");
+            }
+        });
+    }
+
     return {
         init: init
     };

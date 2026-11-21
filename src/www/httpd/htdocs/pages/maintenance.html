@@ -101,5 +101,40 @@
             </tbody>
         </table>
 
+        <h5 class="tiny-margin strong">Update from file</h5>
+        <hr class="no-margin"/>
+
+        <table class="u-full-width padded-table">
+            <tbody id="fwpkg-tbody">
+            <tr class="row">
+                <td>
+                    <input class="u-full-width" type="file" id="file-fwpkg"/>
+                    <span class="switch-description">Upload a yi-hack tgz package (e.g. yi_dome_0.4.3b.tgz). After the upload completes, press Install: the camera backs up its configuration, installs the package and reboots. The package installs the yi-hack tree and, when the SD card is FAT32, also updates the camera's baseline (rootfs and home partitions).</span>
+                </td>
+                <td>
+                    <input class="button-primary" type="button" id="button-fwpkg-upload" value="Upload"/>
+                    <input class="button-primary" type="button" id="button-fwpkg-install" value="Install" disabled=""/>
+                    <div id="fwpkg-status"></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h5 class="tiny-margin strong">Legacy</h5>
+        <hr class="no-margin"/>
+
+        <table class="u-full-width padded-table">
+            <tbody>
+            <tr class="row">
+                <td>
+                    Flash home + rootfs images (v4 style)
+                </td>
+                <td>
+                    <a href="/?page=update">Open the Update page</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
     </div>
 </div>

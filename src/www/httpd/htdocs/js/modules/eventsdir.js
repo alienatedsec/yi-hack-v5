@@ -17,6 +17,8 @@ APP.eventsdir = (function ($) {
     function buttonClick() {
         if (event.target.id=="button-save") {
             saveConfigs();
+        } else if (event.target.id=="button-delete-all") {
+            deleteAll();
         } else {
             deleteDir();
         }
@@ -26,6 +28,23 @@ APP.eventsdir = (function ($) {
         $.ajax({
             type: "GET",
             url: 'cgi-bin/eventsdirdel.sh?dir='+event.target.id.substring(14),
+            dataType: "json",
+            success: function(response) {
+                window.location.reload();
+            },
+            error: function(response) {
+                console.log('error', response);
+            }
+        });
+    }
+
+    function deleteAll() {
+        if (!confirm("Delete all recorded events? This cannot be undone.")) {
+            return;
+        }
+        $.ajax({
+            type: "GET",
+            url: 'cgi-bin/eventsdirdel.sh?dir=all',
             dataType: "json",
             success: function(response) {
                 window.location.reload();
@@ -110,6 +129,7 @@ APP.eventsdir = (function ($) {
                 if (data.records.length == 0) {
                     html += "<tr><td>No events</td><td></td></tr>";
                 } else {
+                    html += "<tr><td colspan=\"3\"><input class=\"button-primary\" type=\"button\" id=\"button-delete-all\" value=\"Delete all\"/></td></tr>";
                     for (var i = 0; i < data.records.length; i++) {
                         var record = data.records[i];
                         html += "<tr><td>" + record.datetime + "</td>";
